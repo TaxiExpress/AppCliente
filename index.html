@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TaxiExpress</title>
+    <link rel="stylesheet" href="components/lungo/lungo.css">
+    <link rel="stylesheet" href="components/lungo/lungo.icon.css">
+    <link rel="stylesheet" href="components/lungo/lungo.theme.css">
+</head>
+<body>	
+    <section id="init_s" class="initial_section" >
+        <article id="init_a" class="active splash">
+            <span class="logo"><img src="img/logo.png" alt="logo"></span>
+            <span class="load"><img src="img/loading.gif" alt="Cargando..." /></span>
+            <span class="name">taxiexpress.com</span>
+       </article>
+    </section>
+
+    <aside id="tools_s">
+        <article id ="tools_a" class="active list">            
+            <li class="profile" data-view-section="profile_s">
+                <img src="https://scontent-b-mad.xx.fbcdn.net/hphotos-prn2/1426161_10201819061252704_667174747_n.jpg" alt="" />
+                <div>
+                    <strong>David Lallana</strong>
+                    <small data-icon="envelope">davidlallana@gmail.com</small>
+                    <small data-icon="phone">677 399 899</small>
+                </div>
+            </li>
+            <li data-view-section="routes_s">Trayectos realizados</li>
+            <li data-view-section="favorites_s">Taxistas favoritos</li>
+            <li data-view-section="tools_s">Configuración</li>
+            <li data-view-section="social_s">Redes sociales</li>
+            <li data-view-section="payment_s">Formas de pago</li>
+            <li data-view-section="faq_s">F.A.Q.</li>
+            <li data-view-section="legalAdvice_s">Aviso Legal</li>
+            <li>Cerrar sesión</li>
+        </article>
+    </aside>   
+
+    <section id="home_s" data-transition="slide" data-pull="arrow-down">        
+        <header>
+            <h1 class="title centered">Taxi Express</h1>
+            <nav>
+                <a href="#" data-view-aside="tools_s" data-icon="align-left"></a>
+            </nav>
+            <nav class="on-right">
+                <a href="#" id="filters" data-view-section="filters_s" data-icon="bookmark-empty"></a>
+            </nav>
+        </header>  
+        <nav data-control="groupbar">
+            <a href="#" id="taxis_b" data-view-article="taxis_a" data-label="Lista"></a>
+            <a href="#" id="map_b" data-view-article="map_a" data-label="Mapa" ></a>
+        </nav>
+        <article id="taxis_a" class="list form active scroll" >
+            <li class="thumb arrow" data-view-section="chosenTaxi_s">                
+                <div class="on-right">1 minuto</div>
+                <img src="http://www.sixt.com/uploads/pics/mercedes_03.png" alt="" />
+                <div>
+                    <strong>a 402 metros</strong>
+                    <small>Ernesto Gutierrez</small>
+                    <small><strong>★★★☆☆</strong></small>
+                </div>
+            </li>     
+            <li class="thumb arrow" data-view-section="chosenTaxi_s">                
+                <div class="on-right">2 minutos</div>
+                <img src="http://mundosoloautos.com.mx/wp-content/uploads/2012/06/audi-logo1.jpg" alt="" />
+                <div>
+                    <strong>a 1209 metros</strong>
+                    <small>Paco Paquito Paco</small>
+                    <small><strong>★☆☆☆☆</strong></small>
+                </div>
+            </li>   
+            <li class="thumb arrow" data-view-section="chosenTaxi_s">                
+                <div class="on-right">5 minutos</div>
+                <img src="http://www.kaosconcept.net/wp-content/logo-peugeot-nuevo.gif" alt="" />
+                <div>
+                    <strong>a 4695 metros</strong>
+                    <small>Elena Pérez Gómez</small>
+                    <small><strong>★★★★☆</strong></small>
+                </div>
+            </li>   
+        </article>
+        <article id="map_a">
+            <button class="locate" id="refresh" data-icon="screenshot" data-view-article="map_a" ></button>
+            <div id="map-canvas"/>
+        </article>
+    </section>
+
+
+    <section id="profile_s" data-transition="cover">
+        <header data-title="Editar perfil" data-back="angle-left">
+            <nav class="on-right">
+                <a href="#" id="save" data-icon="save"></a>
+            </nav>
+        </header>      
+        <article id="profile_a" class="scroll" >
+            <div class="form list">
+                <li class="anchor contrast">DATOS PERSONALES</li>
+                <img class="avatar" id="avatar" src="https://scontent-b-mad.xx.fbcdn.net/hphotos-prn2/1426161_10201819061252704_667174747_n.jpg" />
+                <fieldset> 
+                    <input type="text" id="reg_name" maxlength="20" placeholder="Nombre" value="David">
+                </fieldset>
+                <fieldset> 
+                    <input type="text" id="reg_surname" maxlength="20" placeholder="Apellidos" value="Lallana Diarte">
+                </fieldset>
+                <li class="anchor contrast">OTROS DATOS</li>
+                <fieldset>                    
+                    <label data-icon="phone"></label>
+                    <small>677 399 899</small>
+                </fieldset>
+                <fieldset>
+                    <label data-icon="envelope"></label>
+                    <small>davidlallana@gmail.com</small>
+                </fieldset>
+                <br/>
+                <fieldset data-icon="angle-right">
+                    <label data-icon="lock"></label>
+                    <small>Cambiar contraseña</small>
+                </fieldset>
+                <input id="reg_image" type="file" style="visibility: hidden"/>                
+            </div>           
+        </article>
+    </section>
+
+    <section id="filters_s" data-transition="cover">
+        <header data-title="Configurar búsqueda" data-back="angle-down"></header>      
+        <article id="filters_a" class="scroll" >
+            <div class="form list">
+                <li class="anchor contrast">CARACTERÍSTICAS DEL VEHÍCULO</li>
+                <fieldset> 
+                    <small>Mínimo número de plazas</small>
+                    <input type="number" id="reg_seats" value="4" min="3">
+                </fieldset> 
+                <li class="anchor contrast">PERMISOS</li>
+                <fieldset> 
+                    <small>Transporte de animales</small>
+                    <input type="checkbox" id="reg_animals" >
+                </fieldset> 
+                <fieldset> 
+                    <small>Permitir comer y beber</small>
+                    <input type="checkbox" id="reg_food" checked >
+                </fieldset>
+                <fieldset> 
+                    <small>Permitir fumar</small>
+                    <input type="checkbox" id="reg_smoke" checked >
+                </fieldset>            
+            </div>           
+        </article>
+    </section>
+
+    <section id="chosenTaxi_s" data-transition="slide">
+        <header data-title="Taxi elegido" data-back="angle-left"></header>      
+        <article id="chosenTaxi_a" class="scroll" >
+            <div class="form list">
+                <li class="anchor contrast">DATOS DEL TAXISTA</li>
+                <img class="avatar" src="http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG" />
+                <fieldset> 
+                    <small>Alfonso García Torreiglesias</small>
+                </fieldset>
+                <fieldset> 
+                    <small class="yellow">★★★★☆</small>
+                </fieldset>
+                <li class="anchor contrast">DATOS DEL VEHÍCULO</li>
+                <fieldset>  
+                    <small><label>Vehículo:</label>Renault Laguna</small>
+                </fieldset>
+                <fieldset>
+                    <small><label>Año de matriculación:</label>2009</small>
+                </fieldset>  
+                <fieldset>  
+                    <small><label>Número de plazas:</label>4</small>
+                </fieldset>
+                <fieldset>
+                    <small><label>Habilitado para minusválidos:</label>No</small>
+                </fieldset>
+                <fieldset>
+                    <small><label>Viaje con animales:</label>Si</small>
+                </fieldset>
+                <button class="anchor accept" data-label="Solicitar taxi"></button>
+            </div>          
+        </article>
+    </section>
+
+    <section id="favorites_s" data-transition="slide">
+        <header data-title="Taxistas favoritos" data-back="angle-left"></header>      
+        <article id="favorites_a" class="scroll" >
+            <div class="form list">
+                <!--    TAXISTAS FAVORITOS   -->
+            </div>          
+        </article>
+    </section>
+
+    <section id="routes_s" data-transition="slide">
+        <header data-title="Trayectos realizados" data-back="angle-left"></header>      
+        <article id="routes_a" class="scroll" >
+            <div class="form list">
+                <!--    TRAYECTOS REALIZADOS    -->
+            </div>          
+        </article>
+    </section>
+
+    <section id="tools_s" data-transition="slide">
+        <header data-title="Configuración" data-back="angle-left"></header>      
+        <article id="tools_a" class="scroll" >
+            <div class="form list">
+                <!--    CONFIGURACION   -->
+            </div>          
+        </article>
+    </section>
+
+    <section id="social_s" data-transition="slide">
+        <header data-title="Redes sociales" data-back="angle-left"></header>      
+        <article id="social_a" class="scroll" >
+            <div class="form list">
+                <!--    REDES SOCIALES   -->
+            </div>          
+        </article>
+    </section>
+
+    <section id="payment_s" data-transition="slide">
+        <header data-title="Formas de pago" data-back="angle-left"></header>      
+        <article id="payment_a" class="scroll" >
+            <div class="form list">
+                <!--    FORMAS DE PAGO    -->
+            </div>          
+        </article>
+    </section>
+
+    <section id="faq_s" data-transition="slide">
+        <header data-title="F.A.Q." data-back="angle-left"></header>      
+        <article id="faq_a" class="scroll" >
+            <div class="form list">
+                <li class="feature">
+                    <p>1- ¿Es segura TaxiExpress?</p>
+                    <p>Claaaro</p><br/>
+                    <p>2- ¿Qué hago si no viene el taxi?</p>
+                    <p>Pedir otro</p>
+                </li>
+            </div>          
+        </article>
+    </section>
+
+    <section id="legalAdvice_s" data-transition="slide">
+        <header data-title="Aviso Legal" data-back="angle-left"></header>      
+        <article id="legalAdvice_a" class="scroll" >
+            <div class="list">
+                <li class="feature">
+                    <p>Nam blandit, libero id posuere ullamcorper, risus eros vulputate ligula, ac volutpat mi turpis vitae libero. Suspendisse non consequat magna. Proin at bibendum tellus, id tincidunt mauris. In hac habitasse platea dictumst. Nullam cursus leo rhoncus, adipiscing elit ac, ultricies neque. Quisque quam ligula, tristique eget rhoncus et, posuere sit amet nunc. Cras accumsan vel erat id dapibus. Praesent ac tortor dui.</p><br/>
+
+                    <p>Integer laoreet sem interdum dui facilisis dictum. Donec posuere nisi nunc. Phasellus lobortis cursus lorem, quis lacinia libero viverra non. Phasellus aliquam purus turpis, et feugiat nunc convallis eu. Vivamus congue metus ligula, non volutpat dolor adipiscing at. Vestibulum eu metus rutrum, rhoncus risus at, pellentesque sapien. Sed ac luctus magna.</p><br/>
+                </li>
+            </div>          
+        </article>
+    </section>
+
+    <script src="components/quojs/quo.js"></script>
+    <script src="components/monocle/monocle.js"></script>
+    <script src="components/lungo/lungo.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script src="app/taxiExpress.js"></script>    
+</html>
