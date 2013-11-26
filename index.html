@@ -80,8 +80,10 @@
                 </div>
             </li>   
         </article>
-        <article id="map_a">
-            <button class="locate" id="refresh" data-icon="screenshot" data-view-article="map_a" ></button>
+        <article id="map_a" class="street" >
+            <img src="img/poi1.png" alt="" />
+            <span id="refresh" class="icon screenshot"></span>
+            <input type="text" id="streetField" value="Buscando ..."></input>
             <div id="map-canvas"/>
         </article>
     </section>
@@ -257,6 +259,6 @@
     <script src="components/monocle/monocle.js"></script>
     <script src="components/lungo/lungo.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-    <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
     <script src="app/taxiExpress.js"></script>    
 </html>

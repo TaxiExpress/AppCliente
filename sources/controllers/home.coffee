@@ -9,6 +9,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
 
   elements:
     "#refresh"                        : "button_refresh"
+    "#streetField"                    : "streetField"
 
   events:
     "singleTap #taxis_b"              : "showTaxis"
@@ -27,7 +28,8 @@ class __Controller.HomeCtrl extends Monocle.Controller
 
   constructor: ->
     super
-    poi_me = new google.maps.MarkerImage("img/poi1.png", null, null, new google.maps.Point(25,25));
+    google.maps.visualRefresh = true
+    poi_me = new google.maps.MarkerImage("img/poi1.png", null, null, new google.maps.Point(24,48));
     poi_taxi = new google.maps.MarkerImage("img/poi2.png", null, null, new google.maps.Point(25,25));
 
   showFilters: (event) =>
@@ -38,26 +40,19 @@ class __Controller.HomeCtrl extends Monocle.Controller
 
   refresh: (event) =>
     console.log "CLICK REFRESH"
-    myPosition.setMap(null)
+    @streetField[0].value = 'Buscando ...'
     if navigator.geolocation
       navigator.geolocation.getCurrentPosition refrescar
     else
       alert("navigator.geolocation is not available");
-    
 
-  refrescar = (location) ->
+  refrescar = (location) =>
     currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude)
-    myPosition = new google.maps.Marker(
-      position: currentLocation
-      icon: poi_me
-      map: map
-    )
+    map.setCenter(currentLocation)
+    positioner(currentLocation)
 
   showMap: (event) =>
     console.log "CLICK MAP"
-    mapcanvas = document.getElementById("map-canvas")
-    mapcanvas.style.height = 100%
-    mapcanvas.style.width = 100%
     Lungo.Notification.show()
     if navigator.geolocation
       navigator.geolocation.getCurrentPosition initialize
@@ -69,7 +64,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
       currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude)
       mapOptions =
         center: currentLocation
-        zoom: 16
+        zoom: 17
         mapTypeId: google.maps.MapTypeId.ROADMAP
         panControl: false
         streetViewControl:false
@@ -77,16 +72,10 @@ class __Controller.HomeCtrl extends Monocle.Controller
         mapTypeControl:false
         zoomControl:false
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
-      myPosition = new google.maps.Marker(
-        position: currentLocation
-        icon: poi_me
-        map: map
-      ) 
-      bounds = new google.maps.LatLngBounds()
-      bounds.extend currentLocation
+      positioner(currentLocation)
       i = 1
       while i < 6
-        pos = new google.maps.LatLng(location.coords.latitude+(i*0.0001), location.coords.longitude)
+        pos = new google.maps.LatLng(location.coords.latitude+(i*0.001), location.coords.longitude)
         marker = new google.maps.Marker(
           position: pos
           icon: poi_taxi
@@ -95,8 +84,25 @@ class __Controller.HomeCtrl extends Monocle.Controller
         google.maps.event.addListener marker, "click", ((marker, i) ->
           ->
             Lungo.Router.section "chosenTaxi_s"
-        )(marker, i)
-        bounds.extend pos
+        )(marker, i)        
         i++
-      map.fitBounds bounds       
+      google.maps.event.addListener map, "dragend", (event) ->
+        positioner(map.getCenter())
     Lungo.Notification.hide()
+
+  positioner = (pos) =>
+    geocoder = new google.maps.Geocoder()
+    geocoder.geocode
+      latLng: pos
+    , (results, status) ->
+      if status is google.maps.GeocoderStatus.OK
+        if results[1]
+          #marker = new google.maps.Marker(
+          #  position: pos
+          #  map: map
+          #)
+          streetField.value = results[0].address_components[1].short_name + ", " +results[0].address_components[0].short_name
+        else
+          alert "No results found"
+      else
+        alert "Geocoder failed due to: " + status

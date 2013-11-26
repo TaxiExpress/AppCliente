@@ -31,7 +31,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.HomeCtrl = (function(_super) {
-    var bounds, currentLocation, initialize, map, myPosition, poi_me, poi_taxi, pull_panel, refrescar,
+    var bounds, currentLocation, initialize, map, myPosition, poi_me, poi_taxi, positioner, pull_panel, refrescar,
       _this = this;
 
     __extends(HomeCtrl, _super);
@@ -49,7 +49,8 @@
     poi_taxi = void 0;
 
     HomeCtrl.prototype.elements = {
-      "#refresh": "button_refresh"
+      "#refresh": "button_refresh",
+      "#streetField": "streetField"
     };
 
     HomeCtrl.prototype.events = {
@@ -75,7 +76,8 @@
       this.showTaxis = __bind(this.showTaxis, this);
       this.showFilters = __bind(this.showFilters, this);
       HomeCtrl.__super__.constructor.apply(this, arguments);
-      poi_me = new google.maps.MarkerImage("img/poi1.png", null, null, new google.maps.Point(25, 25));
+      google.maps.visualRefresh = true;
+      poi_me = new google.maps.MarkerImage("img/poi1.png", null, null, new google.maps.Point(24, 48));
       poi_taxi = new google.maps.MarkerImage("img/poi2.png", null, null, new google.maps.Point(25, 25));
     }
 
@@ -89,7 +91,7 @@
 
     HomeCtrl.prototype.refresh = function(event) {
       console.log("CLICK REFRESH");
-      myPosition.setMap(null);
+      this.streetField[0].value = 'Buscando ...';
       if (navigator.geolocation) {
         return navigator.geolocation.getCurrentPosition(refrescar);
       } else {
@@ -99,18 +101,13 @@
 
     refrescar = function(location) {
       currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
-      return myPosition = new google.maps.Marker({
-        position: currentLocation,
-        icon: poi_me,
-        map: map
-      });
+      map.setCenter(currentLocation);
+      return positioner(currentLocation);
     };
 
     HomeCtrl.prototype.showMap = function(event) {
-      var mapcanvas;
       console.log("CLICK MAP");
-      mapcanvas = document.getElementById("map-canvas");
-      mapcanvas.style.height = 100 % (mapcanvas.style.width = 100 % Lungo.Notification.show());
+      Lungo.Notification.show();
       if (navigator.geolocation) {
         return navigator.geolocation.getCurrentPosition(initialize);
       } else {
@@ -124,7 +121,7 @@
         currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
         mapOptions = {
           center: currentLocation,
-          zoom: 16,
+          zoom: 17,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           panControl: false,
           streetViewControl: false,
@@ -133,16 +130,10 @@
           zoomControl: false
         };
         map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-        myPosition = new google.maps.Marker({
-          position: currentLocation,
-          icon: poi_me,
-          map: map
-        });
-        bounds = new google.maps.LatLngBounds();
-        bounds.extend(currentLocation);
+        positioner(currentLocation);
         i = 1;
         while (i < 6) {
-          pos = new google.maps.LatLng(location.coords.latitude + (i * 0.0001), location.coords.longitude);
+          pos = new google.maps.LatLng(location.coords.latitude + (i * 0.001), location.coords.longitude);
           marker = new google.maps.Marker({
             position: pos,
             icon: poi_taxi,
@@ -153,12 +144,31 @@
               return Lungo.Router.section("chosenTaxi_s");
             };
           })(marker, i));
-          bounds.extend(pos);
           i++;
         }
-        map.fitBounds(bounds);
+        google.maps.event.addListener(map, "dragend", function(event) {
+          return positioner(map.getCenter());
+        });
       }
       return Lungo.Notification.hide();
+    };
+
+    positioner = function(pos) {
+      var geocoder;
+      geocoder = new google.maps.Geocoder();
+      return geocoder.geocode({
+        latLng: pos
+      }, function(results, status) {
+        if (status === google.maps.GeocoderStatus.OK) {
+          if (results[1]) {
+            return streetField.value = results[0].address_components[1].short_name + ", " + results[0].address_components[0].short_name;
+          } else {
+            return alert("No results found");
+          }
+        } else {
+          return alert("Geocoder failed due to: " + status);
+        }
+      });
     };
 
     return HomeCtrl;
