@@ -31,22 +31,12 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.HomeCtrl = (function(_super) {
-    var bounds, currentLocation, initialize, map, myPosition, poi_me, poi_taxi, positioner, pull_panel, refrescar,
+    var initialize, map, positioner, pull_panel, refrescar,
       _this = this;
 
     __extends(HomeCtrl, _super);
 
     map = void 0;
-
-    myPosition = void 0;
-
-    currentLocation = void 0;
-
-    bounds = void 0;
-
-    poi_me = void 0;
-
-    poi_taxi = void 0;
 
     HomeCtrl.prototype.elements = {
       "#refresh": "button_refresh",
@@ -76,9 +66,6 @@
       this.showTaxis = __bind(this.showTaxis, this);
       this.showFilters = __bind(this.showFilters, this);
       HomeCtrl.__super__.constructor.apply(this, arguments);
-      google.maps.visualRefresh = true;
-      poi_me = new google.maps.MarkerImage("img/poi1.png", null, null, new google.maps.Point(24, 48));
-      poi_taxi = new google.maps.MarkerImage("img/poi2.png", null, null, new google.maps.Point(25, 25));
     }
 
     HomeCtrl.prototype.showFilters = function(event) {
@@ -95,11 +82,12 @@
       if (navigator.geolocation) {
         return navigator.geolocation.getCurrentPosition(refrescar);
       } else {
-        return alert("navigator.geolocation is not available");
+        return Lungo.Notification.show("GPS NO HABILITADO");
       }
     };
 
     refrescar = function(location) {
+      var currentLocation;
       currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
       map.setCenter(currentLocation);
       return positioner(currentLocation);
@@ -111,17 +99,17 @@
       if (navigator.geolocation) {
         return navigator.geolocation.getCurrentPosition(initialize);
       } else {
-        return alert("navigator.geolocation is not available");
+        return Lungo.Notification.show("GPS NO HABILITADO");
       }
     };
 
     initialize = function(location) {
-      var i, mapOptions, marker, pos;
+      var currentLocation, mapOptions;
       if (map === void 0) {
         currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
         mapOptions = {
           center: currentLocation,
-          zoom: 17,
+          zoom: 16,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           panControl: false,
           streetViewControl: false,
@@ -131,22 +119,10 @@
         };
         map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
         positioner(currentLocation);
-        i = 1;
-        while (i < 6) {
-          pos = new google.maps.LatLng(location.coords.latitude + (i * 0.001), location.coords.longitude);
-          marker = new google.maps.Marker({
-            position: pos,
-            icon: poi_taxi,
-            map: map
-          });
-          google.maps.event.addListener(marker, "click", (function(marker, i) {
-            return function() {
-              return Lungo.Router.section("chosenTaxi_s");
-            };
-          })(marker, i));
-          i++;
-        }
         google.maps.event.addListener(map, "dragend", function(event) {
+          return positioner(map.getCenter());
+        });
+        google.maps.event.addListener(map, "zoom_changed", function(event) {
           return positioner(map.getCenter());
         });
       }
@@ -163,10 +139,10 @@
           if (results[1]) {
             return streetField.value = results[0].address_components[1].short_name + ", " + results[0].address_components[0].short_name;
           } else {
-            return alert("No results found");
+            return streetField.value = 'Calle desconocida';
           }
         } else {
-          return alert("Geocoder failed due to: " + status);
+          return streetField.value = 'Calle desconocida';
         }
       });
     };
@@ -248,7 +224,7 @@
     };
 
     ProfileCtrl.prototype.clickAvatar = function(event) {
-      return $("#reg_image").click();
+      return this.image[0].click();
     };
 
     ProfileCtrl.prototype.saveChanges = function(event) {

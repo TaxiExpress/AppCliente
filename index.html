@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>TaxiExpress</title>
+    <meta name="viewport" content="width=device-width,user-scalable=false;">
     <link rel="stylesheet" href="components/lungo/lungo.css">
     <link rel="stylesheet" href="components/lungo/lungo.icon.css">
     <link rel="stylesheet" href="components/lungo/lungo.theme.css">
@@ -19,11 +20,10 @@
     <aside id="tools_s">
         <article id ="tools_a" class="active list">            
             <li class="profile" data-view-section="profile_s">
-                <img src="https://scontent-b-mad.xx.fbcdn.net/hphotos-prn2/1426161_10201819061252704_667174747_n.jpg" alt="" />
+                <img src="https://pbs.twimg.com/profile_images/378800000638981863/e6b9769bbd741c6e98e3cb1fb79dbdfb.jpeg" alt="" />
                 <div>
-                    <strong>David Lallana</strong>
-                    <small data-icon="envelope">davidlallana@gmail.com</small>
-                    <small data-icon="phone">677 399 899</small>
+                    <strong>Héctor Gómez Torres</strong>
+                    <small data-icon="phone">655 445 987</small>
                 </div>
             </li>
             <li data-view-section="routes_s">Trayectos realizados</li>
@@ -48,8 +48,8 @@
             </nav>
         </header>  
         <nav data-control="groupbar">
-            <a href="#" id="taxis_b" data-view-article="taxis_a" data-label="Lista"></a>
-            <a href="#" id="map_b" data-view-article="map_a" data-label="Mapa" ></a>
+            <a href="#" id="taxis_b" data-view-article="taxis_a" data-label="Los más cercanos"></a>
+            <a href="#" id="map_b" data-view-article="map_a" data-label="Pedir taxi" ></a>
         </nav>
         <article id="taxis_a" class="list form active scroll" >
             <li class="thumb arrow" data-view-section="chosenTaxi_s">                
@@ -80,10 +80,10 @@
                 </div>
             </li>   
         </article>
-        <article id="map_a" class="street" >
-            <img src="img/poi1.png" alt="" />
+        <article class="street" id="map_a">
+            <div class="marker"><img src="img/poi1.png" alt="" /></div>
             <span id="refresh" class="icon screenshot"></span>
-            <input type="text" id="streetField" value="Buscando ..."></input>
+            <input type="text" id="streetField" value="Buscando ..." readonly="readonly"></input>
             <div id="map-canvas"/>
         </article>
     </section>
@@ -98,21 +98,21 @@
         <article id="profile_a" class="scroll" >
             <div class="form list">
                 <li class="anchor contrast">DATOS PERSONALES</li>
-                <img class="avatar" id="avatar" src="https://scontent-b-mad.xx.fbcdn.net/hphotos-prn2/1426161_10201819061252704_667174747_n.jpg" />
+                <img class="avatar" id="avatar" src="https://pbs.twimg.com/profile_images/378800000638981863/e6b9769bbd741c6e98e3cb1fb79dbdfb.jpeg" />
                 <fieldset> 
-                    <input type="text" id="reg_name" maxlength="20" placeholder="Nombre" value="David">
+                    <input type="text" id="reg_name" maxlength="20" placeholder="Nombre" value="Héctor">
                 </fieldset>
                 <fieldset> 
-                    <input type="text" id="reg_surname" maxlength="20" placeholder="Apellidos" value="Lallana Diarte">
+                    <input type="text" id="reg_surname" maxlength="20" placeholder="Apellidos" value="Gómez Torres">
                 </fieldset>
                 <li class="anchor contrast">OTROS DATOS</li>
                 <fieldset>                    
                     <label data-icon="phone"></label>
-                    <small>677 399 899</small>
+                    <small>655 665 987</small>
                 </fieldset>
                 <fieldset>
                     <label data-icon="envelope"></label>
-                    <small>davidlallana@gmail.com</small>
+                    <small>emaildeprueba@gmail.com</small>
                 </fieldset>
                 <br/>
                 <fieldset data-icon="angle-right">
@@ -258,7 +258,6 @@
     <script src="components/quojs/quo.js"></script>
     <script src="components/monocle/monocle.js"></script>
     <script src="components/lungo/lungo.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
     <script src="app/taxiExpress.js"></script>    
 </html>

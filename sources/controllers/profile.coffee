@@ -43,7 +43,7 @@ class __Controller.ProfileCtrl extends Monocle.Controller
         $("#avatar").attr "src", dataURL
 
   clickAvatar: (event) =>
-    $("#reg_image").click()
+    @image[0].click()
 
   saveChanges: (event) =>
     Lungo.Router.back()
