@@ -7,11 +7,8 @@
 
     function AppCtrl() {
       AppCtrl.__super__.constructor.apply(this, arguments);
-      setTimeout((function() {
-        return Lungo.Router.section("home_s");
-      }), 1000);
+      __Controller.login = new __Controller.LoginCtrl("section#login_s");
       __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
-      __Controller.home = new __Controller.HomeCtrl("section#home_s");
     }
 
     return AppCtrl;
@@ -31,7 +28,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.HomeCtrl = (function(_super) {
-    var initialize, map, positioner, pull_panel, refrescar,
+    var getStreet, initialize, manageErrors, map, updatePosition,
       _this = this;
 
     __extends(HomeCtrl, _super);
@@ -44,67 +41,73 @@
     };
 
     HomeCtrl.prototype.events = {
-      "singleTap #taxis_b": "showTaxis",
-      "singleTap #map_b": "showMap",
-      "singleTap #filters": "showFilters",
-      "singleTap #refresh": "refresh"
+      "singleTap #refresh": "refresh",
+      "singleTap #confirm": "confirm"
     };
-
-    pull_panel = new Lungo.Element.Pull("#taxis_a", {
-      onPull: "Deslizar para abajo para refrescar",
-      onRelease: "Suelta para recargar",
-      onRefresh: "Cargando...",
-      callback: function() {
-        alert("Lista actualizada!");
-        return pull_panel.hide();
-      }
-    });
 
     function HomeCtrl() {
-      this.showMap = __bind(this.showMap, this);
+      this.confirm = __bind(this.confirm, this);
       this.refresh = __bind(this.refresh, this);
-      this.showTaxis = __bind(this.showTaxis, this);
-      this.showFilters = __bind(this.showFilters, this);
+      var options;
       HomeCtrl.__super__.constructor.apply(this, arguments);
+      if (navigator.geolocation) {
+        options = {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 5000
+        };
+        navigator.geolocation.getCurrentPosition(initialize, manageErrors);
+      }
     }
 
-    HomeCtrl.prototype.showFilters = function(event) {
-      return console.log("MUESTRO FIlTROS");
-    };
-
-    HomeCtrl.prototype.showTaxis = function(event) {
-      return console.log("CLICK TAXI");
+    manageErrors = function(err) {
+      return alert("Error de localización GPS");
     };
 
     HomeCtrl.prototype.refresh = function(event) {
+      var options;
       console.log("CLICK REFRESH");
-      this.streetField[0].value = 'Buscando ...';
+      this.streetField[0].value = 'Localizando ...';
       if (navigator.geolocation) {
-        return navigator.geolocation.getCurrentPosition(refrescar);
-      } else {
-        return Lungo.Notification.show("GPS NO HABILITADO");
+        options = {
+          enableHighAccuracy: false,
+          timeout: 5000,
+          maximumAge: 0
+        };
+        return navigator.geolocation.getCurrentPosition(updatePosition, manageErrors);
       }
     };
 
-    refrescar = function(location) {
+    updatePosition = function(location) {
       var currentLocation;
       currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
       map.setCenter(currentLocation);
-      return positioner(currentLocation);
+      return getStreet(currentLocation);
     };
 
-    HomeCtrl.prototype.showMap = function(event) {
-      console.log("CLICK MAP");
-      Lungo.Notification.show();
-      if (navigator.geolocation) {
-        return navigator.geolocation.getCurrentPosition(initialize);
-      } else {
-        return Lungo.Notification.show("GPS NO HABILITADO");
-      }
+    HomeCtrl.prototype.confirm = function(event) {
+      console.log("LOCALIZACION CONFIRMADA");
+      return Lungo.Notification.confirm({
+        title: "¿Qué taxi desea?",
+        description: "Seleccione la opción que  más le convenga",
+        accept: {
+          label: "El más cercano",
+          callback: function() {
+            return alert("Yes!");
+          }
+        },
+        cancel: {
+          label: "Elegir taxi",
+          callback: function() {
+            return Lungo.Router.section("list_s");
+          }
+        }
+      });
     };
 
     initialize = function(location) {
       var currentLocation, mapOptions;
+      Lungo.Router.section("home_s");
       if (map === void 0) {
         currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
         mapOptions = {
@@ -115,21 +118,35 @@
           streetViewControl: false,
           overviewMapControl: false,
           mapTypeControl: false,
-          zoomControl: false
+          zoomControl: false,
+          styles: [
+            {
+              featureType: "poi.business",
+              elementType: "labels",
+              stylers: [
+                {
+                  visibility: "off"
+                }
+              ]
+            }
+          ]
         };
         map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-        positioner(currentLocation);
+        getStreet(currentLocation);
         google.maps.event.addListener(map, "dragend", function(event) {
-          return positioner(map.getCenter());
+          return getStreet(map.getCenter());
+        });
+        google.maps.event.addListener(map, "dragstart", function(event) {
+          return streetField.value = 'Localizando ...';
         });
         google.maps.event.addListener(map, "zoom_changed", function(event) {
-          return positioner(map.getCenter());
+          return getStreet(map.getCenter());
         });
       }
       return Lungo.Notification.hide();
     };
 
-    positioner = function(pos) {
+    getStreet = function(pos) {
       var geocoder;
       geocoder = new google.maps.Geocoder();
       return geocoder.geocode({
@@ -150,6 +167,94 @@
     return HomeCtrl;
 
   }).call(this, Monocle.Controller);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Controller.LoginCtrl = (function(_super) {
+    var credentials, db;
+
+    __extends(LoginCtrl, _super);
+
+    db = void 0;
+
+    credentials = void 0;
+
+    LoginCtrl.prototype.elements = {
+      "#username": "username",
+      "#password": "password"
+    };
+
+    LoginCtrl.prototype.events = {
+      "tap #login_b": "doLogin"
+    };
+
+    function LoginCtrl() {
+      this.read = __bind(this.read, this);
+      this.drop = __bind(this.drop, this);
+      this.doLogin = __bind(this.doLogin, this);
+      var _this = this;
+      LoginCtrl.__super__.constructor.apply(this, arguments);
+      this.db = window.openDatabase("taxiexpress", "1.0", "description", 5 * 1024 * 1024);
+      this.db.transaction(function(tx) {
+        return tx.executeSql("CREATE TABLE IF NOT EXISTS access (username STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL)");
+      });
+      this.read();
+    }
+
+    LoginCtrl.prototype.doLogin = function(event) {
+      var data, profile, url,
+        _this = this;
+      this.drop();
+      this.db.transaction(function(tx) {
+        var sql;
+        sql = "INSERT INTO access (username, pass) VALUES ('" + _this.username[0].value + "','" + _this.password[0].value + "');";
+        return tx.executeSql(sql);
+      });
+      url = "";
+      data = "username=" + this.username[0].value + "&password=" + this.password[0].value;
+      profile = {
+        user: this.username[0].value,
+        pass: this.password[0].value
+      };
+      Lungo.Cache.set("credentials", profile);
+      return __Controller.home = new __Controller.HomeCtrl("section#home_s");
+    };
+
+    LoginCtrl.prototype.drop = function() {
+      var _this = this;
+      return this.db.transaction(function(tx) {
+        return tx.executeSql("DELETE FROM access");
+      });
+    };
+
+    LoginCtrl.prototype.read = function() {
+      var _this = this;
+      return this.db.transaction(function(tx) {
+        return tx.executeSql("SELECT * FROM access", [], (function(tx, results) {
+          var profile;
+          if (results.rows.length > 0) {
+            credentials = results.rows.item(0);
+            profile = {
+              user: credentials.username,
+              pass: credentials.pass
+            };
+            Lungo.Cache.set("credentials", profile);
+            return __Controller.home = new __Controller.HomeCtrl("section#home_s");
+          } else {
+            return Lungo.Router.section("login_s");
+          }
+        }), null);
+      });
+    };
+
+    return LoginCtrl;
+
+  })(Monocle.Controller);
 
 }).call(this);
 

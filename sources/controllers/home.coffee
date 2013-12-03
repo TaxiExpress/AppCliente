@@ -7,51 +7,53 @@ class __Controller.HomeCtrl extends Monocle.Controller
     "#streetField"                    : "streetField"
 
   events:
-    "singleTap #taxis_b"              : "showTaxis"
-    "singleTap #map_b"                : "showMap"
-    "singleTap #filters"              : "showFilters"
     "singleTap #refresh"              : "refresh"
-
-  pull_panel = new Lungo.Element.Pull("#taxis_a",
-    onPull: "Deslizar para abajo para refrescar" #Text on pulling
-    onRelease: "Suelta para recargar" #Text on releasing
-    onRefresh: "Cargando..." #Text on refreshing
-    callback: -> #Action on refresh
-      alert "Lista actualizada!"
-      pull_panel.hide()
-  )
+    "singleTap #confirm"              : "confirm"
 
   constructor: ->
     super
+    if navigator.geolocation
+      options =
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 5000
+      navigator.geolocation.getCurrentPosition initialize, manageErrors
 
-  showFilters: (event) =>
-    console.log "MUESTRO FIlTROS"
-
-  showTaxis: (event) =>
-    console.log "CLICK TAXI"
+  manageErrors = (err) ->
+    alert "Error de localización GPS"
+    #navigator.geolocation.getCurrentPosition initialize, manageErrors
 
   refresh: (event) =>
     console.log "CLICK REFRESH"
-    @streetField[0].value = 'Buscando ...'
+    @streetField[0].value = 'Localizando ...'
     if navigator.geolocation
-      navigator.geolocation.getCurrentPosition refrescar
-    else
-      Lungo.Notification.show "GPS NO HABILITADO"
+      options =
+        enableHighAccuracy: false,
+        timeout: 5000,
+        maximumAge: 0
+      navigator.geolocation.getCurrentPosition updatePosition, manageErrors
     
-  refrescar = (location) ->
+  updatePosition = (location) ->
     currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude)
     map.setCenter(currentLocation)
-    positioner(currentLocation)
+    getStreet(currentLocation)
 
-  showMap: (event) =>
-    console.log "CLICK MAP"
-    Lungo.Notification.show()
-    if navigator.geolocation
-      navigator.geolocation.getCurrentPosition initialize
-    else
-      Lungo.Notification.show "GPS NO HABILITADO"
-   
+  confirm: (event) =>
+    console.log "LOCALIZACION CONFIRMADA"
+    Lungo.Notification.confirm
+      title: "¿Qué taxi desea?"
+      description: "Seleccione la opción que  más le convenga"
+      accept:
+        label: "El más cercano"
+        callback: ->
+          alert "Yes!"
+      cancel:
+        label: "Elegir taxi"
+        callback: ->
+          Lungo.Router.section "list_s"
+
   initialize = (location) =>
+    Lungo.Router.section "home_s"
     if map== undefined
       currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude)
       mapOptions =
@@ -63,16 +65,23 @@ class __Controller.HomeCtrl extends Monocle.Controller
         overviewMapControl:false
         mapTypeControl:false
         zoomControl:false
+        styles: [
+          featureType: "poi.business"
+          elementType: "labels"
+          stylers: [visibility: "off"]
+        ]
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
-      positioner(currentLocation)
+      getStreet(currentLocation)
       google.maps.event.addListener map, "dragend", (event) ->
-        positioner(map.getCenter())
+        getStreet(map.getCenter())
+      google.maps.event.addListener map, "dragstart", (event) ->
+        streetField.value = 'Localizando ...'
       google.maps.event.addListener map, "zoom_changed", (event) ->
-        positioner(map.getCenter())
+        getStreet(map.getCenter())
     Lungo.Notification.hide()
 
 
-  positioner = (pos) =>
+  getStreet = (pos) =>
     geocoder = new google.maps.Geocoder()
     geocoder.geocode
       latLng: pos

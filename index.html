@@ -3,22 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>TaxiExpress</title>
-    <meta name="viewport" content="width=device-width,user-scalable=false;">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <meta name=”apple-mobile-web-app-capable” content=”yes” />
     <link rel="stylesheet" href="components/lungo/lungo.css">
     <link rel="stylesheet" href="components/lungo/lungo.icon.css">
     <link rel="stylesheet" href="components/lungo/lungo.theme.css">
 </head>
-<body>	
+<body>  
     <section id="init_s" class="initial_section" >
-        <article id="init_a" class="active splash">
+        <article id="init_a" class="active splash initial">
             <span class="logo"><img src="img/logo.png" alt="logo"></span>
             <span class="load"><img src="img/loading.gif" alt="Cargando..." /></span>
             <span class="name">taxiexpress.com</span>
        </article>
     </section>
 
+    <section id="login_s" class="initial_section" >
+        <article id="login_a" class="active splash initial">
+          <span class="logo"><img src="img/logo.png" alt="logo"></span>
+          <div class="form initial_form">
+              <fieldset class="radius-top">
+                  <input id="username" type="text" placeholder="Usuario" value="dalalla">
+              </fieldset>
+              <fieldset class="radius-bottom" >
+                  <input id="password" type="password" placeholder="Contraseña" value="1234">
+              </fieldset>
+              <button class="anchor" id="login_b" data-label="Acceder"></button>
+          </div>    
+       </article>
+    </section>
+
     <aside id="tools_s">
-        <article id ="tools_a" class="active list">            
+        <article id ="tools_a" class="active scroll list">            
             <li class="profile" data-view-section="profile_s">
                 <img src="https://pbs.twimg.com/profile_images/378800000638981863/e6b9769bbd741c6e98e3cb1fb79dbdfb.jpeg" alt="" />
                 <div>
@@ -28,7 +44,7 @@
             </li>
             <li data-view-section="routes_s">Trayectos realizados</li>
             <li data-view-section="favorites_s">Taxistas favoritos</li>
-            <li data-view-section="tools_s">Configuración</li>
+            <li data-view-section="filters_s">Configuración</li>
             <li data-view-section="social_s">Redes sociales</li>
             <li data-view-section="payment_s">Formas de pago</li>
             <li data-view-section="faq_s">F.A.Q.</li>
@@ -37,20 +53,26 @@
         </article>
     </aside>   
 
-    <section id="home_s" data-transition="slide" data-pull="arrow-down">        
-        <header>
-            <h1 class="title centered">Taxi Express</h1>
-            <nav>
-                <a href="#" data-view-aside="tools_s" data-icon="align-left"></a>
-            </nav>
+    <section id="home_s" data-transition="slide">        
+        <article class="street" id="map_a">
+            <button class="topLeftButton" data-view-aside="tools_s" data-icon="menu"></button>
+            <div class="marker"><img src="img/poi1.png" alt="" /></div>
+            <div class="location">
+                <span id="refresh" class="icon screenshot"></span>
+                <input type="text" id="streetField" value="" readonly="readonly"></input>
+                <button class="anchor" id="confirm" data-label="Confirmar posición"></button>
+            </div>
+            <div id="map-canvas"/>
+        </article>
+    </section>
+
+    <section id="list_s" data-transition="slide">        
+        <header data-back="angle-left">
+            <h1 class="title centered">Taxis cercanos</h1>
             <nav class="on-right">
-                <a href="#" id="filters" data-view-section="filters_s" data-icon="bookmark-empty"></a>
+                <a href="#" data-view-section="filters_s" data-icon="bookmark-empty"></a>
             </nav>
-        </header>  
-        <nav data-control="groupbar">
-            <a href="#" id="taxis_b" data-view-article="taxis_a" data-label="Los más cercanos"></a>
-            <a href="#" id="map_b" data-view-article="map_a" data-label="Pedir taxi" ></a>
-        </nav>
+        </header>
         <article id="taxis_a" class="list form active scroll" >
             <li class="thumb arrow" data-view-section="chosenTaxi_s">                
                 <div class="on-right">1 minuto</div>
@@ -80,15 +102,7 @@
                 </div>
             </li>   
         </article>
-        <article class="street" id="map_a">
-            <div class="marker"><img src="img/poi1.png" alt="" /></div>
-            <span id="refresh" class="icon screenshot"></span>
-            <input type="text" id="streetField" value="Buscando ..." readonly="readonly"></input>
-            <div id="map-canvas"/>
-        </article>
     </section>
-
-
     <section id="profile_s" data-transition="cover">
         <header data-title="Editar perfil" data-back="angle-left">
             <nav class="on-right">
@@ -183,7 +197,7 @@
         </article>
     </section>
 
-    <section id="favorites_s" data-transition="slide">
+    <section id="favorites_s" data-transition="cover">
         <header data-title="Taxistas favoritos" data-back="angle-left"></header>      
         <article id="favorites_a" class="scroll" >
             <div class="form list">
@@ -192,7 +206,7 @@
         </article>
     </section>
 
-    <section id="routes_s" data-transition="slide">
+    <section id="routes_s" data-transition="cover">
         <header data-title="Trayectos realizados" data-back="angle-left"></header>      
         <article id="routes_a" class="scroll" >
             <div class="form list">
@@ -201,16 +215,7 @@
         </article>
     </section>
 
-    <section id="tools_s" data-transition="slide">
-        <header data-title="Configuración" data-back="angle-left"></header>      
-        <article id="tools_a" class="scroll" >
-            <div class="form list">
-                <!--    CONFIGURACION   -->
-            </div>          
-        </article>
-    </section>
-
-    <section id="social_s" data-transition="slide">
+    <section id="social_s" data-transition="cover">
         <header data-title="Redes sociales" data-back="angle-left"></header>      
         <article id="social_a" class="scroll" >
             <div class="form list">
@@ -219,16 +224,26 @@
         </article>
     </section>
 
-    <section id="payment_s" data-transition="slide">
+    <section id="payment_s" data-transition="cover">
         <header data-title="Formas de pago" data-back="angle-left"></header>      
         <article id="payment_a" class="scroll" >
             <div class="form list">
                 <!--    FORMAS DE PAGO    -->
+                <form action="/charge" method="POST">
+                  <script
+                    src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                    data-key="pk_test_6pRNASCoBOKtIshFeQd4XMUh"
+                    data-image="http://b.dryicons.com/images/icon_sets/colorful_stickers_part_2_icons_set/png/256x256/dollar_currency_sign.png"
+                    data-name="Demo Site"
+                    data-description="2 widfdgets ($20.00)"
+                    data-amount="2000">
+                  </script>
+                </form>
             </div>          
         </article>
     </section>
 
-    <section id="faq_s" data-transition="slide">
+    <section id="faq_s" data-transition="cover">
         <header data-title="F.A.Q." data-back="angle-left"></header>      
         <article id="faq_a" class="scroll" >
             <div class="form list">
@@ -242,7 +257,7 @@
         </article>
     </section>
 
-    <section id="legalAdvice_s" data-transition="slide">
+    <section id="legalAdvice_s" data-transition="cover">
         <header data-title="Aviso Legal" data-back="angle-left"></header>      
         <article id="legalAdvice_a" class="scroll" >
             <div class="list">
@@ -259,5 +274,5 @@
     <script src="components/monocle/monocle.js"></script>
     <script src="components/lungo/lungo.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
-    <script src="app/taxiExpress.js"></script>    
+    <script src="app/taxiExpress.js"></script>   
 </html>
