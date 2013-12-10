@@ -51,10 +51,10 @@ class __Controller.HomeCtrl extends Monocle.Controller
         label: "Elegir taxi"
         callback: ->
           Lungo.Router.section "list_s"
-
+      
   initialize = (location) =>
     Lungo.Router.section "home_s"
-    if map== undefined
+    if map == undefined
       currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude)
       mapOptions =
         center: currentLocation

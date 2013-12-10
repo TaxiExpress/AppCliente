@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="components/lungo/lungo.theme.css">
 </head>
 <body>  
-    <section id="init_s">
+    <section id="init_s" data-transition="fade">
         <article id="init_a" class="active splash initial">
             <span class="logo"><img src="img/logo.png" alt="logo"></span>
             <span class="load"><img src="img/loading.gif" alt="Cargando..." /></span>
@@ -23,15 +23,50 @@
           <span class="logo"><img src="img/logo.png" alt="logo"></span>
           <div class="form initial_form">
               <fieldset class="radius-top">
-                  <input id="username" type="text" placeholder="Usuario" value="dalalla">
+                  <input id="username" type="text" placeholder="Usuario" >
               </fieldset>
               <fieldset class="radius-bottom" >
-                  <input id="password" type="password" placeholder="Contraseña" value="1234">
+                  <input id="password" type="password" placeholder="Contraseña" >
               </fieldset>
               <button class="anchor" id="login_b" data-label="Acceder"></button>
+              <button class="anchor accept" id="register" data-view-section="register_s" data-label="Registro"></button>
           </div>    
        </article>
     </section>
+
+    <section id="register_s" data-transition="cover">
+        <header data-title="Registro" data-back="angle-down"></header>      
+        <article id="register_a" class="scroll" >
+            <div class="form list">
+                <li class="anchor contrast">DATOS PERSONALES</li>
+                <fieldset> 
+                    <input type="text" id="name_fr" maxlength="20" placeholder="Nombre">
+                </fieldset>
+                <fieldset> 
+                    <input type="text" id="surname_fr" maxlength="20" placeholder="Apellidos" >
+                </fieldset>
+                <fieldset>                    
+                    <label data-icon="phone"></label>
+                    <input type="text" id="phone_fr" maxlength="9" placeholder="Teléfono" >
+                </fieldset>
+                <fieldset>
+                    <label data-icon="envelope"></label>
+                    <input type="email" id="email_fr" maxlength="30" placeholder="Email" >
+                </fieldset>
+                <li class="anchor contrast">DETALLES DE CUENTA</li>                
+                <fieldset> 
+                    <input type="text" id="username_fr" maxlength="20" placeholder="Nombre de usuario" >
+                </fieldset>
+                <fieldset> 
+                    <input type="password" id="pass1_fr" maxlength="20" placeholder="Escriba su contraseña" >
+                </fieldset>
+                <fieldset> 
+                    <input type="password" id="pass2_fr" maxlength="20" placeholder="Repita su contraseña" >
+                </fieldset>
+            </div>
+        </article>
+    </section>
+
 
     <aside id="tools_s">
         <article id ="tools_a" class="active scroll list">            
@@ -49,7 +84,7 @@
             <li data-view-section="payment_s">Formas de pago</li>
             <li data-view-section="faq_s">F.A.Q.</li>
             <li data-view-section="legalAdvice_s">Aviso Legal</li>
-            <li>Cerrar sesión</li>
+            <li data-view-section="login_s">Cerrar sesión</li>
         </article>
     </aside>   
 
@@ -68,13 +103,17 @@
 
     <section id="list_s" data-transition="slide">        
         <header data-back="angle-left">
-            <h1 class="title centered">Taxis cercanos</h1>
+            <h1 class="title centered">Elegir taxi</h1>
             <nav class="on-right">
                 <a href="#" data-view-section="filters_s" data-icon="bookmark-empty"></a>
             </nav>
         </header>
-        <article id="taxis_a" class="list form active scroll" >
-            <li class="thumb arrow" data-view-section="chosenTaxi_s">                
+        <nav data-control="groupbar">
+            <a href="#" id="taxis_b" data-view-article="taxisList_a" data-label="Los más cercanos"></a>
+            <a href="#" id="favorites_b" data-view-article="favoritesList_a" data-label="Taxis favoritos" ></a>
+        </nav>
+        <article id="taxisList_a" class="list form active scroll" >
+            <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
                 <div class="on-right">1 minuto</div>
                 <img src="http://www.sixt.com/uploads/pics/mercedes_03.png" alt="" />
                 <div>
@@ -82,8 +121,9 @@
                     <small>Ernesto Gutierrez</small>
                     <small><strong>★★★☆☆</strong></small>
                 </div>
+                <span data-icon="credit-card" />
             </li>     
-            <li class="thumb arrow" data-view-section="chosenTaxi_s">                
+            <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
                 <div class="on-right">2 minutos</div>
                 <img src="http://mundosoloautos.com.mx/wp-content/uploads/2012/06/audi-logo1.jpg" alt="" />
                 <div>
@@ -92,7 +132,7 @@
                     <small><strong>★☆☆☆☆</strong></small>
                 </div>
             </li>   
-            <li class="thumb arrow" data-view-section="chosenTaxi_s">                
+            <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
                 <div class="on-right">5 minutos</div>
                 <img src="http://www.kaosconcept.net/wp-content/logo-peugeot-nuevo.gif" alt="" />
                 <div>
@@ -100,7 +140,19 @@
                     <small>Elena Pérez Gómez</small>
                     <small><strong>★★★★☆</strong></small>
                 </div>
+                <span data-icon="credit-card" />
             </li>   
+        </article>
+        <article id="favoritesList_a" class="list form scroll" >
+            <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
+                <div class="on-right">238 metros</div>
+                <img src="http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG" alt="" />
+                <div>
+                    <strong>Ernesto Gutierrez</strong>
+                    <small><strong>★★★☆☆</strong></small>
+                </div>
+                <span data-icon="credit-card" />
+            </li>
         </article>
     </section>
     <section id="profile_s" data-transition="cover">
@@ -149,6 +201,10 @@
                 </fieldset> 
                 <li class="anchor contrast">PERMISOS</li>
                 <fieldset> 
+                    <small>Pago a través de la App</small>
+                    <input type="checkbox" id="reg_payment" checked>
+                </fieldset> 
+                <fieldset> 
                     <small>Transporte de animales</small>
                     <input type="checkbox" id="reg_animals" >
                 </fieldset> 
@@ -165,7 +221,7 @@
     </section>
 
     <section id="chosenTaxi_s" data-transition="slide">
-        <header data-title="Taxi elegido" data-back="angle-left"></header>      
+        <header data-title="Taxi seleccionado" data-back="angle-left"></header>      
         <article id="chosenTaxi_a" class="scroll" >
             <div class="form list">
                 <li class="anchor contrast">DATOS DEL TAXISTA</li>
@@ -225,21 +281,25 @@
     </section>
 
     <section id="payment_s" data-transition="cover">
-        <header data-title="Formas de pago" data-back="angle-left"></header>      
+        <header data-title="Pago a taxista" data-back="angle-left"></header>      
         <article id="payment_a" class="scroll" >
-            <div class="form list">
-                <!--    FORMAS DE PAGO    -->
-                <form action="/charge" method="POST">
-                  <script
-                    src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                    data-key="pk_test_6pRNASCoBOKtIshFeQd4XMUh"
-                    data-image="http://b.dryicons.com/images/icon_sets/colorful_stickers_part_2_icons_set/png/256x256/dollar_currency_sign.png"
-                    data-name="Demo Site"
-                    data-description="2 widfdgets ($20.00)"
-                    data-amount="2000">
-                  </script>
-                </form>
-            </div>          
+            <div class="form list payments">
+                <strong id="payment-amount"></strong>
+                <span id="payment-errors"></span>
+                <fieldset> 
+                    <label data-icon="credit-card"></label>
+                    <input type="text" id="credit_card_payment" maxlength="16" placeholder="Número de tarjeta">
+                </fieldset>
+                <fieldset>
+                    <label data-icon="lock"></label>
+                    <input type="text" id="cvc_payment" maxlength="4" placeholder="CVC" >
+                </fieldset>
+                <fieldset>                    
+                    <label data-icon="calendar"></label>
+                    <input type="text" id="expires_payment" maxlength="7" placeholder="MM/YYYY" >
+                </fieldset>
+                <button id="submit_payment" class="anchor accept">Pagar</button>
+            </div>
         </article>
     </section>
 
@@ -273,6 +333,7 @@
     <script src="components/quojs/quo.js"></script>
     <script src="components/monocle/monocle.js"></script>
     <script src="components/lungo/lungo.js"></script>
+    <script src="https://js.stripe.com/v2/"></script>
     <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
     <script src="app/taxiExpress.js"></script>   
 </html>

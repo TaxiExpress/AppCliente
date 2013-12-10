@@ -46,14 +46,15 @@ body { height: 100%; margin: 0; padding: 0 }
 .locate {z-index:1!important; position:absolute; bottom:10px; right:10px; color:#444;}
 .yellow {color:#ffcc00;}
 .street .marker {bottom: 50%;left: 50%; position: absolute;z-index: 2; margin-left:-24px; }
-.street .location button{z-index:1!important; font-family:'Open Sans'; outline:none; position:absolute!important; bottom:10px; left:10px; right: 10px; height:40px; width:auto!important; border-radius:6px; }
+.street .location button{z-index:1!important; font-family:'Open Sans'; outline:none; position:absolute!important; color: #444; bottom:10px; left:10px; right: 10px; height:40px; width:auto!important; border-radius:6px; }
 .street .location input{z-index:1!important; font-family:'Open Sans'; outline:none; position:absolute; bottom:55px; left:10px; right: 10px; height:43px; width:auto; font-size:16px; padding-left:60px; padding-right:10px; color:#444; border:0px; border-radius:6px; text-align:center; font-weight: 100; text-overflow:ellipsis; overflow: hidden;}
 .street .location span {z-index:2!important; position:absolute; bottom: 60px; left:12px; padding-bottom:6px;padding-top:6px; color:#444; width:48px; height:32px;text-align:center; border-right:1px solid #ddd;}
-.street button.topLeftButton {position:absolute; z-index:2; width:40px!important; height: 40px!important; opacity:.9; background: #f5f5f5;left:15px; top:0; border-radius: 4px; border: 1px solid #ddd;}
-.street button.topLeftButton span, .street button.topRightButton span{margin-left:-5px; font-size:18px;}
-.street button.topRightButton {position:absolute; z-index:2; width:40px!important; height: 40px!important; opacity:.9; background: #f5f5f5;right:15px; top:0; border-radius: 4px; border: 1px solid #ddd;}
-.initial_form {position:absolute; width:80%; left: 10%;right: 10%;bottom:25%;}
-
+.street button.topLeftButton {position:absolute; z-index:2; width:48px!important; height: 48px!important; color: #444; opacity:.9; background: #f5f5f5;left:15px; top:0; border-radius: 4px; border: 1px solid #ddd;}
+.street button.topLeftButton span {margin-left:-2px; font-size:20px;}
+.street img.topRight {position:absolute; z-index:2; width:48px!important; height: 48px!important; right:15px; top:15px; border-radius: 4px; border: 1px solid #ddd;}
+.initial_form {position:absolute; width:80%; left: 10%; right: 10%; bottom:15%;}
+.payments > strong {font-size: 33px; padding-top: 10px; padding-bottom: 10px; font-weight:400; text-align: center; width: 100%; display: block}
+.payments > span {font-size: 12px; color:red; display: block;padding: 0 0 10px 13px}
 
 .list li{list-style-type:none;position:relative;text-align:-webkit-match-parent;line-height:inherit;}
 .list li:not(.big){padding-top:10px;padding-bottom:9px;padding-left:10px;margin-bottom: 1px;}
@@ -76,6 +77,8 @@ body { height: 100%; margin: 0; padding: 0 }
 .list li .on-right.tag{padding-left:.4em;padding-right:.4em;-webkit-text-shadow:none;-moz-text-shadow:none;-ms-text-shadow:none;-o-text-shadow:none;text-shadow:none}
 .list .on-right .icon,.list small .icon{font-size:10px !important;width:auto !important;height:auto !important}
 .list.indented li:not(:last-child){margin-bottom:.8em}
+.list li  > span {font-size:12px!important; color:#777; margin-left:-58px; margin-top:28px; position:absolute;}
+
 
 header nav a,header nav button{position:relative;text-align:center;float:left;height:50px;min-width:56px;}
 header nav a > .icon,header nav button > .icon{font-size:1.3em;color:#444;margin-left: 4px;margin-right: -4px;}
@@ -165,12 +168,12 @@ footer nav.with-labels abbr{z-index:1;display:block !important;margin-top:-1.3em
 [data-view-menu]:after{content:"▼";position:relative;top:-5px;left:1px;font-size:11px}
 [data-control=carousel]{overflow:hidden;list-style:none;margin:0}
 body > section > article.splash{text-align:center;padding:1.3333333333333333em; }
-body > section > article.splash .logo{position:absolute; left:0px;top:20%; width:100%;}
+body > section > article.splash .logo{position:absolute; left:0px;bottom:55%; width:100%;}
 body > section > article.splash .logo img {max-width:80%;margin:0 auto; float:center; position:relative;max-height:400px;}
 body > section > article.splash .load{position:absolute; left:0px;bottom:30%; width:100%;}
 body > section > article.splash .load img {margin:0 auto; float:center; position:relative;}
 body > section > article.splash .name{bottom:15px; position:absolute; text-align: center; left:0px; width:100%; font-size:1em; color:#444; letter-spacing: 0px;}
-body > section > article.splash .button,body > section > article.splash button{margin-bottom:.35555555555555557em}
+body > section > article.splash .button,body > section > article.splash button{}
 body > section > article.splash .copyright{position:absolute;width:100%;bottom:8px;left:0;font-size:11px;padding:0}
 
 .button,button{display:inline-block;border:none;cursor:pointer;font-family:inherit;font-weight:inherit;text-align:center;text-decoration:none;outline:none;background:none;font-size:inherit;}
@@ -318,27 +321,28 @@ section.show .loading,section.active .loading,.notification .loading{-webkit-ani
 .notification{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1980;display:none;}
 .notification.show{display:-webkit-box;display:-moz-box;display:-ms-box;display:-o-box;display:box;-webkit-box-align:center;-moz-box-align:center;-ms-box-align:center;-o-box-align:center;box-align:center;-webkit-box-pack:center;-moz-box-pack:center;-ms-box-pack:center;-o-box-pack:center;box-pack:center}
 .notification.push{height:26.285714285714285px}
-.notification .window{position:relative;opacity:0;text-align:center;-webkit-transition-timing-function:cubic-bezier(.645,.045,.355,1);-moz-transition-timing-function:cubic-bezier(.645,.045,.355,1);-ms-transition-timing-function:cubic-bezier(.645,.045,.355,1);-o-transition-timing-function:cubic-bezier(.645,.045,.355,1);transition-timing-function:cubic-bezier(.645,.045,.355,1);-webkit-backface-visibility:hidden;-moz-backface-visibility:hidden;-ms-backface-visibility:hidden;-o-backface-visibility:hidden;backface-visibility:hidden;}
+.notification .window{position:relative;opacity:0;text-align:center;-webkit-transition-duration:250ms;-moz-transition-duration:250ms;-ms-transition-duration:250ms;-o-transition-duration:250ms;transition-duration:250ms;-webkit-transition-timing-function:cubic-bezier(.645,.045,.355,1);-moz-transition-timing-function:cubic-bezier(.645,.045,.355,1);-ms-transition-timing-function:cubic-bezier(.645,.045,.355,1);-o-transition-timing-function:cubic-bezier(.645,.045,.355,1);transition-timing-function:cubic-bezier(.645,.045,.355,1);-webkit-backface-visibility:hidden;-moz-backface-visibility:hidden;-ms-backface-visibility:hidden;-o-backface-visibility:hidden;backface-visibility:hidden;}
 .notification .window.show{opacity:1}
 .notification .window:not(.push){-webkit-transition-property:opacity,margin-top;-moz-transition-property:opacity,margin-top;-ms-transition-property:opacity,margin-top;-o-transition-property:opacity,margin-top;transition-property:opacity,margin-top;margin-top:100%;}
 .notification .window:not(.push).show{margin-top:0%}
 .notification .window.growl > *{position:absolute}
-.notification .window.growl > span{position:relative; font-weight: 500; margin-left:-40px}
+.notification .window.growl,.notification .window.growl > *:not(.loading){width:104px;text-align:center}
+.notification .window.growl,.notification .window.growl > .icon{height:104px !important}
 .notification .window.growl > .icon{left:0;top:0;font-size:52px;line-height:104px}
 .notification .window.growl > strong{height:18px;top:84px;padding:0 .5em;overflow:hidden;font-size:11px}
 .notification .window.growl > small{display:none}
-.notification .window.growl > .loading{top:0px; left:50px;}
+.notification .window.growl > .loading{top:28px}
 .notification .window.success,.notification .window.error,.notification .window.confirm,.notification .window.html{width:280px;margin-top:100%}
 .notification .window.success,.notification .window.error,.notification .window.confirm{padding-top:1em;}
 .notification .window.success > .icon,.notification .window.error > .icon,.notification .window.confirm > .icon{font-size:5em;line-height:1em}
 .notification .window.success > small,.notification .window.error > small,.notification .window.confirm > small{font-size:.9em;padding-bottom:1em}
 .notification .window.success > .icon,.notification .window.error > .icon,.notification .window.confirm > .icon,.notification .window.success > strong,.notification .window.error > strong,.notification .window.confirm > strong{padding-bottom:.25em}
-.notification .window.success > strong,.notification .window.error > strong,.notification .window.confirm > strong,.notification .window.success > small,.notification .window.error > small,.notification .window.confirm > small{padding-left:.5em;padding-right:.5em}
+.notification .window.success > strong,.notification .window.error > strong,.notification .window.confirm > strong,.notification .window.success > small,.notification .window.error > small,.notification .window.confirm > small{padding-left:1.5em;padding-right:1.5em;padding-bottom: 10px}
 .notification .window.html .title{height:46px;line-height:46px;font-size:1.2em}
 .notification .window.push{position:absolute !important;text-align:left;height:30.666666666666668px;line-height:30.666666666666668px;padding:0 1em;width:100%;-webkit-transition-property:opacity,top;-moz-transition-property:opacity,top;-ms-transition-property:opacity,top;-o-transition-property:opacity,top;transition-property:opacity,top;top:-30.666666666666668px !important;}
 .notification .window.push.show{top:0 !important}
 .notification .window.push .icon{float:left;display:inline;margin-right:.5em;font-size:1.4em}
-.notification .window button{display:block;margin-bottom:1px;width:inherit;line-height:2.5em;border:none;font-size:1.2em}
+.notification .window button{display:block;margin-bottom:1px;width:inherit;line-height:3.2em;border:none;font-size:1.2em}
 .notification .window strong,.notification .window small{display:block}
 
 section.hide > [data-control="pull"]{display:none}

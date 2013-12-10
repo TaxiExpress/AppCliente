@@ -40,7 +40,8 @@ class __Controller.ProfileCtrl extends Monocle.Controller
         ctx = canvas.getContext("2d")
         ctx.drawImage this, 0, 0, tempW, tempH
         dataURL = canvas.toDataURL("image/jpeg")
-        $("#avatar").attr "src", dataURL
+        console.log avatar.src
+        avatar.src = dataURL
 
   clickAvatar: (event) =>
     @image[0].click()

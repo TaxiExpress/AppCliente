@@ -91,48 +91,14 @@ section .list li.theme,
 section .list li a.theme,
 section .list li.active,
 section .list li a.active {
-  background: #0ec8ff;
+  background: #f5f5f5;
 }
 section .list li.light,
 section .list li a.light {
   background: #cfcfcf;
   color: #808080;
 }
-section .list li.contrast,
-section .list li a.contrast,
-section .list li.selectable:active,
-section .list li a.selectable:active,
-section .list li.theme,
-section .list li a.theme,
-section .list li.contrast small,
-section .list li a.contrast small,
-section .list li.selectable:active small,
-section .list li a.selectable:active small,
-section .list li.theme small,
-section .list li a.theme small,
-section .list li.contrast .on-right:not(.tag),
-section .list li a.contrast .on-right:not(.tag),
-section .list li.selectable:active .on-right:not(.tag),
-section .list li a.selectable:active .on-right:not(.tag),
-section .list li.theme .on-right:not(.tag),
-section .list li a.theme .on-right:not(.tag),
-section .list li.contrast strong,
-section .list li a.contrast strong,
-section .list li.selectable:active strong,
-section .list li a.selectable:active strong,
-section .list li.theme strong,
-section .list li a.theme strong,
-section .list li.contrast .arrow::after,
-section .list li a.contrast .arrow::after,
-section .list li.selectable:active .arrow::after,
-section .list li a.selectable:active .arrow::after,
-section .list li.theme .arrow::after,
-section .list li a.theme .arrow::after {
-  color: #444;
-  padding-top: 20px;
-  padding-bottom: 10px;
-  padding-left: 15px;
-}
+
 section .list li.contrast.arrow::after,
 section .list li a.contrast.arrow::after,
 section .list li.selectable:active.arrow::after,
@@ -406,7 +372,6 @@ article .button,
 article button,
 article .button abbr,
 article button abbr {
-  color: #444;
   font-weight: 400;
 }
 article .button .icon,
@@ -425,11 +390,11 @@ article .button.color {
 article button.accept,
 article .button.accept {
   background-color: #444;
-  color:#fff !important;
+  color:#ffcc00 !important;
 }
 article button.cancel,
 article .button.cancel {
-  background-color: #e74c3c;
+  color:#444;
 }
 article button.warning,
 article .button.warning {
@@ -872,7 +837,7 @@ form input[type=checkbox]:checked:after,
   color: #fff;
 }
 .notification:not(.push) {
-  background-color: rgba(0,0,0,0.85);
+  background-color: rgba(0,0,0,0.4);
 }
 .notification .window.growl strong {
   color: #bfbfbf;
@@ -881,7 +846,7 @@ form input[type=checkbox]:checked:after,
 .notification .window.confirm button,
 .notification .window.html button {
   background-color: #fff;
-  color: #444;
+  color: #0080FF;
   font-weight: 200;
   font-size:15px;
 }

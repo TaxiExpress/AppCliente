@@ -8,6 +8,7 @@
     function AppCtrl() {
       AppCtrl.__super__.constructor.apply(this, arguments);
       __Controller.login = new __Controller.LoginCtrl("section#login_s");
+      __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
       __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
     }
 
@@ -197,31 +198,12 @@
       this.read = __bind(this.read, this);
       this.drop = __bind(this.drop, this);
       this.doLogin = __bind(this.doLogin, this);
-      var _this = this;
       LoginCtrl.__super__.constructor.apply(this, arguments);
-      this.db = window.openDatabase("taxiexpress", "1.0", "description", 5 * 1024 * 1024);
-      this.db.transaction(function(tx) {
-        return tx.executeSql("CREATE TABLE IF NOT EXISTS access (username STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL)");
-      });
-      this.read();
+      Lungo.Router.section("login_s");
     }
 
     LoginCtrl.prototype.doLogin = function(event) {
-      var data, profile, url,
-        _this = this;
-      this.drop();
-      this.db.transaction(function(tx) {
-        var sql;
-        sql = "INSERT INTO access (username, pass) VALUES ('" + _this.username[0].value + "','" + _this.password[0].value + "');";
-        return tx.executeSql(sql);
-      });
-      url = "";
-      data = "username=" + this.username[0].value + "&password=" + this.password[0].value;
-      profile = {
-        user: this.username[0].value,
-        pass: this.password[0].value
-      };
-      Lungo.Cache.set("credentials", profile);
+      Lungo.Router.section("init_s");
       return __Controller.home = new __Controller.HomeCtrl("section#home_s");
     };
 
@@ -253,6 +235,77 @@
     };
 
     return LoginCtrl;
+
+  })(Monocle.Controller);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Controller.PaymentCtrl = (function(_super) {
+    var amount;
+
+    __extends(PaymentCtrl, _super);
+
+    amount = void 0;
+
+    PaymentCtrl.prototype.elements = {
+      "#credit_card_payment": "creditCard",
+      "#cvc_payment": "cvc",
+      "#expires_payment": "expires",
+      "#submit_payment": "button",
+      "#payment-amount": "amount_text",
+      "#payment-errors": "errors",
+      "#payment-form": "form"
+    };
+
+    PaymentCtrl.prototype.events = {
+      "singleTap #submit_payment": "doPayment"
+    };
+
+    function PaymentCtrl() {
+      this.stripeResponseHandler = __bind(this.stripeResponseHandler, this);
+      this.doPayment = __bind(this.doPayment, this);
+      PaymentCtrl.__super__.constructor.apply(this, arguments);
+      this.loadPayment(23);
+    }
+
+    PaymentCtrl.prototype.doPayment = function(event) {
+      this.button[0].disabled = true;
+      Stripe.setPublishableKey("pk_test_omPl1VUhfXi514McgAsj4Sus");
+      return Stripe.createToken({
+        name: "David Lallana",
+        number: "4242424242424242",
+        cvc: this.cvc.val(),
+        exp_month: this.expires.val().substring(0, 3),
+        exp_year: this.expires.val().substring(4, 8)
+      }, amount, this.stripeResponseHandler);
+    };
+
+    PaymentCtrl.prototype.stripeResponseHandler = function(status, response) {
+      this.button[0].disabled = false;
+      if (response.error) {
+        return this.errors[0].innerText = "Los datos de la tarjeta no son válidos. Compruébelos.";
+      } else {
+        return Lungo.Router.section("home_s");
+      }
+    };
+
+    PaymentCtrl.prototype.showErrors = function() {};
+
+    PaymentCtrl.prototype.loadPayment = function(amount_payment) {
+      amount = amount_payment;
+      this.amount_text[0].innerText = "A pagar: " + amount + " €";
+      this.creditCard.val("");
+      this.cvc.val("");
+      this.expires.val("");
+      return this.button[0].disabled = false;
+    };
+
+    return PaymentCtrl;
 
   })(Monocle.Controller);
 
@@ -323,7 +376,8 @@
           ctx = canvas.getContext("2d");
           ctx.drawImage(this, 0, 0, tempW, tempH);
           dataURL = canvas.toDataURL("image/jpeg");
-          return $("#avatar").attr("src", dataURL);
+          console.log(avatar.src);
+          return avatar.src = dataURL;
         };
       };
     };
