@@ -1,4 +1,58 @@
 (function() {
+  var _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Model.Driver = (function(_super) {
+    __extends(Driver, _super);
+
+    function Driver() {
+      _ref = Driver.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    Driver.fields("license", "name", "surname", "valoration", "position", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
+
+    Driver.get = function(id) {
+      return this.select(function(driver) {
+        return driver.license === id;
+      });
+    };
+
+    return Driver;
+
+  })(Monocle.Model);
+
+}).call(this);
+
+(function() {
+  var _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Model.Travel = (function(_super) {
+    __extends(Travel, _super);
+
+    function Travel() {
+      _ref = Travel.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    Travel.fields("id", "starttime", "endtime", "startpoint", "endpoint", "cost", "driver");
+
+    Travel.get = function(iden) {
+      return this.select(function(travel) {
+        return driver.id === iden;
+      });
+    };
+
+    return Travel;
+
+  })(Monocle.Model);
+
+}).call(this);
+
+(function() {
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -38,15 +92,18 @@
 
     HomeCtrl.prototype.elements = {
       "#refresh": "button_refresh",
-      "#streetField": "streetField"
+      "#streetField": "streetField",
+      "#driver": "driver"
     };
 
     HomeCtrl.prototype.events = {
       "singleTap #refresh": "refresh",
-      "singleTap #confirm": "confirm"
+      "singleTap #confirm": "confirm",
+      "singleTap #map-canvas": "hideAside"
     };
 
     function HomeCtrl() {
+      this.hideAside = __bind(this.hideAside, this);
       this.confirm = __bind(this.confirm, this);
       this.refresh = __bind(this.refresh, this);
       var options;
@@ -68,6 +125,7 @@
     HomeCtrl.prototype.refresh = function(event) {
       var options;
       console.log("CLICK REFRESH");
+      Lungo.Aside.hide();
       this.streetField[0].value = 'Localizando ...';
       if (navigator.geolocation) {
         options = {
@@ -87,14 +145,16 @@
     };
 
     HomeCtrl.prototype.confirm = function(event) {
+      var _this = this;
       console.log("LOCALIZACION CONFIRMADA");
+      Lungo.Aside.hide();
       return Lungo.Notification.confirm({
         title: "¿Qué taxi desea?",
         description: "Seleccione la opción que  más le convenga",
         accept: {
           label: "El más cercano",
           callback: function() {
-            return alert("Yes!");
+            return _this.showAsigning();
           }
         },
         cancel: {
@@ -104,6 +164,33 @@
           }
         }
       });
+    };
+
+    HomeCtrl.prototype.showAsigning = function() {
+      Lungo.Notification.hide();
+      return setTimeout((function() {
+        var _this = this;
+        return Lungo.Notification.confirm({
+          icon: "time",
+          title: "Esperando la confirmación del taxi",
+          accept: {
+            label: "Cancelar petición",
+            callback: function() {
+              return _this;
+            }
+          },
+          cancel: {
+            label: "Cancelar2",
+            callback: function() {
+              return this;
+            }
+          }
+        });
+      }), 250);
+    };
+
+    HomeCtrl.prototype.hideAside = function(event) {
+      return Lungo.Aside.hide();
     };
 
     initialize = function(location) {
@@ -140,11 +227,10 @@
         google.maps.event.addListener(map, "dragstart", function(event) {
           return streetField.value = 'Localizando ...';
         });
-        google.maps.event.addListener(map, "zoom_changed", function(event) {
+        return google.maps.event.addListener(map, "zoom_changed", function(event) {
           return getStreet(map.getCenter());
         });
       }
-      return Lungo.Notification.hide();
     };
 
     getStreet = function(pos) {
@@ -198,12 +284,32 @@
       this.read = __bind(this.read, this);
       this.drop = __bind(this.drop, this);
       this.doLogin = __bind(this.doLogin, this);
+      var _this = this;
       LoginCtrl.__super__.constructor.apply(this, arguments);
-      Lungo.Router.section("login_s");
+      this.db = window.openDatabase("taxiexpress", "1.0", "description", 5 * 1024 * 1024);
+      this.db.transaction(function(tx) {
+        return tx.executeSql("CREATE TABLE IF NOT EXISTS access (username STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL)");
+      });
+      this.read();
     }
 
     LoginCtrl.prototype.doLogin = function(event) {
+      var data, profile, url,
+        _this = this;
+      this.drop();
+      this.db.transaction(function(tx) {
+        var sql;
+        sql = "INSERT INTO access (username, pass) VALUES ('" + _this.username[0].value + "','" + _this.password[0].value + "');";
+        return tx.executeSql(sql);
+      });
       Lungo.Router.section("init_s");
+      url = "";
+      data = "username=" + this.username[0].value + "&password=" + this.password[0].value;
+      profile = {
+        user: this.username[0].value,
+        pass: this.password[0].value
+      };
+      Lungo.Cache.set("credentials", profile);
       return __Controller.home = new __Controller.HomeCtrl("section#home_s");
     };
 
@@ -279,9 +385,9 @@
       return Stripe.createToken({
         name: "David Lallana",
         number: "4242424242424242",
-        cvc: this.cvc.val(),
-        exp_month: this.expires.val().substring(0, 3),
-        exp_year: this.expires.val().substring(4, 8)
+        cvc: "123",
+        exp_month: "12",
+        exp_year: "2014"
       }, amount, this.stripeResponseHandler);
     };
 
@@ -290,6 +396,7 @@
       if (response.error) {
         return this.errors[0].innerText = "Los datos de la tarjeta no son válidos. Compruébelos.";
       } else {
+        Lungo.Notification.html('<h2 data-icon="spinner">Trayecto pagado</h2>', "Aceptar");
         return Lungo.Router.section("home_s");
       }
     };

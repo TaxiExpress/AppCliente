@@ -24,9 +24,9 @@ class __Controller.PaymentCtrl extends Monocle.Controller
     Stripe.createToken
       name: "David Lallana"
       number: "4242424242424242"#@creditCard.val()
-      cvc: @cvc.val()
-      exp_month: @expires.val().substring 0, 3
-      exp_year: @expires.val().substring 4, 8
+      cvc: "123"#@cvc.val()
+      exp_month: "12"#@expires.val().substring 0, 3
+      exp_year: "2014"#@expires.val().substring 4, 8
     , amount, @stripeResponseHandler
  
   stripeResponseHandler: (status, response) =>
@@ -34,6 +34,7 @@ class __Controller.PaymentCtrl extends Monocle.Controller
     if response.error      
       @errors[0].innerText = "Los datos de la tarjeta no son válidos. Compruébelos."
     else
+      Lungo.Notification.html '<h2 data-icon="spinner">Trayecto pagado</h2>', "Aceptar"
       Lungo.Router.section "home_s"
 
   showErrors: ->

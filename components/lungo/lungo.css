@@ -51,7 +51,7 @@ body { height: 100%; margin: 0; padding: 0 }
 .street .location span {z-index:2!important; position:absolute; bottom: 60px; left:12px; padding-bottom:6px;padding-top:6px; color:#444; width:48px; height:32px;text-align:center; border-right:1px solid #ddd;}
 .street button.topLeftButton {position:absolute; z-index:2; width:48px!important; height: 48px!important; color: #444; opacity:.9; background: #f5f5f5;left:15px; top:0; border-radius: 4px; border: 1px solid #ddd;}
 .street button.topLeftButton span {margin-left:-2px; font-size:20px;}
-.street img.topRight {position:absolute; z-index:2; width:48px!important; height: 48px!important; right:15px; top:15px; border-radius: 4px; border: 1px solid #ddd;}
+.street img.topRight {position:absolute; z-index:2; visibility: hidden; width:48px!important; height: 48px!important; right:15px; top:15px; border-radius: 4px; border: 1px solid #ddd;}
 .initial_form {position:absolute; width:80%; left: 10%; right: 10%; bottom:15%;}
 .payments > strong {font-size: 33px; padding-top: 10px; padding-bottom: 10px; font-weight:400; text-align: center; width: 100%; display: block}
 .payments > span {font-size: 12px; color:red; display: block;padding: 0 0 10px 13px}
@@ -73,6 +73,7 @@ body { height: 100%; margin: 0; padding: 0 }
 .list li strong{padding-bottom:3px;}
 .list li small + .on-right{margin-left:0;margin-top:-1.4em;}
 .list li small,.list li.anchor{font-size:.8em; }
+.list li.anchor{font-size:.8em; padding-left: 15px;padding-top: 15px;padding-bottom: 10px;}
 .list li .on-right:not(.tag){font-size:.8em}
 .list li .on-right.tag{padding-left:.4em;padding-right:.4em;-webkit-text-shadow:none;-moz-text-shadow:none;-ms-text-shadow:none;-o-text-shadow:none;text-shadow:none}
 .list .on-right .icon,.list small .icon{font-size:10px !important;width:auto !important;height:auto !important}
@@ -366,8 +367,8 @@ section.show > [data-control="pull"].refresh > .loading{display:inline-block}
 .text.big{font-size:1.2em}
 .text.large{font-size:1.4em}
 .text.opacity{opacity:.5}
-h1{font-size:1.6em}
-h2{font-size:1.5em}
+h1{font-size:1.5em}
+h2{font-size:1.5em;padding:15px;}
 h3{font-size:1.4em}
 h4{font-size:1.3em}
 

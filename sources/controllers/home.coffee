@@ -5,10 +5,12 @@ class __Controller.HomeCtrl extends Monocle.Controller
   elements:
     "#refresh"                        : "button_refresh"
     "#streetField"                    : "streetField"
+    "#driver"                         : "driver"
 
   events:
     "singleTap #refresh"              : "refresh"
     "singleTap #confirm"              : "confirm"
+    "singleTap #map-canvas"           : "hideAside"
 
   constructor: ->
     super
@@ -25,6 +27,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
 
   refresh: (event) =>
     console.log "CLICK REFRESH"
+    Lungo.Aside.hide()
     @streetField[0].value = 'Localizando ...'
     if navigator.geolocation
       options =
@@ -40,18 +43,38 @@ class __Controller.HomeCtrl extends Monocle.Controller
 
   confirm: (event) =>
     console.log "LOCALIZACION CONFIRMADA"
+    Lungo.Aside.hide()
     Lungo.Notification.confirm
       title: "¿Qué taxi desea?"
       description: "Seleccione la opción que  más le convenga"
       accept:
         label: "El más cercano"
-        callback: ->
-          alert "Yes!"
+        callback: =>
+          @showAsigning()
       cancel:
         label: "Elegir taxi"
         callback: ->
           Lungo.Router.section "list_s"
-      
+  
+  showAsigning: ->
+    Lungo.Notification.hide()
+    setTimeout((-> 
+      Lungo.Notification.confirm
+        icon: "time"
+        title: "Esperando la confirmación del taxi"
+        accept:
+          label: "Cancelar petición"
+          callback: =>
+            @
+        cancel:
+          label: "Cancelar2"
+          callback: ->
+            @
+    ) , 250)
+
+  hideAside: (event) =>
+    Lungo.Aside.hide()
+
   initialize = (location) =>
     Lungo.Router.section "home_s"
     if map == undefined
@@ -78,8 +101,6 @@ class __Controller.HomeCtrl extends Monocle.Controller
         streetField.value = 'Localizando ...'
       google.maps.event.addListener map, "zoom_changed", (event) ->
         getStreet(map.getCenter())
-    Lungo.Notification.hide()
-
 
   getStreet = (pos) =>
     geocoder = new google.maps.Geocoder()
