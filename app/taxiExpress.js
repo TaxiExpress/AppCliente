@@ -104,6 +104,7 @@
 
     function HomeCtrl() {
       this.hideAside = __bind(this.hideAside, this);
+      this.showAsigning = __bind(this.showAsigning, this);
       this.confirm = __bind(this.confirm, this);
       this.refresh = __bind(this.refresh, this);
       var options;
@@ -112,14 +113,18 @@
         options = {
           enableHighAccuracy: true,
           timeout: 5000,
-          maximumAge: 5000
+          maximumAge: 0
         };
         navigator.geolocation.getCurrentPosition(initialize, manageErrors);
       }
     }
 
     manageErrors = function(err) {
-      return alert("Error de localización GPS");
+      var _this = this;
+      alert("Error de localización GPS");
+      return setTimeout((function() {
+        return navigator.geolocation.getCurrentPosition(initialize, manageErrors);
+      }), 5000);
     };
 
     HomeCtrl.prototype.refresh = function(event) {
@@ -146,7 +151,6 @@
 
     HomeCtrl.prototype.confirm = function(event) {
       var _this = this;
-      console.log("LOCALIZACION CONFIRMADA");
       Lungo.Aside.hide();
       return Lungo.Notification.confirm({
         title: "¿Qué taxi desea?",
@@ -167,25 +171,12 @@
     };
 
     HomeCtrl.prototype.showAsigning = function() {
+      var _this = this;
       Lungo.Notification.hide();
       return setTimeout((function() {
-        var _this = this;
-        return Lungo.Notification.confirm({
-          icon: "time",
-          title: "Esperando la confirmación del taxi",
-          accept: {
-            label: "Cancelar petición",
-            callback: function() {
-              return _this;
-            }
-          },
-          cancel: {
-            label: "Cancelar2",
-            callback: function() {
-              return this;
-            }
-          }
-        });
+        Lungo.Notification.html('<h2>Esperando la confirmación del taxi</h2>', 'Cancelar');
+        console.log(_this.button_cancel);
+        return _this.button_cancel[0].style.visibility = "visible";
       }), 250);
     };
 
@@ -283,10 +274,12 @@
     function LoginCtrl() {
       this.read = __bind(this.read, this);
       this.drop = __bind(this.drop, this);
+      this.parseResponse = __bind(this.parseResponse, this);
+      this.valideCredentials = __bind(this.valideCredentials, this);
       this.doLogin = __bind(this.doLogin, this);
       var _this = this;
       LoginCtrl.__super__.constructor.apply(this, arguments);
-      this.db = window.openDatabase("taxiexpress", "1.0", "description", 5 * 1024 * 1024);
+      this.db = window.openDatabase("taxiexpress", "1.0", "description", 2 * 1024 * 1024);
       this.db.transaction(function(tx) {
         return tx.executeSql("CREATE TABLE IF NOT EXISTS access (username STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL)");
       });
@@ -294,17 +287,53 @@
     }
 
     LoginCtrl.prototype.doLogin = function(event) {
-      var data, profile, url,
-        _this = this;
+      var _this = this;
+      Lungo.Router.section("init_s");
       this.drop();
       this.db.transaction(function(tx) {
         var sql;
         sql = "INSERT INTO access (username, pass) VALUES ('" + _this.username[0].value + "','" + _this.password[0].value + "');";
         return tx.executeSql(sql);
       });
-      Lungo.Router.section("init_s");
-      url = "";
-      data = "username=" + this.username[0].value + "&password=" + this.password[0].value;
+      return this.valideCredentials(this.username[0].value, this.password[0].value);
+    };
+
+    LoginCtrl.prototype.valideCredentials = function(email, pass) {
+      var data, url;
+      url = "http://192.168.43.137:8000/client/login";
+      data = {
+        email: email,
+        password: pass
+      };
+      return __Controller.home = new __Controller.HomeCtrl("section#home_s");
+    };
+
+    Lungo.Service.Settings.error = function(type, xhr) {
+      var _this = this;
+      console.log(xhr.response);
+      return Lungo.Notification.confirm({
+        title: "Error al autenticar",
+        description: "Los datos introductidos no son correctos.",
+        accept: {
+          label: "Reintentar",
+          callback: function() {
+            return setTimeout((function() {
+              return _this.valideCredentials();
+            }), 250);
+          }
+        },
+        cancel: {
+          label: "Cambiar credenciales",
+          callback: function() {
+            _this.password[0].value = "";
+            return Lungo.Router.section("login_s");
+          }
+        }
+      });
+    };
+
+    LoginCtrl.prototype.parseResponse = function(result) {
+      var profile;
       profile = {
         user: this.username[0].value,
         pass: this.password[0].value
@@ -324,15 +353,9 @@
       var _this = this;
       return this.db.transaction(function(tx) {
         return tx.executeSql("SELECT * FROM access", [], (function(tx, results) {
-          var profile;
           if (results.rows.length > 0) {
             credentials = results.rows.item(0);
-            profile = {
-              user: credentials.username,
-              pass: credentials.pass
-            };
-            Lungo.Cache.set("credentials", profile);
-            return __Controller.home = new __Controller.HomeCtrl("section#home_s");
+            return _this.valideCredentials(credentials.username, credentials.pass);
           } else {
             return Lungo.Router.section("login_s");
           }
@@ -381,7 +404,7 @@
 
     PaymentCtrl.prototype.doPayment = function(event) {
       this.button[0].disabled = true;
-      Stripe.setPublishableKey("pk_test_omPl1VUhfXi514McgAsj4Sus");
+      Stripe.setPublishableKey("pk_test_WKa2sNz0xP9t3ue3ao1nYBSf");
       return Stripe.createToken({
         name: "David Lallana",
         number: "4242424242424242",

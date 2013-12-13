@@ -20,7 +20,7 @@ class __Controller.PaymentCtrl extends Monocle.Controller
 
   doPayment: (event) =>
     @button[0].disabled = true
-    Stripe.setPublishableKey "pk_test_omPl1VUhfXi514McgAsj4Sus"
+    Stripe.setPublishableKey "pk_test_WKa2sNz0xP9t3ue3ao1nYBSf"
     Stripe.createToken
       name: "David Lallana"
       number: "4242424242424242"#@creditCard.val()

@@ -18,12 +18,12 @@ class __Controller.HomeCtrl extends Monocle.Controller
       options =
         enableHighAccuracy: true,
         timeout: 5000,
-        maximumAge: 5000
+        maximumAge: 0
       navigator.geolocation.getCurrentPosition initialize, manageErrors
 
   manageErrors = (err) ->
     alert "Error de localización GPS"
-    #navigator.geolocation.getCurrentPosition initialize, manageErrors
+    setTimeout((=> navigator.geolocation.getCurrentPosition initialize, manageErrors) , 5000)
 
   refresh: (event) =>
     console.log "CLICK REFRESH"
@@ -42,7 +42,6 @@ class __Controller.HomeCtrl extends Monocle.Controller
     getStreet(currentLocation)
 
   confirm: (event) =>
-    console.log "LOCALIZACION CONFIRMADA"
     Lungo.Aside.hide()
     Lungo.Notification.confirm
       title: "¿Qué taxi desea?"
@@ -56,20 +55,12 @@ class __Controller.HomeCtrl extends Monocle.Controller
         callback: ->
           Lungo.Router.section "list_s"
   
-  showAsigning: ->
+  showAsigning: =>
     Lungo.Notification.hide()
-    setTimeout((-> 
-      Lungo.Notification.confirm
-        icon: "time"
-        title: "Esperando la confirmación del taxi"
-        accept:
-          label: "Cancelar petición"
-          callback: =>
-            @
-        cancel:
-          label: "Cancelar2"
-          callback: ->
-            @
+    setTimeout((=> 
+      Lungo.Notification.html '<h2>Esperando la confirmación del taxi</h2>', 'Cancelar'
+      console.log @button_cancel
+      @button_cancel[0].style.visibility = "visible"
     ) , 250)
 
   hideAside: (event) =>
@@ -101,6 +92,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
         streetField.value = 'Localizando ...'
       google.maps.event.addListener map, "zoom_changed", (event) ->
         getStreet(map.getCenter())
+
 
   getStreet = (pos) =>
     geocoder = new google.maps.Geocoder()
