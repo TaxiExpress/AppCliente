@@ -42,13 +42,18 @@ body .theme:active {
  *
  * @author Javier Jimenez Villar <javi@tapquo.com> || @soyjavi
  */
+section .list {
+
+}
+
 section .list li {
   background: #fff;
   font-weight: 300;
 }
 section .list li:not(.anchor) {
   margin-bottom: 1px;
-  height: 75px!important;
+  border-bottom: 1px solid #e5e5e5;
+  height: 85px;
 }
 section .list li.color {
   -webkit-box-shadow: inset 4px 0 #f4f4f4;
@@ -79,7 +84,7 @@ section .list li.warning {
   box-shadow: inset 4px 0 #edba22;
 }
 section .list li.arrow::after {
-  border-color: #cfcfcf;
+  border-color: #777;
 }
 section .list li.contrast,
 section .list li a.contrast {
@@ -321,7 +326,7 @@ body > section > footer {
 
 body > section > article,
 body > section > [data-control="pull"] {
-  background-color: #f3f3f3;
+  background-color: #f4f4f4;
 }
 body > section > article,
 body > section > [data-control="pull"],

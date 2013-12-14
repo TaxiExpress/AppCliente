@@ -1,5 +1,7 @@
 class __Controller.ProfileCtrl extends Monocle.Controller
 
+  date = undefined
+
   elements:
     "#reg_email"                      : "email"
     "#reg_phone"                      : "phone"
@@ -9,9 +11,23 @@ class __Controller.ProfileCtrl extends Monocle.Controller
     "#avatar"                         : "avatar"
 
   events:
-    "singleTap #save"                 : "saveChanges"
+    "singleTap #saveProfile"          : "saveChanges"
     "singleTap #avatar"               : "clickAvatar"
     "change #reg_image"               : "saveAvatar"
+
+  constructor: ->
+    super
+    @loadProfile()
+    __Controller.password = new __Controller.PasswordCtrl "section#password_s"
+    __Controller.aside = new __Controller.AsideCtrl "aside#tools_s"
+
+  loadProfile: =>
+    profile = Lungo.Cache.get "credentials"
+    @email[0].textContent = profile.email if profile.email
+    @phone[0].textContent = profile.phone if profile.phone
+    @name[0].value = profile.name if profile.name
+    @surname[0].value = profile.surname if profile.surname
+    avatar.src = profile.image if profile.image
 
   saveAvatar: (event) =>
     file = @image[0].files[0]
@@ -47,4 +63,30 @@ class __Controller.ProfileCtrl extends Monocle.Controller
     @image[0].click()
 
   saveChanges: (event) =>
-    Lungo.Router.back()
+    server = Lungo.Cache.get "server"
+    url = server + "client/changeDetails"
+    date = new Date().toISOString().substring 0, 19
+    date = date.replace "T", " "
+    data =
+      email: @email[0].textContent
+      firstName: @name[0].value
+      lastName: @surname[0].value
+      image: avatar.src
+      dateUpdate: date
+    #Lungo.Service.post(url, data, @parseResponse, "json")
+    @parseResponse ""
+
+  parseResponse: (result) =>
+    credentials = Lungo.Cache.get "credentials"
+    credentials.name = @name[0].value
+    credentials.surname = @surname[0].value
+    credentials.image = avatar.src
+    credentials.dateUpdate = date
+    Lungo.Cache.set "credentials", credentials
+    __Controller.aside.updateProfile()
+    @db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024) #2MB
+    @db.transaction (tx) =>
+      sql = "UPDATE accessData SET dateUpdate = '"+credentials.dateUpdate+"', name = '"+credentials.name+"', surname = '"+credentials.surname+"', image = '"+credentials.image+"' WHERE email ='"+credentials.email+"';"
+      tx.executeSql sql
+    alert "Perfil actualizado"
+

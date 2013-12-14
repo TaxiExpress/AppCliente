@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>TaxiExpress</title>
     <meta name="viewport" content="width=device-width, user-scalable=no">
-    <meta name=”apple-mobile-web-app-capable” content=”yes” />
     <link rel="stylesheet" href="components/lungo/lungo.css">
     <link rel="stylesheet" href="components/lungo/lungo.icon.css">
     <link rel="stylesheet" href="components/lungo/lungo.theme.css">
@@ -23,7 +22,7 @@
           <span class="logo"><img src="img/logo.png" alt="logo"></span>
           <div class="form initial_form">
               <fieldset class="radius-top">
-                  <input id="username" type="text" placeholder="Usuario" >
+                  <input id="username" type="email" placeholder="Usuario" >
               </fieldset>
               <fieldset class="radius-bottom" >
                   <input id="password" type="password" placeholder="Contraseña" >
@@ -38,43 +37,28 @@
         <header data-title="Registro" data-back="angle-down"></header>      
         <article id="register_a" class="scroll" >
             <div class="form list">
-                <li class="anchor contrast">DATOS PERSONALES</li>
-                <fieldset> 
-                    <input type="text" id="name_fr" maxlength="20" placeholder="Nombre">
-                </fieldset>
-                <fieldset> 
-                    <input type="text" id="surname_fr" maxlength="20" placeholder="Apellidos" >
-                </fieldset>
-                <fieldset>                    
-                    <label data-icon="phone"></label>
-                    <input type="text" id="phone_fr" maxlength="9" placeholder="Teléfono" >
-                </fieldset>
-                <fieldset>
-                    <label data-icon="envelope"></label>
-                    <input type="email" id="email_fr" maxlength="30" placeholder="Email" >
-                </fieldset>
                 <li class="anchor contrast">DETALLES DE CUENTA</li>                
-                <fieldset> 
-                    <input type="text" id="username_fr" maxlength="20" placeholder="Nombre de usuario" >
+                <fieldset>
+                    <input type="email" id="email_fr" maxlength="40" placeholder="Email" >
                 </fieldset>
                 <fieldset> 
-                    <input type="password" id="pass1_fr" maxlength="20" placeholder="Escriba su contraseña" >
+                    <input type="password" id="pass1_fr" placeholder="Escriba su contraseña" >
                 </fieldset>
                 <fieldset> 
-                    <input type="password" id="pass2_fr" maxlength="20" placeholder="Repita su contraseña" >
+                    <input type="password" id="pass2_fr" placeholder="Repita su contraseña" >
                 </fieldset>
+                <button class="anchor accept" id="doRegister" data-label="Registrar en TaxiExpress"></button>
             </div>
         </article>
     </section>
 
-
     <aside id="tools_s">
         <article id ="tools_a" class="active scroll list">            
             <li class="profile" data-view-section="profile_s">
-                <img src="https://pbs.twimg.com/profile_images/378800000638981863/e6b9769bbd741c6e98e3cb1fb79dbdfb.jpeg" alt="" />
+                <img id="menu_avatar" src="img/user_white.png" alt="" />
                 <div>
-                    <strong>Héctor Gómez Torres</strong>
-                    <small data-icon="phone">655 445 987</small>
+                    <strong id="menu_name">--</strong>
+                    <small data-icon="phone" id="menu_phone">--</small>
                 </div>
             </li>
             <li data-view-section="routes_s">Trayectos realizados</li>
@@ -86,6 +70,57 @@
             <li data-view-section="login_s">Cerrar sesión</li>
         </article>
     </aside>   
+
+    <section id="profile_s" data-transition="cover">
+        <header data-title="Detalles de cuenta" data-back="angle-left"></header>      
+        <article id="profile_a" class="scroll" >
+            <div class="form list">
+                <li class="anchor contrast">DATOS PERSONALES</li>
+                <img class="avatar" id="avatar" src="img/user.png" />
+                <fieldset> 
+                    <input type="text" id="reg_name" maxlength="20" placeholder="Nombre">
+                </fieldset>
+                <fieldset> 
+                    <input type="text" id="reg_surname" maxlength="20" placeholder="Apellidos">
+                </fieldset>
+                <li class="anchor contrast">OTROS DATOS</li>
+                <fieldset>                    
+                    <label data-icon="phone"></label>
+                    <small id="reg_phone"></small>
+                </fieldset>
+                <fieldset>
+                    <label data-icon="envelope"></label>
+                    <small id="reg_email"></small>
+                </fieldset>
+                <br/>
+                <fieldset data-icon="angle-right" data-view-section="password_s">
+                    <label data-icon="lock"></label>
+                    <small>Cambiar contraseña</small>
+                </fieldset>
+                <input id="reg_image" type="file" style="visibility: hidden"/>
+                <button class="anchor accept" id="saveProfile" data-label="Guardar cambios"></button>
+            </div>           
+        </article>
+    </section>
+
+    <section id="password_s" data-transition="slide">        
+        <header data-title="Detalles de cuenta" data-back="angle-left"></header>
+        <article id="password_a">
+            <div class="form list">  
+                <li class="anchor contrast">CAMBIO DE CONTRASEÑA</li>       
+                <fieldset> 
+                    <input type="password" id="old_pass" maxlength="20" placeholder="Contraseña actual" >
+                </fieldset>
+                <fieldset> 
+                    <input type="password" id="new_pass1" placeholder="Nueva contraseña" >
+                </fieldset>
+                <fieldset> 
+                    <input type="password" id="new_pass2" placeholder="Repita su nueva contraseña" >
+                </fieldset>
+                <button class="anchor accept" id="changePassword_b" data-label="Cambiar contraseña"></button>
+            </div>
+        </article>
+    </section>
 
     <section id="home_s" data-transition="slide">        
         <article class="street" id="map_a">
@@ -112,7 +147,7 @@
             <a href="#" id="taxis_b" data-view-article="taxisList_a" data-label="Los más cercanos"></a>
             <a href="#" id="favorites_b" data-view-article="favoritesList_a" data-label="Taxis favoritos" ></a>
         </nav>
-        <article id="taxisList_a" class="list form active scroll" >
+        <article id="taxisList_a" class="list form active scroll white" >
             <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
                 <div class="on-right">1 minuto</div>
                 <img src="http://www.sixt.com/uploads/pics/mercedes_03.png" alt="" />
@@ -143,7 +178,7 @@
                 <span data-icon="credit-card" />
             </li>   
         </article>
-        <article id="favoritesList_a" class="list form scroll" >
+        <article id="favoritesList_a" class="list meddium_list form scroll white" >
             <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
                 <div class="on-right">238 metros</div>
                 <img src="http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG" alt="" />
@@ -155,40 +190,7 @@
             </li>
         </article>
     </section>
-    <section id="profile_s" data-transition="cover">
-        <header data-title="Editar perfil" data-back="angle-left">
-            <nav class="on-right">
-                <a href="#" id="save" data-icon="save"></a>
-            </nav>
-        </header>      
-        <article id="profile_a" class="scroll" >
-            <div class="form list">
-                <li class="anchor contrast">DATOS PERSONALES</li>
-                <img class="avatar" id="avatar" src="https://pbs.twimg.com/profile_images/378800000638981863/e6b9769bbd741c6e98e3cb1fb79dbdfb.jpeg" />
-                <fieldset> 
-                    <input type="text" id="reg_name" maxlength="20" placeholder="Nombre" value="Héctor">
-                </fieldset>
-                <fieldset> 
-                    <input type="text" id="reg_surname" maxlength="20" placeholder="Apellidos" value="Gómez Torres">
-                </fieldset>
-                <li class="anchor contrast">OTROS DATOS</li>
-                <fieldset>                    
-                    <label data-icon="phone"></label>
-                    <small>655 665 987</small>
-                </fieldset>
-                <fieldset>
-                    <label data-icon="envelope"></label>
-                    <small>emaildeprueba@gmail.com</small>
-                </fieldset>
-                <br/>
-                <fieldset data-icon="angle-right">
-                    <label data-icon="lock"></label>
-                    <small>Cambiar contraseña</small>
-                </fieldset>
-                <input id="reg_image" type="file" style="visibility: hidden"/>                
-            </div>           
-        </article>
-    </section>
+    
 
     <section id="filters_s" data-transition="cover">
         <header data-title="Configurar búsqueda" data-back="angle-down"></header>      
@@ -255,9 +257,15 @@
 
     <section id="favorites_s" data-transition="cover">
         <header data-title="Taxistas favoritos" data-back="angle-left"></header>      
-        <article id="favorites_a" class="scroll" >
-            <div class="form list">
-                <!--    TAXISTAS FAVORITOS   -->
+        <article id="favorites_a" class="scroll white" >
+            <div class="form little_list list">
+                <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
+                    <img src="http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG" alt="" />
+                    <div>
+                        <strong>Ernesto Gutierrez</strong>
+                        <small><strong>★★★☆☆</strong></small>
+                    </div>
+                </li>
             </div>          
         </article>
     </section>
@@ -311,12 +319,26 @@
     <section id="legalAdvice_s" data-transition="cover">
         <header data-title="Aviso Legal" data-back="angle-left"></header>      
         <article id="legalAdvice_a" class="scroll" >
-            <div class="list">
-                <li class="feature">
-                    <p>Nam blandit, libero id posuere ullamcorper, risus eros vulputate ligula, ac volutpat mi turpis vitae libero. Suspendisse non consequat magna. Proin at bibendum tellus, id tincidunt mauris. In hac habitasse platea dictumst. Nullam cursus leo rhoncus, adipiscing elit ac, ultricies neque. Quisque quam ligula, tristique eget rhoncus et, posuere sit amet nunc. Cras accumsan vel erat id dapibus. Praesent ac tortor dui.</p><br/>
+            <div class="list indented">
+                <p><strong>TAXIEXPRESS</strong>, como responsable de ficheros de los que es propietaria, se compromete a respetar la confidencialidad de la información de carácter personal de sus clientes guardando en todo momento el deber de secreto profesional.</p>
 
-                    <p>Integer laoreet sem interdum dui facilisis dictum. Donec posuere nisi nunc. Phasellus lobortis cursus lorem, quis lacinia libero viverra non. Phasellus aliquam purus turpis, et feugiat nunc convallis eu. Vivamus congue metus ligula, non volutpat dolor adipiscing at. Vestibulum eu metus rutrum, rhoncus risus at, pellentesque sapien. Sed ac luctus magna.</p><br/>
-                </li>
+                <p><strong>TAXIEXPRESS</strong> le informa que se encuentra adaptada a la Ley Orgánica 15/1.999, de Protección de Datos de Carácter Personal, y el Real Decreto 1720/2007 por el que se aprueba el Reglamento de desarrollo de la L.O.P.D., que sus ficheros con datos personales han sido debidamente inscritos en la Agencia Española de Protección de Datos y que cumple con el resto de las obligaciones establecidas en la normativa sobre protección de datos para garantizar la confidencialidad y seguridad de la información de que dispone.</p><br/>
+                
+                <p>Los datos personales proporcionados en ningún caso serán cedidos a terceros salvo previo consentimiento de los interesados.</p>
+                
+                <p>Por todo ello, <strong>TAXIEXPRESS</strong>, ha adoptado los niveles de seguridad de protección de datos personales legalmente requeridos, y ha instalado todos los medios y medidas técnicas a su alcance para evitar la pérdida, mal uso, alteración, acceso no autorizado y robo de los datos que le han sido confiados.
+                </p>
+
+                <p>Los titulares de los datos tienen reconocidos y podrán ejercitar los derechos de acceso, cancelación rectificación y oposición, contactando con:</p>
+                
+                <p>TAXIEXPRESS S.L.<br/>                
+                CIF B99999999<br/>                
+                Domicilio social: Avenida de las Universidades 24, 48007 Bilbao.<br/>
+                Teléfono: 949 999 999<br/>
+                E-mail: <a href="mailto:dessiproject@googlegroups.com">dessiproject@googlegroups.com</a><br/>
+                Web: <a href="http://www.taxiexpress.com">www.taxiexpress.com</a></p>
+                
+                <p>Para la utilización de nuestro sitio web es necesaria la utilización de cookies. Las cookies se utilizan con las finalidades descritas en el tercer párrafo de este documento. Si usted lo desea puede configurar su navegador para ser avisado en pantalla de la recepción de cookies y para impedir la instalación de cookies en su disco duro. Por favor, consulte las instrucciones y manuales de su navegador para ampliar esta información.</p>
             </div>          
         </article>
     </section>
@@ -327,4 +349,6 @@
     <script src="https://js.stripe.com/v2/"></script>
     <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
     <script src="app/taxiExpress.js"></script>   
+    <script src="cordova.js"></script>
+    <script src="telephonenumber.js"></script>
 </html>
