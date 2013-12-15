@@ -61,7 +61,7 @@
                     <small id="menu_profile_phone"></small>
                 </div>
             </li>
-            <li data-view-section="routes_s">Trayectos realizados</li>
+            <li data-view-section="travelList_s">Trayectos realizados</li>
             <li data-view-section="favorites_s">Taxistas favoritos</li>
             <li data-view-section="filters_s">Configuración</li>
             <li data-view-section="payment_s">Formas de pago</li>
@@ -266,46 +266,23 @@
             <div class="form list">
                 <li class="anchor contrast">DATOS DEL TAXISTA</li>
                 <img id="favDriver_image" class="avatar" src="" alt="" />
-                <fieldset> 
-                    <small id="favDriver_name"></small>
-                </fieldset>
-                <fieldset> 
-                    <small id="favDriver_valoration" class="yellow"></small>
-                </fieldset>
+                <fieldset><small id="favDriver_name"></small></fieldset>
+                <fieldset><small id="favDriver_valoration" class="yellow"></small></fieldset>
                 <li class="anchor contrast">DATOS DEL VEHÍCULO</li>
-                <fieldset>  
-                    <small><label>Nº Licencia:</label><span id="favDriver_license" /></small>
-                </fieldset>
-                <fieldset>  
-                    <small><label>Vehículo:</label><span id="favDriver_model" /></small>
-                </fieldset>
-                <fieldset>
-                    <small><label>Matricula:</label><span id="favDriver_plate" /></small>
-                </fieldset>  
-                <fieldset>  
-                    <small><label>Número de plazas:</label><span id="favDriver_capacity" /></small>
-                </fieldset>
-                <fieldset>
-                    <small><label>Habilitado para minusválidos:</label><span id="favDriver_accesible" /></small>
-                </fieldset>
-                <fieldset>
-                    <small><label>Viaje con animales:</label><span id="favDriver_animals" /></small>
-                </fieldset>
+                <fieldset><small><label>Nº Licencia:</label><span id="favDriver_license" /></small></fieldset>
+                <fieldset><small><label>Vehículo:</label><span id="favDriver_model" /></small></fieldset>
+                <fieldset><small><label>Matricula:</label><span id="favDriver_plate" /></small></fieldset>  
+                <fieldset><small><label>Número de plazas:</label><span id="favDriver_capacity" /></small></fieldset>
+                <fieldset><small><label>Habilitado para minusválidos:</label><span id="favDriver_accesible" /></small></fieldset>
+                <fieldset><small><label>Viaje con animales:</label><span id="favDriver_animals" /></small></fieldset>
             </div>          
         </article>
     </section>
 
-    <section id="routes_s" data-transition="cover">
+    <section id="travelList_s" data-transition="cover">
         <header data-title="Trayectos realizados" data-back="angle-left"></header>      
-        <article id="routes_a" class="scroll" >
-            <div class="form little_list list">
-                <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
-                    <div>
-                        <strong>Bilbao - Torrelavega</strong>
-                        <small>12/12/2013 21:25</small>
-                    </div>
-                </li>
-            </div>          
+        <article id="travelList_a" class="scroll" >
+            <div id="travelList_list" class="form little_list list" />
         </article>
     </section>
 

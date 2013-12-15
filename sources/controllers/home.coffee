@@ -90,7 +90,6 @@ class __Controller.HomeCtrl extends Monocle.Controller
       google.maps.event.addListener map, "zoom_changed", (event) ->
         getStreet(map.getCenter())
 
-
   getStreet = (pos) =>
     geocoder = new google.maps.Geocoder()
     geocoder.geocode

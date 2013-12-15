@@ -144,6 +144,88 @@
 }).call(this);
 
 (function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __View.Travel = (function(_super) {
+    var places;
+
+    __extends(Travel, _super);
+
+    places = void 0;
+
+    Travel.prototype.container = "section #travelList_list";
+
+    Travel.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"travelDetails_s\">                \n    <div>\n        <strong>{{ origin }} - {{ target }}</strong>\n        <small>{{ starttime }}</small>\n    </div>\n</li>";
+
+    Travel.prototype.events = {
+      "singleTap li": "onView",
+      "swipeLeft li": "deleteTravel"
+    };
+
+    function Travel() {
+      this.getStreet = __bind(this.getStreet, this);
+      var date, time;
+      Travel.__super__.constructor.apply(this, arguments);
+      date = this.model.starttime.getDate() + "/" + (1 + this.model.starttime.getMonth()) + "/" + this.model.starttime.getFullYear() + " ";
+      time = this.model.starttime.toISOString().substring(11, 16);
+      this.model.starttime = date + time;
+      this.getStreet(this.model.startpoint);
+      this.model.origin = this.places;
+      this.model.target = this.places;
+      this.append(this.model);
+    }
+
+    Travel.prototype.onView = function(event) {
+      return __Controller.travelDetails.loadTravelDetails(this.model);
+    };
+
+    Travel.prototype.deleteTravel = function(event) {
+      var _this = this;
+      return Lungo.Notification.confirm({
+        icon: "road",
+        title: "Eliminar viaje",
+        description: "¿Desea eliminar este viaje?",
+        accept: {
+          label: "Sí",
+          callback: function() {
+            return __Controller.travelList.deleteTravel(_this.model);
+          }
+        },
+        cancel: {
+          label: "No",
+          callback: function() {
+            return this;
+          }
+        }
+      });
+    };
+
+    Travel.prototype.getStreet = function(pos) {
+      var geocoder,
+        _this = this;
+      geocoder = new google.maps.Geocoder();
+      return geocoder.geocode({
+        latLng: pos
+      }, function(results, status) {
+        var result;
+        result = "";
+        if (status === google.maps.GeocoderStatus.OK) {
+          if (results[1]) {
+            return console.log(results[1].address_components[1].short_name);
+          }
+        }
+      });
+    };
+
+    return Travel;
+
+  })(Monocle.View);
+
+}).call(this);
+
+(function() {
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -460,6 +542,7 @@
     };
 
     function LoginCtrl() {
+      this.loadTravels = __bind(this.loadTravels, this);
       this.loadFavoriteTaxis = __bind(this.loadFavoriteTaxis, this);
       this.read = __bind(this.read, this);
       this.drop = __bind(this.drop, this);
@@ -513,10 +596,13 @@
       }
       Lungo.Cache.set("credentials", profile);
       this.loadFavoriteTaxis();
+      this.loadTravels();
       __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
       __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
       __Controller.favorites = new __Controller.FavoritesCtrl("section#favorites_s");
       __Controller.favDriver = new __Controller.FavDriverCtrl("section#favDriver_s");
+      __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
+      __Controller.travelDetails = new __Controller.TravelDetailsCtrl("section#travelDetails_s");
       return setTimeout((function() {
         return __Controller.home = new __Controller.HomeCtrl("section#home_s");
       }), 1000);
@@ -564,7 +650,7 @@
         name = "Taxista ";
         surname = i.toString();
         valoration = (i % 5) + 1;
-        position = new google.maps.LatLng(43.271239, -2.944673200000011 + (i * 0.0001));
+        position = new google.maps.LatLng(43.271239, -2.9445875);
         plate = "DVT 78" + i.toString();
         model = "Opel Corsa";
         image = "img/user.png";
@@ -586,6 +672,31 @@
           accesible: accesible,
           animals: animals,
           appPayment: appPayment
+        }));
+      }
+      return _results;
+    };
+
+    LoginCtrl.prototype.loadTravels = function() {
+      var cost, driver, endpoint, endtime, i, id, startpoint, starttime, travel, _results;
+      i = 0;
+      _results = [];
+      while (i < 2) {
+        id = i;
+        starttime = new Date();
+        endtime = new Date();
+        startpoint = new google.maps.LatLng(43.271239, -2.9445875);
+        endpoint = new google.maps.LatLng(43.281239, -2.9445875);
+        cost = "DVT 78" + i.toString();
+        driver = void 0;
+        i++;
+        _results.push(travel = __Model.Travel.create({
+          id: id,
+          starttime: starttime,
+          endtime: endtime,
+          startpoint: startpoint,
+          cost: cost,
+          driver: driver
         }));
       }
       return _results;
@@ -959,6 +1070,77 @@
     };
 
     return RegisterCtrl;
+
+  })(Monocle.Controller);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Controller.TravelDetailsCtrl = (function(_super) {
+    __extends(TravelDetailsCtrl, _super);
+
+    TravelDetailsCtrl.prototype.elements = {
+      "#travelDetails_description": "description"
+    };
+
+    function TravelDetailsCtrl() {
+      this.loadTravelDetails = __bind(this.loadTravelDetails, this);
+      TravelDetailsCtrl.__super__.constructor.apply(this, arguments);
+    }
+
+    TravelDetailsCtrl.prototype.loadTravelDetails = function(travel) {
+      return console.log("llego");
+    };
+
+    return TravelDetailsCtrl;
+
+  })(Monocle.Controller);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Controller.TravelListCtrl = (function(_super) {
+    var _views;
+
+    __extends(TravelListCtrl, _super);
+
+    _views = [];
+
+    function TravelListCtrl() {
+      this.deleteTravel = __bind(this.deleteTravel, this);
+      this.loadTravelList = __bind(this.loadTravelList, this);
+      TravelListCtrl.__super__.constructor.apply(this, arguments);
+      this.loadTravelList();
+    }
+
+    TravelListCtrl.prototype.loadTravelList = function() {
+      var travel, _i, _len, _ref, _results;
+      _ref = __Model.Travel.all();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        travel = _ref[_i];
+        _results.push(_views[travel.id] = new __View.Travel({
+          model: travel
+        }));
+      }
+      return _results;
+    };
+
+    TravelListCtrl.prototype.deleteTravel = function(travel) {
+      _views[travel.id].remove();
+      _views[travel.id] = void 0;
+      return travel.destroy();
+    };
+
+    return TravelListCtrl;
 
   })(Monocle.Controller);
 
