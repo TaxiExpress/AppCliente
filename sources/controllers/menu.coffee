@@ -1,9 +1,9 @@
-class __Controller.AsideCtrl extends Monocle.Controller
+class __Controller.MenuCtrl extends Monocle.Controller
 
   elements:
-    "#menu_avatar"                     : "avatar"
-    "#menu_phone"                      : "phone"
-    "#menu_name"                       : "name"
+    "#menu_profile_avatar"                     : "avatar"
+    "#menu_profile_phone"                      : "phone"
+    "#menu_profile_name"                       : "name"
 
   constructor: ->
     super

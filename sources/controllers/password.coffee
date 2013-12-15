@@ -1,12 +1,12 @@
 class __Controller.PasswordCtrl extends Monocle.Controller
 
   elements:
-    "#old_pass"                       : "old_pass"
-    "#new_pass1"                      : "new_pass1"
-    "#new_pass2"                      : "new_pass2"
+    "#password_old_pass"                       : "old_pass"
+    "#password_new_pass1"                      : "new_pass1"
+    "#password_new_pass2"                      : "new_pass2"
 
   events:
-    "singleTap #changePassword_b"     : "saveNewPassword"
+    "singleTap #password_save_b"     : "saveNewPassword"
 
   constructor: ->
     super

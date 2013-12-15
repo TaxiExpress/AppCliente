@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>TaxiExpress</title>
@@ -10,55 +10,55 @@
 </head>
 <body>  
     <section id="init_s" data-transition="fade">
-        <article id="init_a" class="active splash initial">
-            <span class="logo"><img src="img/logo.png" alt="logo"></span>
+        <article id="init_a" class="splash initial">
+            <span class="logo"><img src="img/logo.png" alt=""/></span>
             <span class="load"><img src="img/loading.gif" alt="Cargando..." /></span>
             <span class="name">taxiexpress.com</span>
        </article>
     </section>
 
-    <section id="login_s" class="active splash initial" data-transition="fade" >
-        <article id="login_a" class="active splash initial">
-          <span class="logo"><img src="img/logo.png" alt="logo"></span>
+    <section id="login_s" data-transition="fade">
+        <article id="login_a" class="splash initial">
+          <span class="logo"><img src="img/logo.png" alt=""></span>
           <div class="form initial_form">
               <fieldset class="radius-top">
-                  <input id="username" type="email" placeholder="Usuario" >
+                  <input id="login_username" type="email" placeholder="Usuario">
               </fieldset>
               <fieldset class="radius-bottom" >
-                  <input id="password" type="password" placeholder="Contraseña" >
+                  <input id="login_password" type="password" placeholder="Contraseña">
               </fieldset>
-              <button class="anchor" id="login_b" data-label="Acceder"></button>
-              <button class="anchor accept" id="register" data-view-section="register_s" data-label="Registro"></button>
+              <button id="login_login_b" class="anchor" data-label="Acceder" />
+              <button id="login_register_b" class="anchor accept" data-view-section="register_s" data-label="Registro" />
           </div>    
        </article>
     </section>
 
     <section id="register_s" data-transition="cover">
-        <header data-title="Registro" data-back="angle-down"></header>      
+        <header data-title="Registro" data-back="angle-down" />    
         <article id="register_a" class="scroll" >
             <div class="form list">
                 <li class="anchor contrast">DETALLES DE CUENTA</li>                
                 <fieldset>
-                    <input type="email" id="email_fr" maxlength="40" placeholder="Email" >
+                    <input id="register_email" type="email" maxlength="40" placeholder="Email" />
                 </fieldset>
                 <fieldset> 
-                    <input type="password" id="pass1_fr" placeholder="Escriba su contraseña" >
+                    <input id="register_pass1" type="password" placeholder="Escriba su contraseña" />
                 </fieldset>
                 <fieldset> 
-                    <input type="password" id="pass2_fr" placeholder="Repita su contraseña" >
+                    <input id="register_pass2" type="password" placeholder="Repita su contraseña" />
                 </fieldset>
-                <button class="anchor accept" id="doRegister" data-label="Registrar en TaxiExpress"></button>
+                <button id="register_register_b" class="anchor accept" data-label="Registrar en TaxiExpress" />
             </div>
         </article>
     </section>
 
-    <aside id="tools_s">
-        <article id ="tools_a" class="active scroll list">            
+    <aside id="menu_s">
+        <article id ="menu_a" class="active scroll list">            
             <li class="profile" data-view-section="profile_s">
-                <img id="menu_avatar" src="img/user_white.png" alt="" />
+                <img id="menu_profile_avatar" src="img/user_white.png" alt="" />
                 <div>
-                    <strong id="menu_name">--</strong>
-                    <small data-icon="phone" id="menu_phone">--</small>
+                    <strong id="menu_profile_name"></strong>
+                    <small id="menu_profile_phone"></small>
                 </div>
             </li>
             <li data-view-section="routes_s">Trayectos realizados</li>
@@ -76,29 +76,29 @@
         <article id="profile_a" class="scroll" >
             <div class="form list">
                 <li class="anchor contrast">DATOS PERSONALES</li>
-                <img class="avatar" id="avatar" src="img/user.png" />
+                <img id="profile_avatar" class="avatar" src="img/user.png" />
                 <fieldset> 
-                    <input type="text" id="reg_name" maxlength="20" placeholder="Nombre">
+                    <input id="profile_name" type="text" maxlength="20" placeholder="Nombre" />
                 </fieldset>
                 <fieldset> 
-                    <input type="text" id="reg_surname" maxlength="20" placeholder="Apellidos">
+                    <input id="profile_surname" type="text" maxlength="20" placeholder="Apellidos" />
                 </fieldset>
                 <li class="anchor contrast">OTROS DATOS</li>
                 <fieldset>                    
                     <label data-icon="phone"></label>
-                    <small id="reg_phone"></small>
+                    <small id="profile_phone"></small>
                 </fieldset>
                 <fieldset>
                     <label data-icon="envelope"></label>
-                    <small id="reg_email"></small>
+                    <small id="profile_email"></small>
                 </fieldset>
                 <br/>
                 <fieldset data-icon="angle-right" data-view-section="password_s">
                     <label data-icon="lock"></label>
                     <small>Cambiar contraseña</small>
                 </fieldset>
-                <input id="reg_image" type="file" style="visibility: hidden"/>
-                <button class="anchor accept" id="saveProfile" data-label="Guardar cambios"></button>
+                <input id="profile_image" type="file" style="visibility: hidden" />
+                <button id="profile_save_b" class="anchor accept" data-label="Guardar cambios" />
             </div>           
         </article>
     </section>
@@ -109,45 +109,44 @@
             <div class="form list">  
                 <li class="anchor contrast">CAMBIO DE CONTRASEÑA</li>       
                 <fieldset> 
-                    <input type="password" id="old_pass" maxlength="20" placeholder="Contraseña actual" >
+                    <input id="password_old_pass" type="password" maxlength="20" placeholder="Contraseña actual" />
                 </fieldset>
                 <fieldset> 
-                    <input type="password" id="new_pass1" placeholder="Nueva contraseña" >
+                    <input id="password_new_pass1" type="password" placeholder="Nueva contraseña" />
                 </fieldset>
                 <fieldset> 
-                    <input type="password" id="new_pass2" placeholder="Repita su nueva contraseña" >
+                    <input id="password_new_pass2" type="password" placeholder="Repita su nueva contraseña" />
                 </fieldset>
-                <button class="anchor accept" id="changePassword_b" data-label="Cambiar contraseña"></button>
+                <button id="password_save_b" class="anchor accept" data-label="Cambiar contraseña" />
             </div>
         </article>
     </section>
 
     <section id="home_s" data-transition="slide">        
-        <article class="street" id="map_a">
-            <button class="topLeftButton" data-view-aside="tools_s" data-icon="menu"></button>
-            <img id="driver" class="topRight" src="" />
+        <article id="home_a" class="street">
+            <button class="topLeftButton" data-view-aside="menu_s" data-icon="menu"></button>
+            <img id="home_driver" class="topRight" src="" />
             <div class="marker"><img src="img/poi1.png" alt="" /></div>
             <div class="location">
-                <span id="refresh" class="icon screenshot"></span>
-                <input type="text" id="streetField" value="" readonly="readonly"></input>
-                <button class="anchor" id="confirm" data-label="Confirmar posición"></button>
+                <span id="home_refresh_b" class="icon screenshot"></span>
+                <input id="home_streetField" type="text" readonly="readonly" />
+                <button id="home_confirm_b" class="anchor" data-label="Confirmar posición" />
             </div>
-            <div id="map-canvas"/>
+            <div id="map-canvas" />
         </article>
     </section>
 
     <section id="list_s" data-transition="slide">        
-        <header data-back="angle-left">
-            <h1 class="title centered">Elegir taxi</h1>
+        <header data-back="angle-left" data-title="Elegir taxi">
             <nav class="on-right">
                 <a href="#" data-view-section="filters_s" data-icon="bookmark-empty"></a>
             </nav>
         </header>
         <nav data-control="groupbar">
-            <a href="#" id="taxis_b" data-view-article="taxisList_a" data-label="Los más cercanos"></a>
-            <a href="#" id="favorites_b" data-view-article="favoritesList_a" data-label="Taxis favoritos" ></a>
+            <a id="list_taxis_b" href="#" data-view-article="nearList_a" data-label="Los más cercanos"></a>
+            <a id="list_favorites_b" href="#" data-view-article="favoritesList_a" data-label="Taxis favoritos"></a>
         </nav>
-        <article id="taxisList_a" class="list form active scroll white" >
+        <article id="nearList_a" class="list form active scroll white">
             <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
                 <div class="on-right">1 minuto</div>
                 <img src="http://www.sixt.com/uploads/pics/mercedes_03.png" alt="" />
@@ -178,7 +177,7 @@
                 <span data-icon="credit-card" />
             </li>   
         </article>
-        <article id="favoritesList_a" class="list meddium_list form scroll white" >
+        <article id="favoritesList_a" class="list meddium_list form scroll white">
             <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
                 <div class="on-right">238 metros</div>
                 <img src="http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG" alt="" />
@@ -189,34 +188,33 @@
                 <span data-icon="credit-card" />
             </li>
         </article>
-    </section>
-    
+    </section>    
 
     <section id="filters_s" data-transition="cover">
         <header data-title="Configurar búsqueda" data-back="angle-down"></header>      
-        <article id="filters_a" class="scroll" >
+        <article id="filters_a" class="scroll">
             <div class="form list">
                 <li class="anchor contrast">CARACTERÍSTICAS DEL VEHÍCULO</li>
                 <fieldset> 
                     <small>Mínimo número de plazas</small>
-                    <input type="number" id="reg_seats" value="4" min="3">
+                    <input id="filters_seats" type="number" value="4" min="3" />
                 </fieldset> 
                 <li class="anchor contrast">PERMISOS</li>
                 <fieldset> 
                     <small>Pago a través de la App</small>
-                    <input type="checkbox" id="reg_payment" checked>
+                    <input id="filters_payment" type="checkbox" checked />
                 </fieldset> 
                 <fieldset> 
                     <small>Transporte de animales</small>
-                    <input type="checkbox" id="reg_animals" >
+                    <input id="filters_animals" type="checkbox" />
                 </fieldset> 
                 <fieldset> 
                     <small>Permitir comer y beber</small>
-                    <input type="checkbox" id="reg_food" checked >
+                    <input id="filters_food" type="checkbox" checked />
                 </fieldset>
                 <fieldset> 
                     <small>Permitir fumar</small>
-                    <input type="checkbox" id="reg_smoke" checked >
+                    <input id="filters_smoke" type="checkbox" checked />
                 </fieldset>            
             </div>           
         </article>
@@ -224,10 +222,10 @@
 
     <section id="chosenTaxi_s" data-transition="slide">
         <header data-title="Taxi seleccionado" data-back="angle-left"></header>      
-        <article id="chosenTaxi_a" class="scroll" >
+        <article id="chosenTaxi_a" class="scroll">
             <div class="form list">
                 <li class="anchor contrast">DATOS DEL TAXISTA</li>
-                <img class="avatar" src="http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG" />
+                <img class="avatar" src="http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG" alt="" />
                 <fieldset> 
                     <small>Alfonso García Torreiglesias</small>
                 </fieldset>
@@ -250,14 +248,14 @@
                 <fieldset>
                     <small><label>Viaje con animales:</label>Si</small>
                 </fieldset>
-                <button class="anchor accept" data-label="Solicitar taxi"></button>
+                <button class="anchor accept" data-label="Solicitar taxi" />
             </div>          
         </article>
     </section>
 
     <section id="favorites_s" data-transition="cover">
         <header data-title="Taxistas favoritos" data-back="angle-left"></header>      
-        <article id="favorites_a" class="scroll white" >
+        <article id="favorites_a" class="scroll white">
             <div class="form little_list list">
                 <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
                     <img src="http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG" alt="" />
@@ -281,23 +279,23 @@
 
     <section id="payment_s" data-transition="cover">
         <header data-title="Pago a taxista" data-back="angle-left"></header>      
-        <article id="payment_a" class="scroll" >
+        <article id="payment_a" class="scroll">
             <div class="form list payments">
-                <strong id="payment-amount"></strong>
-                <span id="payment-errors"></span>
+                <strong id="payment_amount"></strong>
+                <span id="payment_errors"></span>
                 <fieldset> 
                     <label data-icon="credit-card"></label>
-                    <input type="text" id="credit_card_payment" maxlength="16" placeholder="Número de tarjeta">
+                    <input id="payment_credit_card" type="text" maxlength="16" placeholder="Número de tarjeta" />
                 </fieldset>
                 <fieldset>
                     <label data-icon="lock"></label>
-                    <input type="text" id="cvc_payment" maxlength="4" placeholder="CVC" >
+                    <input id="payment_cvc" type="text" maxlength="4" placeholder="CVC" />
                 </fieldset>
                 <fieldset>                    
                     <label data-icon="calendar"></label>
-                    <input type="text" id="expires_payment" maxlength="7" placeholder="MM/YYYY" >
+                    <input id="payment_expires" type="text" maxlength="7" placeholder="MM/YYYY" />
                 </fieldset>
-                <button id="submit_payment" class="anchor accept">Pagar</button>
+                <button id="payment_submit" class="anchor accept" data-label="Pagar" />
             </div>
         </article>
     </section>
@@ -305,13 +303,11 @@
     <section id="faq_s" data-transition="cover">
         <header data-title="F.A.Q." data-back="angle-left"></header>      
         <article id="faq_a" class="scroll" >
-            <div class="form list">
-                <li class="feature">
-                    <p>1- ¿Es segura TaxiExpress?</p>
-                    <p>Claaaro</p><br/>
-                    <p>2- ¿Qué hago si no viene el taxi?</p>
-                    <p>Pedir otro</p>
-                </li>
+            <div class="list indented">            
+                <p>1- ¿Es segura TaxiExpress?</p>
+                <p>Claaaro</p><br/>
+                <p>2- ¿Qué hago si no viene el taxi?</p>
+                <p>Pedir otro</p>
             </div>          
         </article>
     </section>

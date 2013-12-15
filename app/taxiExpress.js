@@ -83,40 +83,6 @@
 }).call(this);
 
 (function() {
-  var __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  __Controller.AsideCtrl = (function(_super) {
-    __extends(AsideCtrl, _super);
-
-    AsideCtrl.prototype.elements = {
-      "#menu_avatar": "avatar",
-      "#menu_phone": "phone",
-      "#menu_name": "name"
-    };
-
-    function AsideCtrl() {
-      AsideCtrl.__super__.constructor.apply(this, arguments);
-      this.updateProfile();
-    }
-
-    AsideCtrl.prototype.updateProfile = function() {
-      var profile;
-      profile = Lungo.Cache.get("credentials");
-      this.phone[0].textContent = "Tel. " + profile.phone;
-      this.name[0].textContent = profile.name + " " + profile.surname;
-      if (profile.image) {
-        return this.avatar[0].src = profile.image;
-      }
-    };
-
-    return AsideCtrl;
-
-  })(Monocle.Controller);
-
-}).call(this);
-
-(function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -130,14 +96,14 @@
     map = void 0;
 
     HomeCtrl.prototype.elements = {
-      "#refresh": "button_refresh",
-      "#streetField": "streetField",
-      "#driver": "driver"
+      "#home_refresh_b": "button_refresh",
+      "#home_streetField": "streetField",
+      "#home_driver": "driver"
     };
 
     HomeCtrl.prototype.events = {
-      "singleTap #refresh": "refresh",
-      "singleTap #confirm": "confirm",
+      "singleTap #home_refresh_b": "refresh",
+      "singleTap #home_confirm_b": "confirm",
       "singleTap #map-canvas": "hideAside"
     };
 
@@ -168,7 +134,6 @@
 
     HomeCtrl.prototype.refresh = function(event) {
       var options;
-      console.log("CLICK REFRESH");
       Lungo.Aside.hide();
       this.streetField[0].value = 'Localizando ...';
       if (navigator.geolocation) {
@@ -214,7 +179,6 @@
       Lungo.Notification.hide();
       return setTimeout((function() {
         Lungo.Notification.html('<h2>Esperando la confirmación del taxi</h2>', 'Cancelar');
-        console.log(_this.button_cancel);
         return _this.button_cancel[0].style.visibility = "visible";
       }), 250);
     };
@@ -255,7 +219,7 @@
           return getStreet(map.getCenter());
         });
         google.maps.event.addListener(map, "dragstart", function(event) {
-          return streetField.value = 'Localizando ...';
+          return home_streetField.value = 'Localizando ...';
         });
         return google.maps.event.addListener(map, "zoom_changed", function(event) {
           return getStreet(map.getCenter());
@@ -271,12 +235,12 @@
       }, function(results, status) {
         if (status === google.maps.GeocoderStatus.OK) {
           if (results[1]) {
-            return streetField.value = results[0].address_components[1].short_name + ", " + results[0].address_components[0].short_name;
+            return home_streetField.value = results[0].address_components[1].short_name + ", " + results[0].address_components[0].short_name;
           } else {
-            return streetField.value = 'Calle desconocida';
+            return home_streetField.value = 'Calle desconocida';
           }
         } else {
-          return streetField.value = 'Calle desconocida';
+          return home_streetField.value = 'Calle desconocida';
         }
       });
     };
@@ -304,12 +268,12 @@
     phone_number = void 0;
 
     LoginCtrl.prototype.elements = {
-      "#username": "username",
-      "#password": "password"
+      "#login_username": "username",
+      "#login_password": "password"
     };
 
     LoginCtrl.prototype.events = {
-      "tap #login_b": "doLogin"
+      "tap #login_login_b": "doLogin"
     };
 
     function LoginCtrl() {
@@ -411,6 +375,40 @@
 }).call(this);
 
 (function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Controller.MenuCtrl = (function(_super) {
+    __extends(MenuCtrl, _super);
+
+    MenuCtrl.prototype.elements = {
+      "#menu_profile_avatar": "avatar",
+      "#menu_profile_phone": "phone",
+      "#menu_profile_name": "name"
+    };
+
+    function MenuCtrl() {
+      MenuCtrl.__super__.constructor.apply(this, arguments);
+      this.updateProfile();
+    }
+
+    MenuCtrl.prototype.updateProfile = function() {
+      var profile;
+      profile = Lungo.Cache.get("credentials");
+      this.phone[0].textContent = "Tel. " + profile.phone;
+      this.name[0].textContent = profile.name + " " + profile.surname;
+      if (profile.image) {
+        return this.avatar[0].src = profile.image;
+      }
+    };
+
+    return MenuCtrl;
+
+  })(Monocle.Controller);
+
+}).call(this);
+
+(function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -419,13 +417,13 @@
     __extends(PasswordCtrl, _super);
 
     PasswordCtrl.prototype.elements = {
-      "#old_pass": "old_pass",
-      "#new_pass1": "new_pass1",
-      "#new_pass2": "new_pass2"
+      "#password_old_pass": "old_pass",
+      "#password_new_pass1": "new_pass1",
+      "#password_new_pass2": "new_pass2"
     };
 
     PasswordCtrl.prototype.events = {
-      "singleTap #changePassword_b": "saveNewPassword"
+      "singleTap #password_save_b": "saveNewPassword"
     };
 
     function PasswordCtrl() {
@@ -484,17 +482,16 @@
     amount = void 0;
 
     PaymentCtrl.prototype.elements = {
-      "#credit_card_payment": "creditCard",
-      "#cvc_payment": "cvc",
-      "#expires_payment": "expires",
-      "#submit_payment": "button",
-      "#payment-amount": "amount_text",
-      "#payment-errors": "errors",
-      "#payment-form": "form"
+      "#payment_credit_card": "creditCard",
+      "#payment_cvc": "cvc",
+      "#payment_expires": "expires",
+      "#payment_submit": "button",
+      "#payment_amount": "amount_text",
+      "#payment_errors": "errors"
     };
 
     PaymentCtrl.prototype.events = {
-      "singleTap #submit_payment": "doPayment"
+      "singleTap #payment_submit": "doPayment"
     };
 
     function PaymentCtrl() {
@@ -503,6 +500,15 @@
       PaymentCtrl.__super__.constructor.apply(this, arguments);
       this.loadPayment(23);
     }
+
+    PaymentCtrl.prototype.loadPayment = function(amount_payment) {
+      amount = amount_payment;
+      this.amount_text[0].innerText = "A pagar: " + amount + " €";
+      this.creditCard.val("");
+      this.cvc.val("");
+      this.expires.val("");
+      return this.button[0].disabled = false;
+    };
 
     PaymentCtrl.prototype.doPayment = function(event) {
       this.button[0].disabled = true;
@@ -526,17 +532,6 @@
       }
     };
 
-    PaymentCtrl.prototype.showErrors = function() {};
-
-    PaymentCtrl.prototype.loadPayment = function(amount_payment) {
-      amount = amount_payment;
-      this.amount_text[0].innerText = "A pagar: " + amount + " €";
-      this.creditCard.val("");
-      this.cvc.val("");
-      this.expires.val("");
-      return this.button[0].disabled = false;
-    };
-
     return PaymentCtrl;
 
   })(Monocle.Controller);
@@ -556,30 +551,29 @@
     date = void 0;
 
     ProfileCtrl.prototype.elements = {
-      "#reg_email": "email",
-      "#reg_phone": "phone",
-      "#reg_name": "name",
-      "#reg_surname": "surname",
-      "#reg_image": "image",
-      "#avatar": "avatar"
+      "#profile_email": "email",
+      "#profile_phone": "phone",
+      "#profile_name": "name",
+      "#profile_surname": "surname",
+      "#profile_image": "image",
+      "#profile_avatar": "avatar"
     };
 
     ProfileCtrl.prototype.events = {
-      "singleTap #saveProfile": "saveChanges",
-      "singleTap #avatar": "clickAvatar",
-      "change #reg_image": "saveAvatar"
+      "singleTap #profile_save_b": "saveChanges",
+      "singleTap #profile_avatar": "clickAvatar",
+      "change #profile_image": "saveAvatar"
     };
 
     function ProfileCtrl() {
       this.parseResponse = __bind(this.parseResponse, this);
       this.saveChanges = __bind(this.saveChanges, this);
       this.clickAvatar = __bind(this.clickAvatar, this);
-      this.saveAvatar = __bind(this.saveAvatar, this);
       this.loadProfile = __bind(this.loadProfile, this);
       ProfileCtrl.__super__.constructor.apply(this, arguments);
       this.loadProfile();
       __Controller.password = new __Controller.PasswordCtrl("section#password_s");
-      __Controller.aside = new __Controller.AsideCtrl("aside#tools_s");
+      __Controller.menu = new __Controller.MenuCtrl("aside#menu_s");
     }
 
     ProfileCtrl.prototype.loadProfile = function() {
@@ -598,7 +592,7 @@
         this.surname[0].value = profile.surname;
       }
       if (profile.image) {
-        return avatar.src = profile.image;
+        return this.avatar[0].src = profile.image;
       }
     };
 
@@ -635,8 +629,7 @@
           ctx = canvas.getContext("2d");
           ctx.drawImage(this, 0, 0, tempW, tempH);
           dataURL = canvas.toDataURL("image/jpeg");
-          console.log(avatar.src);
-          return avatar.src = dataURL;
+          return profile_avatar.src = dataURL;
         };
       };
     };
@@ -655,7 +648,7 @@
         email: this.email[0].textContent,
         firstName: this.name[0].value,
         lastName: this.surname[0].value,
-        image: avatar.src,
+        image: this.avatar[0].src,
         dateUpdate: date
       };
       return this.parseResponse("");
@@ -667,10 +660,10 @@
       credentials = Lungo.Cache.get("credentials");
       credentials.name = this.name[0].value;
       credentials.surname = this.surname[0].value;
-      credentials.image = avatar.src;
+      credentials.image = this.avatar[0].src;
       credentials.dateUpdate = date;
       Lungo.Cache.set("credentials", credentials);
-      __Controller.aside.updateProfile();
+      __Controller.menu.updateProfile();
       this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
       this.db.transaction(function(tx) {
         var sql;
@@ -695,13 +688,13 @@
     __extends(RegisterCtrl, _super);
 
     RegisterCtrl.prototype.elements = {
-      "#email_fr": "email",
-      "#pass1_fr": "pass1",
-      "#pass2_fr": "pass2"
+      "#register_email": "email",
+      "#register_pass1": "pass1",
+      "#register_pass2": "pass2"
     };
 
     RegisterCtrl.prototype.events = {
-      "singleTap #doRegister": "register"
+      "singleTap #register_register_b": "register"
     };
 
     function RegisterCtrl() {

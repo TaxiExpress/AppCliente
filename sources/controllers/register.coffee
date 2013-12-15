@@ -1,12 +1,12 @@
 class __Controller.RegisterCtrl extends Monocle.Controller
 
   elements:
-    "#email_fr"                          : "email"
-    "#pass1_fr"                          : "pass1"
-    "#pass2_fr"                          : "pass2"
+    "#register_email"                          : "email"
+    "#register_pass1"                          : "pass1"
+    "#register_pass2"                          : "pass2"
 
   events:
-    "singleTap #doRegister"              : "register"
+    "singleTap #register_register_b"           : "register"
 
   constructor: ->
     super

@@ -3,20 +3,27 @@ class __Controller.PaymentCtrl extends Monocle.Controller
   amount = undefined
 
   elements:
-    "#credit_card_payment"                        : "creditCard"
-    "#cvc_payment"                                : "cvc"
-    "#expires_payment"                            : "expires"
-    "#submit_payment"                             : "button"
-    "#payment-amount"                             : "amount_text"
-    "#payment-errors"                             : "errors"
-    "#payment-form"                               : "form"
+    "#payment_credit_card"                        : "creditCard"
+    "#payment_cvc"                                : "cvc"
+    "#payment_expires"                            : "expires"
+    "#payment_submit"                             : "button"
+    "#payment_amount"                             : "amount_text"
+    "#payment_errors"                             : "errors"
 
   events:
-    "singleTap #submit_payment"                   : "doPayment"
+    "singleTap #payment_submit"                   : "doPayment"
 
   constructor: ->
     super
     @loadPayment(23)
+
+  loadPayment: (amount_payment) ->
+    amount = amount_payment
+    @amount_text[0].innerText = "A pagar: "+amount+" €"
+    @creditCard.val("")
+    @cvc.val("")
+    @expires.val("")
+    @button[0].disabled = false
 
   doPayment: (event) =>
     @button[0].disabled = true
@@ -36,14 +43,3 @@ class __Controller.PaymentCtrl extends Monocle.Controller
     else
       Lungo.Notification.html '<h2 data-icon="spinner">Trayecto pagado</h2>', "Aceptar"
       Lungo.Router.section "home_s"
-
-  showErrors: ->
-
-  loadPayment: (amount_payment) ->
-    amount = amount_payment
-    @amount_text[0].innerText = "A pagar: "+amount+" €"
-    @creditCard.val("")
-    @cvc.val("")
-    @expires.val("")
-    @button[0].disabled = false
-

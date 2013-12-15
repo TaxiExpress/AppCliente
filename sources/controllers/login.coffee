@@ -5,11 +5,11 @@ class __Controller.LoginCtrl extends Monocle.Controller
   phone_number = undefined
 
   elements:
-    "#username"                              : "username"
-    "#password"                              : "password"
+    "#login_username"                              : "username"
+    "#login_password"                              : "password"
 
   events:
-    "tap #login_b"                           : "doLogin"
+    "tap #login_login_b"                           : "doLogin"
 
   constructor: ->
     super

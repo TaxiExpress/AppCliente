@@ -3,14 +3,14 @@ class __Controller.HomeCtrl extends Monocle.Controller
   map = undefined                     #El mapa
 
   elements:
-    "#refresh"                        : "button_refresh"
-    "#streetField"                    : "streetField"
-    "#driver"                         : "driver"
+    "#home_refresh_b"                        : "button_refresh"
+    "#home_streetField"                      : "streetField"
+    "#home_driver"                           : "driver"
 
   events:
-    "singleTap #refresh"              : "refresh"
-    "singleTap #confirm"              : "confirm"
-    "singleTap #map-canvas"           : "hideAside"
+    "singleTap #home_refresh_b"              : "refresh"
+    "singleTap #home_confirm_b"              : "confirm"
+    "singleTap #map-canvas"                  : "hideAside"
 
   constructor: ->
     super
@@ -26,7 +26,6 @@ class __Controller.HomeCtrl extends Monocle.Controller
     setTimeout((=> navigator.geolocation.getCurrentPosition initialize, manageErrors) , 5000)
 
   refresh: (event) =>
-    console.log "CLICK REFRESH"
     Lungo.Aside.hide()
     @streetField[0].value = 'Localizando ...'
     if navigator.geolocation
@@ -59,7 +58,6 @@ class __Controller.HomeCtrl extends Monocle.Controller
     Lungo.Notification.hide()
     setTimeout((=> 
       Lungo.Notification.html '<h2>Esperando la confirmación del taxi</h2>', 'Cancelar'
-      console.log @button_cancel
       @button_cancel[0].style.visibility = "visible"
     ) , 250)
 
@@ -89,7 +87,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
       google.maps.event.addListener map, "dragend", (event) ->
         getStreet(map.getCenter())
       google.maps.event.addListener map, "dragstart", (event) ->
-        streetField.value = 'Localizando ...'
+        home_streetField.value = 'Localizando ...'
       google.maps.event.addListener map, "zoom_changed", (event) ->
         getStreet(map.getCenter())
 
@@ -98,11 +96,11 @@ class __Controller.HomeCtrl extends Monocle.Controller
     geocoder = new google.maps.Geocoder()
     geocoder.geocode
       latLng: pos
-    , (results, status) ->
+    , (results, status) =>
       if status is google.maps.GeocoderStatus.OK
         if results[1]
-          streetField.value = results[0].address_components[1].short_name + ", " +results[0].address_components[0].short_name
+          home_streetField.value = results[0].address_components[1].short_name + ", " +results[0].address_components[0].short_name
         else
-          streetField.value = 'Calle desconocida'
+          home_streetField.value = 'Calle desconocida'
       else
-        streetField.value = 'Calle desconocida'
+        home_streetField.value = 'Calle desconocida'
