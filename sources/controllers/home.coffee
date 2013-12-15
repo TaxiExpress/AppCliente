@@ -58,7 +58,6 @@ class __Controller.HomeCtrl extends Monocle.Controller
     Lungo.Notification.hide()
     setTimeout((=> 
       Lungo.Notification.html '<h2>Esperando la confirmación del taxi</h2>', 'Cancelar'
-      @button_cancel[0].style.visibility = "visible"
     ) , 250)
 
   hideAside: (event) =>

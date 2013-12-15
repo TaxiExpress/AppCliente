@@ -30,6 +30,33 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+  __Model.FavoriteDriver = (function(_super) {
+    __extends(FavoriteDriver, _super);
+
+    function FavoriteDriver() {
+      _ref = FavoriteDriver.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    FavoriteDriver.fields("license", "name", "surname", "valoration", "position", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
+
+    FavoriteDriver.get = function(id) {
+      return this.select(function(driver) {
+        return driver.license === id;
+      });
+    };
+
+    return FavoriteDriver;
+
+  })(Monocle.Model);
+
+}).call(this);
+
+(function() {
+  var _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
   __Model.Travel = (function(_super) {
     __extends(Travel, _super);
 
@@ -49,6 +76,70 @@
     return Travel;
 
   })(Monocle.Model);
+
+}).call(this);
+
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __View.FavDriver = (function(_super) {
+    __extends(FavDriver, _super);
+
+    FavDriver.prototype.container = "section #favorites_list";
+
+    FavDriver.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"favDriver_s\">                \n          <img src=\"{{ image }}\" alt=\"\" />\n          <div>\n              <strong>{{ name }} {{ surname }}</strong>\n              <small><strong>{{ valoration }}</strong></small>\n          </div>\n      </li>";
+
+    FavDriver.prototype.events = {
+      "singleTap li": "onView",
+      "swipeLeft li": "deleteFavorite"
+    };
+
+    function FavDriver() {
+      var i, val;
+      FavDriver.__super__.constructor.apply(this, arguments);
+      val = "";
+      i = 0;
+      while (i < this.model.valoration) {
+        val = val + "★";
+        i++;
+      }
+      while (i < 5) {
+        val = val + "☆";
+        i++;
+      }
+      this.model.valoration = val;
+      this.append(this.model);
+    }
+
+    FavDriver.prototype.onView = function(event) {
+      return __Controller.favDriver.loadDriverDetails(this.model);
+    };
+
+    FavDriver.prototype.deleteFavorite = function(event) {
+      var _this = this;
+      return Lungo.Notification.confirm({
+        icon: "user",
+        title: "Eliminar favorito",
+        description: "¿Desea eliminar al taxista de la lista de favoritos?",
+        accept: {
+          label: "Sí",
+          callback: function() {
+            return __Controller.favorites.deleteFavorite(_this.model);
+          }
+        },
+        cancel: {
+          label: "No",
+          callback: function() {
+            return this;
+          }
+        }
+      });
+    };
+
+    return FavDriver;
+
+  })(Monocle.View);
 
 }).call(this);
 
@@ -79,6 +170,99 @@
     Lungo.init({});
     return __Controller.App = new __Controller.AppCtrl("section#init_s");
   });
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Controller.FavDriverCtrl = (function(_super) {
+    __extends(FavDriverCtrl, _super);
+
+    FavDriverCtrl.prototype.elements = {
+      "#favDriver_name": "name",
+      "#favDriver_valoration": "valoration",
+      "#favDriver_image": "image",
+      "#favDriver_license": "license",
+      "#favDriver_model": "model",
+      "#favDriver_plate": "plate",
+      "#favDriver_capacity": "capacity",
+      "#favDriver_accesible": "accesible",
+      "#favDriver_animals": "animals"
+    };
+
+    function FavDriverCtrl() {
+      this.loadDriverDetails = __bind(this.loadDriverDetails, this);
+      FavDriverCtrl.__super__.constructor.apply(this, arguments);
+    }
+
+    FavDriverCtrl.prototype.loadDriverDetails = function(driver) {
+      this.name[0].innerText = driver.name + " " + driver.surname;
+      this.valoration[0].innerText = driver.valoration;
+      this.image[0].src = driver.image;
+      this.license[0].innerText = driver.license;
+      this.model[0].innerText = driver.model;
+      this.plate[0].innerText = driver.plate;
+      this.capacity[0].innerText = driver.capacity;
+      this.accesible[0].innerText = "No";
+      if (driver.accesible) {
+        this.accesible[0].innerText = "Si";
+      }
+      this.animals[0].innerText = "No";
+      if (driver.animals) {
+        return this.animals[0].innerText = "Si";
+      }
+    };
+
+    return FavDriverCtrl;
+
+  })(Monocle.Controller);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Controller.FavoritesCtrl = (function(_super) {
+    var _views;
+
+    __extends(FavoritesCtrl, _super);
+
+    _views = [];
+
+    function FavoritesCtrl() {
+      this.deleteFavorite = __bind(this.deleteFavorite, this);
+      this.loadFavoriteTaxis = __bind(this.loadFavoriteTaxis, this);
+      FavoritesCtrl.__super__.constructor.apply(this, arguments);
+      this.loadFavoriteTaxis();
+    }
+
+    FavoritesCtrl.prototype.loadFavoriteTaxis = function() {
+      var favDriver, _i, _len, _ref, _results;
+      _ref = __Model.FavoriteDriver.all();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        favDriver = _ref[_i];
+        _results.push(_views[favDriver.license] = new __View.FavDriver({
+          model: favDriver
+        }));
+      }
+      return _results;
+    };
+
+    FavoritesCtrl.prototype.deleteFavorite = function(driver) {
+      _views[driver.license].remove();
+      _views[driver.license] = void 0;
+      return driver.destroy();
+    };
+
+    return FavoritesCtrl;
+
+  })(Monocle.Controller);
 
 }).call(this);
 
@@ -178,8 +362,7 @@
       var _this = this;
       Lungo.Notification.hide();
       return setTimeout((function() {
-        Lungo.Notification.html('<h2>Esperando la confirmación del taxi</h2>', 'Cancelar');
-        return _this.button_cancel[0].style.visibility = "visible";
+        return Lungo.Notification.html('<h2>Esperando la confirmación del taxi</h2>', 'Cancelar');
       }), 250);
     };
 
@@ -277,6 +460,7 @@
     };
 
     function LoginCtrl() {
+      this.loadFavoriteTaxis = __bind(this.loadFavoriteTaxis, this);
       this.read = __bind(this.read, this);
       this.drop = __bind(this.drop, this);
       this.parseResponse = __bind(this.parseResponse, this);
@@ -328,8 +512,11 @@
         });
       }
       Lungo.Cache.set("credentials", profile);
+      this.loadFavoriteTaxis();
       __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
       __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
+      __Controller.favorites = new __Controller.FavoritesCtrl("section#favorites_s");
+      __Controller.favDriver = new __Controller.FavDriverCtrl("section#favDriver_s");
       return setTimeout((function() {
         return __Controller.home = new __Controller.HomeCtrl("section#home_s");
       }), 1000);
@@ -366,6 +553,42 @@
           }
         }), null);
       });
+    };
+
+    LoginCtrl.prototype.loadFavoriteTaxis = function() {
+      var accesible, animals, appPayment, capacity, favDriver, i, image, license, model, name, plate, position, surname, valoration, _results;
+      i = 0;
+      _results = [];
+      while (i < 20) {
+        license = "DDAS65DAS" + i.toString();
+        name = "Taxista ";
+        surname = i.toString();
+        valoration = (i % 5) + 1;
+        position = new google.maps.LatLng(43.271239, -2.944673200000011 + (i * 0.0001));
+        plate = "DVT 78" + i.toString();
+        model = "Opel Corsa";
+        image = "img/user.png";
+        capacity = 4;
+        accesible = false;
+        animals = false;
+        appPayment = i % 4 === 0;
+        i++;
+        _results.push(favDriver = __Model.FavoriteDriver.create({
+          license: license,
+          name: name,
+          surname: surname,
+          valoration: valoration,
+          position: position,
+          plate: plate,
+          model: model,
+          image: image,
+          capacity: capacity,
+          accesible: accesible,
+          animals: animals,
+          appPayment: appPayment
+        }));
+      }
+      return _results;
     };
 
     return LoginCtrl;

@@ -47,8 +47,11 @@ class __Controller.LoginCtrl extends Monocle.Controller
         sql = "INSERT INTO accessData (email, pass, dateUpdate, name, surname, phone, image) VALUES ('"+profile.email+"','"+@password[0].value+"','"+profile.dateUpdate+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"');"
         tx.executeSql sql
     Lungo.Cache.set "credentials", profile
+    @loadFavoriteTaxis()
     __Controller.profile = new __Controller.ProfileCtrl "section#profile_s"
     __Controller.payment = new __Controller.PaymentCtrl "section#payment_s"
+    __Controller.favorites = new __Controller.FavoritesCtrl "section#favorites_s"
+    __Controller.favDriver = new __Controller.FavDriverCtrl "section#favDriver_s"
     setTimeout((=>__Controller.home = new __Controller.HomeCtrl "section#home_s") , 1000)
 
   getProfile: (result) ->
@@ -73,3 +76,21 @@ class __Controller.LoginCtrl extends Monocle.Controller
         else
           Lungo.Router.section "login_s"
       ), null
+
+  loadFavoriteTaxis: =>
+    i = 0
+    while i < 20
+      license = "DDAS65DAS" + i.toString()
+      name = "Taxista "
+      surname = i.toString()
+      valoration = (i % 5) + 1
+      position = new google.maps.LatLng(43.271239,(-2.944673200000011 + (i * 0.0001)))
+      plate = "DVT 78" + i.toString()
+      model = "Opel Corsa"
+      image = "img/user.png"
+      capacity = 4
+      accesible = false
+      animals = false
+      appPayment = (i % 4 == 0)
+      i++
+      favDriver = __Model.FavoriteDriver.create license: license, name: name, surname: surname, valoration: valoration, position: position, plate: plate, model: model, image: image, capacity: capacity, accesible: accesible, animals: animals, appPayment: appPayment

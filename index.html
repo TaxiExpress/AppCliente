@@ -34,7 +34,7 @@
     </section>
 
     <section id="register_s" data-transition="cover">
-        <header data-title="Registro" data-back="angle-down" />    
+        <header data-title="Registro" data-back="angle-down"></header>    
         <article id="register_a" class="scroll" >
             <div class="form list">
                 <li class="anchor contrast">DETALLES DE CUENTA</li>                
@@ -256,14 +256,41 @@
     <section id="favorites_s" data-transition="cover">
         <header data-title="Taxistas favoritos" data-back="angle-left"></header>      
         <article id="favorites_a" class="scroll white">
-            <div class="form little_list list">
-                <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
-                    <img src="http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG" alt="" />
-                    <div>
-                        <strong>Ernesto Gutierrez</strong>
-                        <small><strong>★★★☆☆</strong></small>
-                    </div>
-                </li>
+            <div id="favorites_list" class="form little_list list" />
+        </article>
+    </section>
+
+    <section id="favDriver_s" data-transition="slide">
+        <header data-title="Taxistas favoritos" data-back="angle-left"></header>      
+        <article id="favDriver_a" class="scroll">
+            <div class="form list">
+                <li class="anchor contrast">DATOS DEL TAXISTA</li>
+                <img id="favDriver_image" class="avatar" src="" alt="" />
+                <fieldset> 
+                    <small id="favDriver_name"></small>
+                </fieldset>
+                <fieldset> 
+                    <small id="favDriver_valoration" class="yellow"></small>
+                </fieldset>
+                <li class="anchor contrast">DATOS DEL VEHÍCULO</li>
+                <fieldset>  
+                    <small><label>Nº Licencia:</label><span id="favDriver_license" /></small>
+                </fieldset>
+                <fieldset>  
+                    <small><label>Vehículo:</label><span id="favDriver_model" /></small>
+                </fieldset>
+                <fieldset>
+                    <small><label>Matricula:</label><span id="favDriver_plate" /></small>
+                </fieldset>  
+                <fieldset>  
+                    <small><label>Número de plazas:</label><span id="favDriver_capacity" /></small>
+                </fieldset>
+                <fieldset>
+                    <small><label>Habilitado para minusválidos:</label><span id="favDriver_accesible" /></small>
+                </fieldset>
+                <fieldset>
+                    <small><label>Viaje con animales:</label><span id="favDriver_animals" /></small>
+                </fieldset>
             </div>          
         </article>
     </section>
@@ -271,8 +298,13 @@
     <section id="routes_s" data-transition="cover">
         <header data-title="Trayectos realizados" data-back="angle-left"></header>      
         <article id="routes_a" class="scroll" >
-            <div class="form list">
-                <!--    TRAYECTOS REALIZADOS    -->
+            <div class="form little_list list">
+                <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
+                    <div>
+                        <strong>Bilbao - Torrelavega</strong>
+                        <small>12/12/2013 21:25</small>
+                    </div>
+                </li>
             </div>          
         </article>
     </section>
@@ -318,7 +350,7 @@
             <div class="list indented">
                 <p><strong>TAXIEXPRESS</strong>, como responsable de ficheros de los que es propietaria, se compromete a respetar la confidencialidad de la información de carácter personal de sus clientes guardando en todo momento el deber de secreto profesional.</p>
 
-                <p><strong>TAXIEXPRESS</strong> le informa que se encuentra adaptada a la Ley Orgánica 15/1.999, de Protección de Datos de Carácter Personal, y el Real Decreto 1720/2007 por el que se aprueba el Reglamento de desarrollo de la L.O.P.D., que sus ficheros con datos personales han sido debidamente inscritos en la Agencia Española de Protección de Datos y que cumple con el resto de las obligaciones establecidas en la normativa sobre protección de datos para garantizar la confidencialidad y seguridad de la información de que dispone.</p><br/>
+                <p><strong>TAXIEXPRESS</strong> le informa que se encuentra adaptada a la Ley Orgánica 15/1.999, de Protección de Datos de Carácter Personal, y el Real Decreto 1720/2007 por el que se aprueba el Reglamento de desarrollo de la L.O.P.D., que sus ficheros con datos personales han sido debidamente inscritos en la Agencia Española de Protección de Datos y que cumple con el resto de las obligaciones establecidas en la normativa sobre protección de datos para garantizar la confidencialidad y seguridad de la información de que dispone.</p>
                 
                 <p>Los datos personales proporcionados en ningún caso serán cedidos a terceros salvo previo consentimiento de los interesados.</p>
                 

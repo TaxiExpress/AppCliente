@@ -58,7 +58,7 @@ body { height: 100%; margin: 0; padding: 0 }
 .white {background: white}
 
 .list li{list-style-type:none;position:relative;text-align:-webkit-match-parent;line-height:inherit;}
-.list li:not(.big){padding-top:3.5%;padding-bottom:3.5%;padding-left:10px;margin-bottom: 1px;}
+.list li:not(.big){padding-top:4.5%;padding-bottom:4.5%;padding-left:10px;margin-bottom: 1px;}
 .list li.thumb{display:-webkit-box;display:-moz-box;display:-ms-box;display:-o-box;display:box;-webkit-box-orient:horizontal;-moz-box-orient:horizontal;-ms-box-orient:horizontal;-o-box-orient:horizontal;box-orient:horizontal;}
 .list li.thumb > div{-webkit-box-flex:1;-moz-box-flex:1;-ms-box-flex:1;-o-box-flex:1;box-flex:1}
 .list li.thumb.big > img{width:65px;height:65px}
@@ -87,9 +87,9 @@ body { height: 100%; margin: 0; padding: 0 }
 
 .little_list li {height:55px!important;}
 .little_list li  > span {margin-top:12px; color: #ffcc00;}
-.little_list li.thumb:not(.big) > img{width:35px;height:35px;border-radius:18px;margin-top:0;}
+.little_list li.thumb:not(.big) > img{width:35px;height:35px;border-radius:18px;margin-top:0;margin-right:7px;}
 .little_list li.arrow::after{top:47%;}
-.little_list li.thumb:not(.big) > div{padding-left:.8em; padding-top:2px;}
+.little_list li.thumb:not(.big) > div{padding-left:.2em; padding-top:1px;}
 .little_list li:not(.big){padding-top:3%;padding-bottom:3%;}
 .list li strong{margin-bottom:-3px;}
 
