@@ -65,7 +65,7 @@
       return _ref;
     }
 
-    Travel.fields("id", "starttime", "endtime", "startpoint", "endpoint", "cost", "driver");
+    Travel.fields("id", "starttime", "endtime", "startpoint", "endpoint", "cost", "driver", "origin", "destination");
 
     Travel.get = function(iden) {
       return this.select(function(travel) {
@@ -144,8 +144,7 @@
 }).call(this);
 
 (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = {}.hasOwnProperty,
+  var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __View.Travel = (function(_super) {
@@ -157,7 +156,7 @@
 
     Travel.prototype.container = "section #travelList_list";
 
-    Travel.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"travelDetails_s\">                \n    <div>\n        <strong>{{ origin }} - {{ target }}</strong>\n        <small>{{ starttime }}</small>\n    </div>\n</li>";
+    Travel.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"travelDetails_s\">                \n    <div>\n        <strong>{{ origin }} - {{ destination }}</strong>\n        <small>{{ date }}</small>\n    </div>\n</li>";
 
     Travel.prototype.events = {
       "singleTap li": "onView",
@@ -165,15 +164,11 @@
     };
 
     function Travel() {
-      this.getStreet = __bind(this.getStreet, this);
       var date, time;
       Travel.__super__.constructor.apply(this, arguments);
       date = this.model.starttime.getDate() + "/" + (1 + this.model.starttime.getMonth()) + "/" + this.model.starttime.getFullYear() + " ";
       time = this.model.starttime.toISOString().substring(11, 16);
-      this.model.starttime = date + time;
-      this.getStreet(this.model.startpoint);
-      this.model.origin = this.places;
-      this.model.target = this.places;
+      this.model.date = date + time;
       this.append(this.model);
     }
 
@@ -197,23 +192,6 @@
           label: "No",
           callback: function() {
             return this;
-          }
-        }
-      });
-    };
-
-    Travel.prototype.getStreet = function(pos) {
-      var geocoder,
-        _this = this;
-      geocoder = new google.maps.Geocoder();
-      return geocoder.geocode({
-        latLng: pos
-      }, function(results, status) {
-        var result;
-        result = "";
-        if (status === google.maps.GeocoderStatus.OK) {
-          if (results[1]) {
-            return console.log(results[1].address_components[1].short_name);
           }
         }
       });
@@ -653,7 +631,7 @@
         position = new google.maps.LatLng(43.271239, -2.9445875);
         plate = "DVT 78" + i.toString();
         model = "Opel Corsa";
-        image = "img/user.png";
+        image = "http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG";
         capacity = 4;
         accesible = false;
         animals = false;
@@ -678,25 +656,31 @@
     };
 
     LoginCtrl.prototype.loadTravels = function() {
-      var cost, driver, endpoint, endtime, i, id, startpoint, starttime, travel, _results;
+      var cost, destination, driver, endpoint, endtime, i, id, origin, startpoint, starttime, travel, _results;
       i = 0;
       _results = [];
       while (i < 2) {
         id = i;
         starttime = new Date();
         endtime = new Date();
-        startpoint = new google.maps.LatLng(43.271239, -2.9445875);
+        endtime.setMinutes(endtime.getMinutes() + 21);
+        startpoint = new google.maps.LatLng(43.371239, -2.9445875);
         endpoint = new google.maps.LatLng(43.281239, -2.9445875);
+        origin = "Bilbao";
+        destination = "Bilbao";
         cost = "DVT 78" + i.toString();
-        driver = void 0;
+        driver = __Model.FavoriteDriver.get("DDAS65DAS0")[0];
         i++;
         _results.push(travel = __Model.Travel.create({
           id: id,
           starttime: starttime,
           endtime: endtime,
           startpoint: startpoint,
+          endpoint: endpoint,
           cost: cost,
-          driver: driver
+          driver: driver,
+          origin: origin,
+          destination: destination
         }));
       }
       return _results;
@@ -846,9 +830,11 @@
 
     PaymentCtrl.prototype.doPayment = function(event) {
       this.button[0].disabled = true;
-      Stripe.setPublishableKey("pk_test_WKa2sNz0xP9t3ue3ao1nYBSf");
+      Stripe.setPublishableKey("pk_test_VdRyFEwU3Ap84cUaLp5S8yBC");
       return Stripe.createToken({
         name: "David Lallana",
+        email: "davidlallana@gmail.com",
+        description: "descripcion de prueba",
         number: "4242424242424242",
         cvc: "123",
         exp_month: "12",
@@ -1081,19 +1067,105 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.TravelDetailsCtrl = (function(_super) {
+    var driverDetails;
+
     __extends(TravelDetailsCtrl, _super);
 
+    driverDetails = void 0;
+
     TravelDetailsCtrl.prototype.elements = {
-      "#travelDetails_description": "description"
+      "#travelDetails_start": "start",
+      "#travelDetails_end": "end",
+      "#travelDetails_date": "date",
+      "#travelDetails_time": "time",
+      "#travelDetails_cost": "cost",
+      "#travelDetails_driver": "driver"
+    };
+
+    TravelDetailsCtrl.prototype.events = {
+      "singleTap #travelDetails_driver": "viewDriver"
     };
 
     function TravelDetailsCtrl() {
+      this.viewDriver = __bind(this.viewDriver, this);
+      this.changeValoration = __bind(this.changeValoration, this);
+      this.showMap = __bind(this.showMap, this);
       this.loadTravelDetails = __bind(this.loadTravelDetails, this);
       TravelDetailsCtrl.__super__.constructor.apply(this, arguments);
     }
 
     TravelDetailsCtrl.prototype.loadTravelDetails = function(travel) {
-      return console.log("llego");
+      this.showMap(travel);
+      this.start[0].innerText = travel.origin;
+      this.end[0].innerText = travel.destination;
+      this.date[0].innerText = travel.date;
+      this.time[0].innerText = (travel.endtime - travel.starttime) / 60000 + " minutos";
+      this.cost[0].innerText = "35 €";
+      this.driverDetails = travel.driver;
+      this.changeValoration();
+      return this.driver[0].src = travel.driver.image;
+    };
+
+    TravelDetailsCtrl.prototype.showMap = function(travel) {
+      var bounds, destination, directionsDisplay, directionsService, map, origin, request;
+      directionsService = new google.maps.DirectionsService();
+      directionsDisplay = new google.maps.DirectionsRenderer();
+      map = new google.maps.Map(document.getElementById("map-canvas2"), {
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        panControl: false,
+        streetViewControl: false,
+        overviewMapControl: false,
+        mapTypeControl: false,
+        zoomControl: false,
+        styles: [
+          {
+            featureType: "all",
+            elementType: "labels",
+            stylers: [
+              {
+                visibility: "off"
+              }
+            ]
+          }
+        ]
+      });
+      directionsDisplay.setMap(map);
+      bounds = new google.maps.LatLngBounds();
+      origin = new google.maps.LatLng(travel.startpoint.nb, travel.startpoint.ob);
+      destination = new google.maps.LatLng(travel.endpoint.nb, travel.endpoint.ob);
+      bounds.extend(origin);
+      bounds.extend(destination);
+      map.fitBounds(bounds);
+      request = {
+        origin: origin,
+        destination: destination,
+        travelMode: google.maps.DirectionsTravelMode.DRIVING
+      };
+      return directionsService.route(request, function(response, status) {
+        if (status === google.maps.DirectionsStatus.OK) {
+          return directionsDisplay.setDirections(response);
+        }
+      });
+    };
+
+    TravelDetailsCtrl.prototype.changeValoration = function() {
+      var i, val;
+      val = "";
+      i = 0;
+      while (i < this.driverDetails.valoration) {
+        val = val + "★";
+        i++;
+      }
+      while (i < 5) {
+        val = val + "☆";
+        i++;
+      }
+      return this.driverDetails.valoration = val;
+    };
+
+    TravelDetailsCtrl.prototype.viewDriver = function(event) {
+      __Controller.favDriver.loadDriverDetails(this.driverDetails);
+      return Lungo.Router.section("favDriver_s");
     };
 
     return TravelDetailsCtrl;

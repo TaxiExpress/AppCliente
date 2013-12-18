@@ -90,7 +90,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       position = new google.maps.LatLng(43.271239,-2.9445875)
       plate = "DVT 78" + i.toString()
       model = "Opel Corsa"
-      image = "img/user.png"
+      image = "http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG"
       capacity = 4
       accesible = false
       animals = false
@@ -104,9 +104,12 @@ class __Controller.LoginCtrl extends Monocle.Controller
       id = i
       starttime = new Date()
       endtime = new Date()
-      startpoint = new google.maps.LatLng(43.271239,-2.9445875)
+      endtime.setMinutes(endtime.getMinutes()+21)
+      startpoint = new google.maps.LatLng(43.371239,-2.9445875)
       endpoint = new google.maps.LatLng(43.281239,-2.9445875)
+      origin = "Bilbao"
+      destination = "Bilbao"
       cost = "DVT 78" + i.toString()
-      driver = undefined
+      driver = __Model.FavoriteDriver.get("DDAS65DAS0")[0]
       i++
-      travel = __Model.Travel.create id: id, starttime: starttime, endtime: endtime, startpoint: startpoint, cost: cost, driver: driver
+      travel = __Model.Travel.create id: id, starttime: starttime, endtime: endtime, startpoint: startpoint, endpoint: endpoint, cost: cost, driver: driver, origin: origin, destination: destination
