@@ -1,12 +1,14 @@
-class __View.FavDriverList extends Monocle.View
+class __View.NearDriverList extends Monocle.View
 
-  container: "section #favoritesList_a"
+  container: "section #nearList_a"
 
   template  : """ 
-  		<li class="thumb arrow selectable">                
-          <img src="{{ image }}" alt="" />
+  		<li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
+          <div class="on-right">1 minuto</div>
+          <img src="{{image}}" alt="" />
           <div>
-              <strong>{{ name }} {{ surname }}</strong>
+              <strong>a 402 metros</strong>
+              <small>{{name}} {{surname}}</small>
               <small><strong>{{valorationStars}}</strong></small>
           </div>
           {{#appPayment}}<span data-icon="credit-card">

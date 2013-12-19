@@ -26,7 +26,7 @@ class __View.FavDriver extends Monocle.View
       val = val + "☆"
       i++
     @model.valorationStars = val
-    @append @model
+    @prepend @model
 
   onView: (event) ->
     __Controller.favDriver.loadDriverDetails(@model)

@@ -46,12 +46,6 @@
       });
     };
 
-    FavoriteDriver.getAll = function() {
-      return this.select(function(driver) {
-        return this;
-      });
-    };
-
     return FavoriteDriver;
 
   })(Monocle.Model);
@@ -114,7 +108,7 @@
         i++;
       }
       this.model.valorationStars = val;
-      this.append(this.model);
+      this.prepend(this.model);
     }
 
     FavDriver.prototype.onView = function(event) {
@@ -136,7 +130,7 @@
 
     FavDriverList.prototype.container = "section #favoritesList_a";
 
-    FavDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"chosenTaxi_s\">                \n          <img src=\"{{ image }}\" alt=\"\" />\n          <div>\n              <strong>{{ name }} {{ surname }}</strong>\n              <small><strong>{{valorationStars}}</strong></small>\n          </div>\n          <span data-icon=\"credit-card\" />\n      </li>";
+    FavDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\">                \n          <img src=\"{{ image }}\" alt=\"\" />\n          <div>\n              <strong>{{ name }} {{ surname }}</strong>\n              <small><strong>{{valorationStars}}</strong></small>\n          </div>\n          {{#appPayment}}<span data-icon=\"credit-card\">\n            <span class=\"icon credit-card\"></span>\n          </span>{{/appPayment}}\n      </li>";
 
     FavDriverList.prototype.events = {
       "singleTap li": "onView"
@@ -156,12 +150,58 @@
         i++;
       }
       this.model.valorationStars = val;
-      this.append(this.model);
+      this.prepend(this.model);
     }
 
-    FavDriverList.prototype.onView = function(event) {};
+    FavDriverList.prototype.onView = function(event) {
+      __Controller.chosenTaxi.loadDriverDetails(this.model);
+      return Lungo.Router.section("chosenTaxi_s");
+    };
 
     return FavDriverList;
+
+  })(Monocle.View);
+
+}).call(this);
+
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __View.NearDriverList = (function(_super) {
+    __extends(NearDriverList, _super);
+
+    NearDriverList.prototype.container = "section #nearList_a";
+
+    NearDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"chosenTaxi_s\">                \n          <div class=\"on-right\">1 minuto</div>\n          <img src=\"{{image}}\" alt=\"\" />\n          <div>\n              <strong>a 402 metros</strong>\n              <small>{{name}} {{surname}}</small>\n              <small><strong>{{valorationStars}}</strong></small>\n          </div>\n          {{#appPayment}}<span data-icon=\"credit-card\">\n            <span class=\"icon credit-card\"></span>\n          </span>{{/appPayment}}\n      </li>";
+
+    NearDriverList.prototype.events = {
+      "singleTap li": "onView"
+    };
+
+    function NearDriverList() {
+      var i, val;
+      NearDriverList.__super__.constructor.apply(this, arguments);
+      val = "";
+      i = 0;
+      while (i < this.model.valoration) {
+        val = val + "★";
+        i++;
+      }
+      while (i < 5) {
+        val = val + "☆";
+        i++;
+      }
+      this.model.valorationStars = val;
+      this.prepend(this.model);
+    }
+
+    NearDriverList.prototype.onView = function(event) {
+      __Controller.chosenTaxi.loadDriverDetails(this.model);
+      return Lungo.Router.section("chosenTaxi_s");
+    };
+
+    return NearDriverList;
 
   })(Monocle.View);
 
@@ -193,7 +233,7 @@
       date = this.model.starttime.getDate() + "/" + (1 + this.model.starttime.getMonth()) + "/" + this.model.starttime.getFullYear() + " ";
       time = this.model.starttime.toISOString().substring(11, 16);
       this.model.date = date + time;
-      this.append(this.model);
+      this.prepend(this.model);
     }
 
     Travel.prototype.onView = function(event) {
@@ -254,6 +294,69 @@
     Lungo.init({});
     return __Controller.App = new __Controller.AppCtrl("section#init_s");
   });
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Controller.ChosenTaxiCtrl = (function(_super) {
+    var driverDetails;
+
+    __extends(ChosenTaxiCtrl, _super);
+
+    driverDetails = void 0;
+
+    ChosenTaxiCtrl.prototype.elements = {
+      "#chosenTaxi_name": "name",
+      "#chosenTaxi_valoration": "valoration",
+      "#chosenTaxi_image": "image",
+      "#chosenTaxi_license": "license",
+      "#chosenTaxi_model": "model",
+      "#chosenTaxi_plate": "plate",
+      "#chosenTaxi_capacity": "capacity",
+      "#chosenTaxi_accesible": "accesible",
+      "#chosenTaxi_animals": "animals"
+    };
+
+    ChosenTaxiCtrl.prototype.events = {
+      "singleTap #chosenTaxi_request": "requestTaxi"
+    };
+
+    function ChosenTaxiCtrl() {
+      this.requestTaxi = __bind(this.requestTaxi, this);
+      this.loadDriverDetails = __bind(this.loadDriverDetails, this);
+      ChosenTaxiCtrl.__super__.constructor.apply(this, arguments);
+    }
+
+    ChosenTaxiCtrl.prototype.loadDriverDetails = function(driver) {
+      this.driverDetails = driver;
+      this.name[0].innerText = driver.name + " " + driver.surname;
+      this.valoration[0].innerText = driver.valorationStars;
+      this.image[0].src = driver.image;
+      this.license[0].innerText = driver.license;
+      this.model[0].innerText = driver.model;
+      this.plate[0].innerText = driver.plate;
+      this.capacity[0].innerText = driver.capacity;
+      this.accesible[0].innerText = "No";
+      if (driver.accesible) {
+        this.accesible[0].innerText = "Si";
+      }
+      this.animals[0].innerText = "No";
+      if (driver.animals) {
+        return this.animals[0].innerText = "Si";
+      }
+    };
+
+    ChosenTaxiCtrl.prototype.requestTaxi = function(event) {
+      return console.log("solicito taxi");
+    };
+
+    return ChosenTaxiCtrl;
+
+  })(Monocle.Controller);
 
 }).call(this);
 
@@ -355,7 +458,7 @@
 
     FavoritesCtrl.prototype.loadFavoriteTaxis = function() {
       var favDriver, _i, _len, _ref, _results;
-      _ref = __Model.FavoriteDriver.getAll();
+      _ref = __Model.FavoriteDriver.all();
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         favDriver = _ref[_i];
@@ -443,6 +546,7 @@
     };
 
     function HomeCtrl() {
+      this.loadNearTaxis = __bind(this.loadNearTaxis, this);
       this.hideAside = __bind(this.hideAside, this);
       this.showAsigning = __bind(this.showAsigning, this);
       this.confirm = __bind(this.confirm, this);
@@ -503,7 +607,7 @@
         cancel: {
           label: "Elegir taxi",
           callback: function() {
-            return Lungo.Router.section("list_s");
+            return _this.loadNearTaxis();
           }
         }
       });
@@ -577,6 +681,42 @@
           return home_streetField.value = 'Calle desconocida';
         }
       });
+    };
+
+    HomeCtrl.prototype.loadNearTaxis = function() {
+      var accesible, animals, appPayment, capacity, i, image, license, model, name, plate, position, surname, valoration;
+      i = 0;
+      while (i < 4) {
+        license = "DDAS65DAS" + i.toString();
+        name = "Taxista ";
+        surname = i.toString();
+        valoration = (i % 5) + 1;
+        position = new google.maps.LatLng(43.271239, -2.9445875);
+        plate = "DVT 78" + i.toString();
+        model = "Opel Corsa";
+        image = "http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG";
+        capacity = 4;
+        accesible = false;
+        animals = false;
+        appPayment = i % 4 === 0;
+        i++;
+        __Model.Driver.create({
+          license: license,
+          name: name,
+          surname: surname,
+          valoration: valoration,
+          position: position,
+          plate: plate,
+          model: model,
+          image: image,
+          capacity: capacity,
+          accesible: accesible,
+          animals: animals,
+          appPayment: appPayment
+        });
+      }
+      __Controller.nearDriver.loadNearTaxis();
+      return Lungo.Router.section("list_s");
     };
 
     return HomeCtrl;
@@ -670,6 +810,8 @@
       __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
       __Controller.favorites = new __Controller.FavoritesCtrl("section#favorites_s");
       __Controller.favDriver = new __Controller.FavDriverCtrl("section#favDriver_s");
+      __Controller.chosenTaxi = new __Controller.ChosenTaxiCtrl("section#chosenTaxi_s");
+      __Controller.nearDriver = new __Controller.NearDriverCtrl("section#list_s");
       __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
       __Controller.travelDetails = new __Controller.TravelDetailsCtrl("section#travelDetails_s");
       return setTimeout((function() {
@@ -812,6 +954,55 @@
     };
 
     return MenuCtrl;
+
+  })(Monocle.Controller);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Controller.NearDriverCtrl = (function(_super) {
+    var _viewsList;
+
+    __extends(NearDriverCtrl, _super);
+
+    _viewsList = [];
+
+    function NearDriverCtrl() {
+      this.deleteNearTaxis = __bind(this.deleteNearTaxis, this);
+      this.loadNearTaxis = __bind(this.loadNearTaxis, this);
+      NearDriverCtrl.__super__.constructor.apply(this, arguments);
+    }
+
+    NearDriverCtrl.prototype.loadNearTaxis = function() {
+      var nearDriver, _i, _len, _ref, _results;
+      _ref = __Model.Driver.all();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        nearDriver = _ref[_i];
+        _results.push(_viewsList[nearDriver.license] = new __View.NearDriverList({
+          model: nearDriver
+        }));
+      }
+      return _results;
+    };
+
+    NearDriverCtrl.prototype.deleteNearTaxis = function() {
+      var nearDriver, _i, _len, _ref, _results;
+      _ref = __Model.Driver.getAll();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        nearDriver = _ref[_i];
+        _viewsList[nearDriver.license].remove();
+        _results.push(_viewsList[nearDriver.license] = void 0);
+      }
+      return _results;
+    };
+
+    return NearDriverCtrl;
 
   })(Monocle.Controller);
 

@@ -38,15 +38,9 @@
         <article id="register_a" class="scroll" >
             <div class="form list">
                 <li class="anchor contrast">DETALLES DE CUENTA</li>                
-                <fieldset>
-                    <input id="register_email" type="email" maxlength="40" placeholder="Email" />
-                </fieldset>
-                <fieldset> 
-                    <input id="register_pass1" type="password" placeholder="Escriba su contraseña" />
-                </fieldset>
-                <fieldset> 
-                    <input id="register_pass2" type="password" placeholder="Repita su contraseña" />
-                </fieldset>
+                <fieldset><input id="register_email" type="email" maxlength="40" placeholder="Email" /></fieldset>
+                <fieldset><input id="register_pass1" type="password" placeholder="Escriba su contraseña" /></fieldset>
+                <fieldset><input id="register_pass2" type="password" placeholder="Repita su contraseña" /></fieldset>
                 <button id="register_register_b" class="anchor accept" data-label="Registrar en TaxiExpress" />
             </div>
         </article>
@@ -77,12 +71,8 @@
             <div class="form list">
                 <li class="anchor contrast">DATOS PERSONALES</li>
                 <img id="profile_avatar" class="avatar" src="img/user.png" />
-                <fieldset> 
-                    <input id="profile_name" type="text" maxlength="20" placeholder="Nombre" />
-                </fieldset>
-                <fieldset> 
-                    <input id="profile_surname" type="text" maxlength="20" placeholder="Apellidos" />
-                </fieldset>
+                <fieldset><input id="profile_name" type="text" maxlength="20" placeholder="Nombre" /></fieldset>
+                <fieldset><input id="profile_surname" type="text" maxlength="20" placeholder="Apellidos" /></fieldset>
                 <li class="anchor contrast">OTROS DATOS</li>
                 <fieldset>                    
                     <label data-icon="phone"></label>
@@ -108,15 +98,9 @@
         <article id="password_a">
             <div class="form list">  
                 <li class="anchor contrast">CAMBIO DE CONTRASEÑA</li>       
-                <fieldset> 
-                    <input id="password_old_pass" type="password" maxlength="20" placeholder="Contraseña actual" />
-                </fieldset>
-                <fieldset> 
-                    <input id="password_new_pass1" type="password" placeholder="Nueva contraseña" />
-                </fieldset>
-                <fieldset> 
-                    <input id="password_new_pass2" type="password" placeholder="Repita su nueva contraseña" />
-                </fieldset>
+                <fieldset><input id="password_old_pass" type="password" maxlength="20" placeholder="Contraseña actual" /></fieldset>
+                <fieldset><input id="password_new_pass1" type="password" placeholder="Nueva contraseña" /></fieldset>
+                <fieldset><input id="password_new_pass2" type="password" placeholder="Repita su nueva contraseña" /></fieldset>
                 <button id="password_save_b" class="anchor accept" data-label="Cambiar contraseña" />
             </div>
         </article>
@@ -146,39 +130,8 @@
             <a id="list_taxis_b" href="#" data-view-article="nearList_a" data-label="Los más cercanos"></a>
             <a id="list_favorites_b" href="#" data-view-article="favoritesList_a" data-label="Taxis favoritos"></a>
         </nav>
-        <article id="nearList_a" class="list form active scroll white">
-            <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
-                <div class="on-right">1 minuto</div>
-                <img src="http://www.sixt.com/uploads/pics/mercedes_03.png" alt="" />
-                <div>
-                    <strong>a 402 metros</strong>
-                    <small>Ernesto Gutierrez</small>
-                    <small><strong>★★★☆☆</strong></small>
-                </div>
-                <span data-icon="credit-card" />
-            </li>     
-            <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
-                <div class="on-right">2 minutos</div>
-                <img src="http://mundosoloautos.com.mx/wp-content/uploads/2012/06/audi-logo1.jpg" alt="" />
-                <div>
-                    <strong>a 1209 metros</strong>
-                    <small>Paco Paquito Paco</small>
-                    <small><strong>★☆☆☆☆</strong></small>
-                </div>
-            </li>   
-            <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
-                <div class="on-right">5 minutos</div>
-                <img src="http://www.kaosconcept.net/wp-content/logo-peugeot-nuevo.gif" alt="" />
-                <div>
-                    <strong>a 4695 metros</strong>
-                    <small>Elena Pérez Gómez</small>
-                    <small><strong>★★★★☆</strong></small>
-                </div>
-                <span data-icon="credit-card" />
-            </li>   
-        </article>
-        <article id="favoritesList_a" class="list meddium_list form scroll white">
-        </article>
+        <article id="nearList_a" class="list form active scroll white"></article>
+        <article id="favoritesList_a" class="list meddium_list form scroll white"></article>
     </section>    
 
     <section id="filters_s" data-transition="cover">
@@ -216,30 +169,17 @@
         <article id="chosenTaxi_a" class="scroll">
             <div class="form list">
                 <li class="anchor contrast">DATOS DEL TAXISTA</li>
-                <img class="avatar" src="http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG" alt="" />
-                <fieldset> 
-                    <small>Alfonso García Torreiglesias</small>
-                </fieldset>
-                <fieldset> 
-                    <small class="yellow">★★★★☆</small>
-                </fieldset>
+                <img id="chosenTaxi_image" class="avatar" src="" alt="" />
+                <fieldset><small id ="chosenTaxi_name"></small></fieldset>
+                <fieldset><small id="chosenTaxi_valoration" class="yellow"></small></fieldset>
                 <li class="anchor contrast">DATOS DEL VEHÍCULO</li>
-                <fieldset>  
-                    <small><label>Vehículo:</label>Renault Laguna</small>
-                </fieldset>
-                <fieldset>
-                    <small><label>Año de matriculación:</label>2009</small>
-                </fieldset>  
-                <fieldset>  
-                    <small><label>Número de plazas:</label>4</small>
-                </fieldset>
-                <fieldset>
-                    <small><label>Habilitado para minusválidos:</label>No</small>
-                </fieldset>
-                <fieldset>
-                    <small><label>Viaje con animales:</label>Si</small>
-                </fieldset>
-                <button class="anchor accept" data-label="Solicitar taxi" />
+                <fieldset><small><label>Nº Licencia:</label><span id="chosenTaxi_license" /></small></fieldset>
+                <fieldset><small><label>Vehículo:</label><span id="chosenTaxi_model" /></small></fieldset>
+                <fieldset><small><label>Matricula:</label><span id="chosenTaxi_plate" /></small></fieldset>  
+                <fieldset><small><label>Número de plazas:</label><span id="chosenTaxi_capacity" /></small></fieldset>
+                <fieldset><small><label>Habilitado para minusválidos:</label><span id="chosenTaxi_accesible" /></small></fieldset>
+                <fieldset><small><label>Viaje con animales:</label><span id="chosenTaxi_animals" /></small></fieldset>
+                <button id="chosenTaxi_request" class="anchor accept" data-label="Solicitar taxi" />
             </div>          
         </article>
     </section>

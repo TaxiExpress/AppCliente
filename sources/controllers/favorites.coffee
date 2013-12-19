@@ -8,7 +8,7 @@ class __Controller.FavoritesCtrl extends Monocle.Controller
     @loadFavoriteTaxis()
 
   loadFavoriteTaxis: =>
-    for favDriver in __Model.FavoriteDriver.getAll()
+    for favDriver in __Model.FavoriteDriver.all()
       _views[favDriver.license] = new __View.FavDriver model: favDriver
       _viewsList[favDriver.license] = new __View.FavDriverList model: favDriver
 

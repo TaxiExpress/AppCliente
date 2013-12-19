@@ -53,6 +53,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
     __Controller.payment = new __Controller.PaymentCtrl "section#payment_s"
     __Controller.favorites = new __Controller.FavoritesCtrl "section#favorites_s"
     __Controller.favDriver = new __Controller.FavDriverCtrl "section#favDriver_s"
+    __Controller.chosenTaxi = new __Controller.ChosenTaxiCtrl "section#chosenTaxi_s"
+    __Controller.nearDriver = new __Controller.NearDriverCtrl "section#list_s"
     __Controller.travelList = new __Controller.TravelListCtrl "section#travelList_s"
     __Controller.travelDetails = new __Controller.TravelDetailsCtrl "section#travelDetails_s"
     setTimeout((=>__Controller.home = new __Controller.HomeCtrl "section#home_s") , 1000)

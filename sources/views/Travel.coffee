@@ -22,7 +22,7 @@ class __View.Travel extends Monocle.View
     date = @model.starttime.getDate()+"/"+(1+@model.starttime.getMonth())+"/"+@model.starttime.getFullYear()+" "
     time = @model.starttime.toISOString().substring 11, 16
     @model.date = date + time
-    @append @model
+    @prepend @model
 
   onView: (event) ->
     __Controller.travelDetails.loadTravelDetails(@model)
