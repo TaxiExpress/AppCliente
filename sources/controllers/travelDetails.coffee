@@ -68,7 +68,7 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     while i < 5
       val = val + "☆"
       i++
-    @driverDetails.valoration = val
+    @driverDetails.valorationStars = val
 
   viewDriver: (event) =>
     __Controller.favDriver.loadDriverDetails(@driverDetails)

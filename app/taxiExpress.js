@@ -46,6 +46,12 @@
       });
     };
 
+    FavoriteDriver.getAll = function() {
+      return this.select(function(driver) {
+        return this;
+      });
+    };
+
     return FavoriteDriver;
 
   })(Monocle.Model);
@@ -88,11 +94,10 @@
 
     FavDriver.prototype.container = "section #favorites_list";
 
-    FavDriver.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"favDriver_s\">                \n          <img src=\"{{ image }}\" alt=\"\" />\n          <div>\n              <strong>{{ name }} {{ surname }}</strong>\n              <small><strong>{{ valoration }}</strong></small>\n          </div>\n      </li>";
+    FavDriver.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"favDriver_s\">                \n          <img src=\"{{ image }}\" alt=\"\" />\n          <div>\n              <strong>{{ name }} {{ surname }}</strong>\n              <small><strong>{{ valorationStars }}</strong></small>\n          </div>\n      </li>";
 
     FavDriver.prototype.events = {
-      "singleTap li": "onView",
-      "swipeLeft li": "deleteFavorite"
+      "singleTap li": "onView"
     };
 
     function FavDriver() {
@@ -108,7 +113,7 @@
         val = val + "☆";
         i++;
       }
-      this.model.valoration = val;
+      this.model.valorationStars = val;
       this.append(this.model);
     }
 
@@ -116,28 +121,47 @@
       return __Controller.favDriver.loadDriverDetails(this.model);
     };
 
-    FavDriver.prototype.deleteFavorite = function(event) {
-      var _this = this;
-      return Lungo.Notification.confirm({
-        icon: "user",
-        title: "Eliminar favorito",
-        description: "¿Desea eliminar al taxista de la lista de favoritos?",
-        accept: {
-          label: "Sí",
-          callback: function() {
-            return __Controller.favorites.deleteFavorite(_this.model);
-          }
-        },
-        cancel: {
-          label: "No",
-          callback: function() {
-            return this;
-          }
-        }
-      });
+    return FavDriver;
+
+  })(Monocle.View);
+
+}).call(this);
+
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __View.FavDriverList = (function(_super) {
+    __extends(FavDriverList, _super);
+
+    FavDriverList.prototype.container = "section #favoritesList_a";
+
+    FavDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"chosenTaxi_s\">                \n          <img src=\"{{ image }}\" alt=\"\" />\n          <div>\n              <strong>{{ name }} {{ surname }}</strong>\n              <small><strong>{{valorationStars}}</strong></small>\n          </div>\n          <span data-icon=\"credit-card\" />\n      </li>";
+
+    FavDriverList.prototype.events = {
+      "singleTap li": "onView"
     };
 
-    return FavDriver;
+    function FavDriverList() {
+      var i, val;
+      FavDriverList.__super__.constructor.apply(this, arguments);
+      val = "";
+      i = 0;
+      while (i < this.model.valoration) {
+        val = val + "★";
+        i++;
+      }
+      while (i < 5) {
+        val = val + "☆";
+        i++;
+      }
+      this.model.valorationStars = val;
+      this.append(this.model);
+    }
+
+    FavDriverList.prototype.onView = function(event) {};
+
+    return FavDriverList;
 
   })(Monocle.View);
 
@@ -212,8 +236,8 @@
 
     function AppCtrl() {
       AppCtrl.__super__.constructor.apply(this, arguments);
-      Lungo.Cache.set("phone", "677399899");
-      Lungo.Cache.set("server", "http://192.168.43.137:8000/");
+      Lungo.Cache.set("phone", "656111111");
+      Lungo.Cache.set("server", "http://TaxiLoadBalancer-638315338.us-east-1.elb.amazonaws.com/");
       __Controller.login = new __Controller.LoginCtrl("section#login_s");
       __Controller.register = new __Controller.RegisterCtrl("section#register_s");
     }
@@ -239,7 +263,11 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.FavDriverCtrl = (function(_super) {
+    var driverDetails;
+
     __extends(FavDriverCtrl, _super);
+
+    driverDetails = void 0;
 
     FavDriverCtrl.prototype.elements = {
       "#favDriver_name": "name",
@@ -250,17 +278,24 @@
       "#favDriver_plate": "plate",
       "#favDriver_capacity": "capacity",
       "#favDriver_accesible": "accesible",
-      "#favDriver_animals": "animals"
+      "#favDriver_animals": "animals",
+      "#favDriver_favorite": "favorite"
+    };
+
+    FavDriverCtrl.prototype.events = {
+      "change #favDriver_favorite": "changeFavorite"
     };
 
     function FavDriverCtrl() {
+      this.changeFavorite = __bind(this.changeFavorite, this);
       this.loadDriverDetails = __bind(this.loadDriverDetails, this);
       FavDriverCtrl.__super__.constructor.apply(this, arguments);
     }
 
     FavDriverCtrl.prototype.loadDriverDetails = function(driver) {
+      this.driverDetails = driver;
       this.name[0].innerText = driver.name + " " + driver.surname;
-      this.valoration[0].innerText = driver.valoration;
+      this.valoration[0].innerText = driver.valorationStars;
       this.image[0].src = driver.image;
       this.license[0].innerText = driver.license;
       this.model[0].innerText = driver.model;
@@ -272,7 +307,20 @@
       }
       this.animals[0].innerText = "No";
       if (driver.animals) {
-        return this.animals[0].innerText = "Si";
+        this.animals[0].innerText = "Si";
+      }
+      if (__Model.FavoriteDriver.get(driver.license)[0] !== void 0) {
+        return this.favorite[0].checked = true;
+      } else {
+        return this.favorite[0].checked = false;
+      }
+    };
+
+    FavDriverCtrl.prototype.changeFavorite = function(event) {
+      if (this.favorite[0].checked) {
+        return __Controller.favorites.addFavorite(this.driverDetails);
+      } else {
+        return __Controller.favorites.deleteFavorite(this.driverDetails);
       }
     };
 
@@ -288,13 +336,17 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.FavoritesCtrl = (function(_super) {
-    var _views;
+    var _views, _viewsList;
 
     __extends(FavoritesCtrl, _super);
 
     _views = [];
 
+    _viewsList = [];
+
     function FavoritesCtrl() {
+      this.deleteFavoriteTaxis = __bind(this.deleteFavoriteTaxis, this);
+      this.addFavorite = __bind(this.addFavorite, this);
       this.deleteFavorite = __bind(this.deleteFavorite, this);
       this.loadFavoriteTaxis = __bind(this.loadFavoriteTaxis, this);
       FavoritesCtrl.__super__.constructor.apply(this, arguments);
@@ -303,11 +355,14 @@
 
     FavoritesCtrl.prototype.loadFavoriteTaxis = function() {
       var favDriver, _i, _len, _ref, _results;
-      _ref = __Model.FavoriteDriver.all();
+      _ref = __Model.FavoriteDriver.getAll();
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         favDriver = _ref[_i];
-        _results.push(_views[favDriver.license] = new __View.FavDriver({
+        _views[favDriver.license] = new __View.FavDriver({
+          model: favDriver
+        });
+        _results.push(_viewsList[favDriver.license] = new __View.FavDriverList({
           model: favDriver
         }));
       }
@@ -317,7 +372,43 @@
     FavoritesCtrl.prototype.deleteFavorite = function(driver) {
       _views[driver.license].remove();
       _views[driver.license] = void 0;
-      return driver.destroy();
+      _viewsList[driver.license].remove();
+      _viewsList[driver.license] = void 0;
+      return __Model.FavoriteDriver.get(driver.license)[0].destroy();
+    };
+
+    FavoritesCtrl.prototype.addFavorite = function(driver) {
+      this.deleteFavoriteTaxis();
+      __Model.FavoriteDriver.create({
+        license: driver.license,
+        name: driver.name,
+        surname: driver.surname,
+        valoration: driver.valoration,
+        position: driver.position,
+        plate: driver.plate,
+        model: driver.model,
+        image: driver.image,
+        capacity: driver.capacity,
+        accesible: driver.accesible,
+        animals: driver.animals,
+        appPayment: driver.appPayment
+      });
+      return this.loadFavoriteTaxis();
+    };
+
+    FavoritesCtrl.prototype.deleteFavoriteTaxis = function() {
+      var driver, _i, _len, _ref, _results;
+      _ref = __Model.FavoriteDriver.all();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        driver = _ref[_i];
+        console.log(driver.license);
+        _views[driver.license].remove();
+        _views[driver.license] = void 0;
+        _viewsList[driver.license].remove();
+        _results.push(_viewsList[driver.license] = void 0);
+      }
+      return _results;
     };
 
     return FavoritesCtrl;
@@ -623,7 +714,7 @@
       var accesible, animals, appPayment, capacity, favDriver, i, image, license, model, name, plate, position, surname, valoration, _results;
       i = 0;
       _results = [];
-      while (i < 20) {
+      while (i < 5) {
         license = "DDAS65DAS" + i.toString();
         name = "Taxista ";
         surname = i.toString();
@@ -1160,7 +1251,7 @@
         val = val + "☆";
         i++;
       }
-      return this.driverDetails.valoration = val;
+      return this.driverDetails.valorationStars = val;
     };
 
     TravelDetailsCtrl.prototype.viewDriver = function(event) {

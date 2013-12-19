@@ -1,14 +1,15 @@
-class __View.FavDriver extends Monocle.View
+class __View.FavDriverList extends Monocle.View
 
-  container: "section #favorites_list"
+  container: "section #favoritesList_a"
 
   template  : """ 
-  		<li class="thumb arrow selectable" data-view-section="favDriver_s">                
+  		<li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
           <img src="{{ image }}" alt="" />
           <div>
               <strong>{{ name }} {{ surname }}</strong>
-              <small><strong>{{ valorationStars }}</strong></small>
+              <small><strong>{{valorationStars}}</strong></small>
           </div>
+          <span data-icon="credit-card" />
       </li>
   """
 
@@ -29,4 +30,3 @@ class __View.FavDriver extends Monocle.View
     @append @model
 
   onView: (event) ->
-    __Controller.favDriver.loadDriverDetails(@model)

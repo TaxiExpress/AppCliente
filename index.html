@@ -178,15 +178,6 @@
             </li>   
         </article>
         <article id="favoritesList_a" class="list meddium_list form scroll white">
-            <li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
-                <div class="on-right">238 metros</div>
-                <img src="http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG" alt="" />
-                <div>
-                    <strong>Ernesto Gutierrez</strong>
-                    <small><strong>★★★☆☆</strong></small>
-                </div>
-                <span data-icon="credit-card" />
-            </li>
         </article>
     </section>    
 
@@ -261,13 +252,14 @@
     </section>
 
     <section id="favDriver_s" data-transition="slide">
-        <header data-title="Taxistas favoritos" data-back="angle-left"></header>      
+        <header data-title="Detalle del taxista" data-back="angle-left"></header>      
         <article id="favDriver_a" class="scroll">
             <div class="form list">
                 <li class="anchor contrast">DATOS DEL TAXISTA</li>
                 <img id="favDriver_image" class="avatar" src="" alt="" />
                 <fieldset><small id="favDriver_name"></small></fieldset>
                 <fieldset><small id="favDriver_valoration" class="yellow"></small></fieldset>
+                <fieldset><small>Taxista favorito</small><input id="favDriver_favorite" type="checkbox" /></fieldset>
                 <li class="anchor contrast">DATOS DEL VEHÍCULO</li>
                 <fieldset><small><label>Nº Licencia:</label><span id="favDriver_license" /></small></fieldset>
                 <fieldset><small><label>Vehículo:</label><span id="favDriver_model" /></small></fieldset>
@@ -370,5 +362,4 @@
     <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
     <script src="app/taxiExpress.js"></script>   
     <script src="cordova.js"></script>
-    <script src="telephonenumber.js"></script>
 </html>

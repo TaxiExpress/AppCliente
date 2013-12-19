@@ -82,7 +82,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
   loadFavoriteTaxis: =>
     i = 0
-    while i < 20
+    while i < 5
       license = "DDAS65DAS" + i.toString()
       name = "Taxista "
       surname = i.toString()
