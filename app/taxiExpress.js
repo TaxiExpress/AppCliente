@@ -276,14 +276,14 @@
 
     function AppCtrl() {
       AppCtrl.__super__.constructor.apply(this, arguments);
-      Lungo.Cache.set("phone", "656111111");
+      Lungo.Cache.set("phone", "677399899");
       Lungo.Cache.set("server", "http://TaxiLoadBalancer-638315338.us-east-1.elb.amazonaws.com/");
       __Controller.login = new __Controller.LoginCtrl("section#login_s");
       __Controller.register = new __Controller.RegisterCtrl("section#register_s");
     }
 
     Lungo.Service.Settings.error = function(type, xhr) {
-      return alert(xhr.response);
+      return console.log(xhr.response);
     };
 
     return AppCtrl;
@@ -690,7 +690,7 @@
         license = "DDAS65DAS" + i.toString();
         name = "Taxista ";
         surname = i.toString();
-        valoration = (i % 5) + 1;
+        valoration = i % 5;
         position = new google.maps.LatLng(43.271239, -2.9445875);
         plate = "DVT 78" + i.toString();
         model = "Opel Corsa";
@@ -765,6 +765,7 @@
       this.db.transaction(function(tx) {
         return tx.executeSql("CREATE TABLE IF NOT EXISTS accessData (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, dateUpdate STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL )");
       });
+      this.drop();
       this.read();
     }
 
@@ -793,7 +794,7 @@
     LoginCtrl.prototype.parseResponse = function(result) {
       var profile,
         _this = this;
-      if (result.first_name === void 0) {
+      if (result.email === void 0) {
         profile = this.getProfile(credentials);
       } else {
         profile = this.getProfile(result);
@@ -822,12 +823,12 @@
     LoginCtrl.prototype.getProfile = function(result) {
       var profile;
       return profile = {
-        name: "Héctor",
-        surname: "Torres Gómez",
-        phone: "667933233",
-        email: "emaildeprueba@gmail.com",
-        image: "https://pbs.twimg.com/profile_images/378800000638981863/e6b9769bbd741c6e98e3cb1fb79dbdfb.jpeg",
-        dateUpdate: "2013-12-13 16:12:35"
+        name: result.name,
+        surname: result.surname,
+        phone: result.phone,
+        email: result.email,
+        image: result.image,
+        dateUpdate: result.dateUpdate
       };
     };
 
@@ -860,7 +861,7 @@
         license = "DDAS65DAS" + i.toString();
         name = "Taxista ";
         surname = i.toString();
-        valoration = (i % 5) + 1;
+        valoration = i % 5;
         position = new google.maps.LatLng(43.271239, -2.9445875);
         plate = "DVT 78" + i.toString();
         model = "Opel Corsa";
@@ -1014,7 +1015,13 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.PasswordCtrl = (function(_super) {
+    var credentials, newpass;
+
     __extends(PasswordCtrl, _super);
+
+    credentials = void 0;
+
+    newpass = void 0;
 
     PasswordCtrl.prototype.elements = {
       "#password_old_pass": "old_pass",
@@ -1033,7 +1040,7 @@
     }
 
     PasswordCtrl.prototype.saveNewPassword = function(event) {
-      var credentials, data, server, url;
+      var data, server, url;
       if (!(this.new_pass1[0].value || this.new_pass2[0].value || this.old_pass[0].value)) {
         return alert("Debes rellenar todos los campos");
       } else if (this.new_pass1[0].value.length < 8 || this.new_pass1[0].value.length > 20) {
@@ -1044,7 +1051,7 @@
         server = Lungo.Cache.get("server");
         credentials = Lungo.Cache.get("credentials");
         if (this.new_pass1[0].value === this.new_pass2[0].value) {
-          url = server + "client/changePassword";
+          url = server + "client/changepassword";
           data = {
             email: credentials.email,
             oldPass: this.old_pass[0].value,
@@ -1056,7 +1063,15 @@
     };
 
     PasswordCtrl.prototype.parseResponse = function(result) {
+      var _this = this;
       alert("Contraseña cambiada");
+      this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
+      this.newpass = this.new_pass1[0].value;
+      this.db.transaction(function(tx) {
+        var sql;
+        sql = "UPDATE accessData SET pass = '" + _this.newpass + "' WHERE email ='" + credentials.email + "';";
+        return tx.executeSql(sql);
+      });
       Lungo.Router.back();
       this.new_pass1[0].value = "";
       this.new_pass2[0].value = "";
@@ -1243,14 +1258,14 @@
     ProfileCtrl.prototype.saveChanges = function(event) {
       var data, server, url;
       server = Lungo.Cache.get("server");
-      url = server + "client/changeDetails";
+      url = server + "client/changedetails";
       date = new Date().toISOString().substring(0, 19);
       date = date.replace("T", " ");
       data = {
-        email: this.email[0].textContent,
+        email: this.email[0].innerText,
         firstName: this.name[0].value,
         lastName: this.surname[0].value,
-        image: this.avatar[0].src,
+        newImage: this.avatar[0].src,
         dateUpdate: date
       };
       return this.parseResponse("");
@@ -1323,7 +1338,7 @@
           email: this.email[0].value,
           password: this.pass1[0].value,
           phone: phone,
-          dateUpdate: date
+          lastUpdate: date
         };
         return this.parseResponse("");
       }

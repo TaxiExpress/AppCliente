@@ -109,7 +109,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
       license = "DDAS65DAS" + i.toString()
       name = "Taxista "
       surname = i.toString()
-      valoration = (i % 5) + 1
+      valoration = (i % 5)
       position = new google.maps.LatLng(43.271239,-2.9445875)
       plate = "DVT 78" + i.toString()
       model = "Opel Corsa"

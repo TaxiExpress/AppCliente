@@ -17,7 +17,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     @db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024) #2MB
     @db.transaction (tx) =>
       tx.executeSql "CREATE TABLE IF NOT EXISTS accessData (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, dateUpdate STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL )"
-    #@drop()
+    @drop()
     @read()
 
   doLogin: (event) =>
@@ -39,7 +39,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     @parseResponse("")
 
   parseResponse: (result) =>
-    if result.first_name == undefined
+    if result.email == undefined
       profile = @getProfile(credentials) 
     else 
       profile = @getProfile(result)
@@ -61,12 +61,12 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
   getProfile: (result) ->
     return profile =
-      name: "Héctor"#result.name
-      surname: "Torres Gómez"#result.surname
-      phone: "667933233"#result.phone
-      email: "emaildeprueba@gmail.com"#result.email
-      image: "https://pbs.twimg.com/profile_images/378800000638981863/e6b9769bbd741c6e98e3cb1fb79dbdfb.jpeg"#result.image
-      dateUpdate: "2013-12-13 16:12:35"#result.dateUpdate
+      name: result.name
+      surname: result.surname
+      phone: result.phone
+      email: result.email
+      image: result.image
+      dateUpdate: result.dateUpdate
 
   drop: =>
     @db.transaction (tx) =>
@@ -88,7 +88,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       license = "DDAS65DAS" + i.toString()
       name = "Taxista "
       surname = i.toString()
-      valoration = (i % 5) + 1
+      valoration = (i % 5) 
       position = new google.maps.LatLng(43.271239,-2.9445875)
       plate = "DVT 78" + i.toString()
       model = "Opel Corsa"

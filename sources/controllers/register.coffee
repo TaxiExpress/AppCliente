@@ -28,7 +28,7 @@ class __Controller.RegisterCtrl extends Monocle.Controller
         email: @email[0].value
         password: @pass1[0].value
         phone: phone
-        dateUpdate: date
+        lastUpdate: date
       #Lungo.Service.post(url, data, @parseResponse, "json")
       @parseResponse ""
 
