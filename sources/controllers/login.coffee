@@ -13,11 +13,10 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
   constructor: ->
     super
-    phone_number = Lungo.Cache.get "phone"
     @db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024) #2MB
     @db.transaction (tx) =>
       tx.executeSql "CREATE TABLE IF NOT EXISTS accessData (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, dateUpdate STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL )"
-    @drop()
+    #@drop()
     @read()
 
   doLogin: (event) =>

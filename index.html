@@ -38,10 +38,24 @@
         <article id="register_a" class="scroll" >
             <div class="form list">
                 <li class="anchor contrast">DETALLES DE CUENTA</li>                
+                <fieldset><input id="register_phone" type="tel" maxlength="9" placeholder="Teléfono" /></fieldset>
                 <fieldset><input id="register_email" type="email" maxlength="40" placeholder="Email" /></fieldset>
-                <fieldset><input id="register_pass1" type="password" placeholder="Escriba su contraseña" /></fieldset>
+                <fieldset><input id="register_pass1" type="password" placeholder="Contraseña" /></fieldset>
                 <fieldset><input id="register_pass2" type="password" placeholder="Repita su contraseña" /></fieldset>
                 <button id="register_register_b" class="anchor accept" data-label="Registrar en TaxiExpress" />
+                <button id="register_active_b" class="anchor accept" data-label="Verificar cuenta" data-view-section="phoneVerification_s" />
+            </div>
+        </article>
+    </section>
+
+    <section id="phoneVerification_s" data-transition="cover">
+        <header data-title="Registro" data-back="angle-down"></header>    
+        <article id="phoneVerification_a" class="scroll" >
+            <div class="form list">
+                <li class="anchor contrast">INSERTAR EL CÓDIGO RECIBIDO EN EL SMS</li>                
+                <fieldset><input id="phoneVerification_phone" type="tel" maxlength="9" placeholder="Teléfono" /></fieldset>
+                <fieldset><input id="phoneVerification_code" type="text" maxlength="4" placeholder="Código de verificación" /></fieldset>
+                <button id="phoneVerification_b" class="anchor accept" data-label="Verificar cuenta" />
             </div>
         </article>
     </section>
@@ -49,7 +63,7 @@
     <aside id="menu_s">
         <article id ="menu_a" class="active scroll list">            
             <li class="profile" data-view-section="profile_s">
-                <img id="menu_profile_avatar" src="img/user_white.png" alt="" />
+                <img id="menu_profile_avatar" src="img/user.png" alt="" />
                 <div>
                     <strong id="menu_profile_name"></strong>
                     <small id="menu_profile_phone"></small>

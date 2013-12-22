@@ -276,7 +276,6 @@
 
     function AppCtrl() {
       AppCtrl.__super__.constructor.apply(this, arguments);
-      Lungo.Cache.set("phone", "677399899");
       Lungo.Cache.set("server", "http://TaxiLoadBalancer-638315338.us-east-1.elb.amazonaws.com/");
       __Controller.login = new __Controller.LoginCtrl("section#login_s");
       __Controller.register = new __Controller.RegisterCtrl("section#register_s");
@@ -760,12 +759,10 @@
       this.doLogin = __bind(this.doLogin, this);
       var _this = this;
       LoginCtrl.__super__.constructor.apply(this, arguments);
-      phone_number = Lungo.Cache.get("phone");
       this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
       this.db.transaction(function(tx) {
         return tx.executeSql("CREATE TABLE IF NOT EXISTS accessData (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, dateUpdate STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL )");
       });
-      this.drop();
       this.read();
     }
 
@@ -948,7 +945,11 @@
       var profile;
       profile = Lungo.Cache.get("credentials");
       this.phone[0].textContent = "Tel. " + profile.phone;
-      this.name[0].textContent = profile.name + " " + profile.surname;
+      if (profile.name === "") {
+        this.name[0].textContent = profile.email;
+      } else {
+        this.name[0].textContent = profile.name + " " + profile.surname;
+      }
       if (profile.image) {
         return this.avatar[0].src = profile.image;
       }
@@ -1160,6 +1161,65 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+  __Controller.PhoneVerificationCtrl = (function(_super) {
+    __extends(PhoneVerificationCtrl, _super);
+
+    PhoneVerificationCtrl.prototype.elements = {
+      "#phoneVerification_phone": "phone",
+      "#phoneVerification_code": "code"
+    };
+
+    PhoneVerificationCtrl.prototype.events = {
+      "singleTap #phoneVerification_b": "doVerification"
+    };
+
+    function PhoneVerificationCtrl() {
+      this.parseResponse = __bind(this.parseResponse, this);
+      this.doVerification = __bind(this.doVerification, this);
+      PhoneVerificationCtrl.__super__.constructor.apply(this, arguments);
+    }
+
+    PhoneVerificationCtrl.prototype.setPhone = function(phone) {
+      this.phone[0].value = phone;
+      return this.phone[0].disabled = true;
+    };
+
+    PhoneVerificationCtrl.prototype.doVerification = function(event) {
+      var data, server, url;
+      if (!(this.phone[0].value || this.code[0].value)) {
+        return alert("Debes rellenar todos los campos");
+      } else if (this.code[0].value.length < 4) {
+        return alert("Escribe un código válido");
+      } else {
+        server = Lungo.Cache.get("server");
+        url = server + "client/validateUser";
+        data = {
+          phone: this.phone[0].value,
+          validationCode: this.code[0].value
+        };
+        return this.parseResponse("");
+      }
+    };
+
+    PhoneVerificationCtrl.prototype.parseResponse = function(result) {
+      Lungo.Router.section("init_s");
+      __Controller.register.validated();
+      this.code[0].value = "";
+      this.phone[0].value = "";
+      return this.phone[0].disabled = false;
+    };
+
+    return PhoneVerificationCtrl;
+
+  })(Monocle.Controller);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
   __Controller.ProfileCtrl = (function(_super) {
     var date;
 
@@ -1302,9 +1362,14 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.RegisterCtrl = (function(_super) {
+    var data;
+
     __extends(RegisterCtrl, _super);
 
+    data = void 0;
+
     RegisterCtrl.prototype.elements = {
+      "#register_phone": "phone",
       "#register_email": "email",
       "#register_pass1": "pass1",
       "#register_pass2": "pass2"
@@ -1315,14 +1380,15 @@
     };
 
     function RegisterCtrl() {
+      this.validated = __bind(this.validated, this);
       this.parseResponse = __bind(this.parseResponse, this);
       this.register = __bind(this.register, this);
       RegisterCtrl.__super__.constructor.apply(this, arguments);
     }
 
     RegisterCtrl.prototype.register = function(event) {
-      var data, date, phone, server, url;
-      if (!(this.pass1[0].value || this.pass2[0].value || this.email[0].value)) {
+      var date, server, url;
+      if (!(this.pass1[0].value || this.pass2[0].value || this.email[0].value || this.phone[0].value)) {
         return alert("Debes rellenar todos los campos");
       } else if (this.pass1[0].value.length < 8 || this.pass1[0].value.length > 20) {
         return alert("La contraseña debe tener entre 8 y 20 caracteres");
@@ -1331,13 +1397,12 @@
       } else {
         date = new Date().toISOString().substring(0, 19);
         date = date.replace("T", " ");
-        phone = Lungo.Cache.get("phone");
         server = Lungo.Cache.get("server");
         url = server + "client/register";
-        data = {
+        this.data = {
           email: this.email[0].value,
           password: this.pass1[0].value,
-          phone: phone,
+          phone: this.phone[0].value,
           lastUpdate: date
         };
         return this.parseResponse("");
@@ -1345,8 +1410,41 @@
     };
 
     RegisterCtrl.prototype.parseResponse = function(result) {
-      Lungo.Notification.html('<h2>Comprueba tu email y verifica el registro para poder acceder</h2>', 'Aceptar');
-      Lungo.Router.back();
+      __Controller.phoneVerification = new __Controller.PhoneVerificationCtrl("section#phoneVerification_s");
+      __Controller.phoneVerification.setPhone(this.phone[0].value);
+      return Lungo.Router.section("phoneVerification_s");
+    };
+
+    RegisterCtrl.prototype.validated = function() {
+      var db, profile,
+        _this = this;
+      db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
+      db.transaction(function(tx) {
+        var sql;
+        sql = "INSERT INTO accessData (email, pass, dateUpdate, name, surname, phone, image) VALUES ('" + _this.data.email + "','" + _this.data.password + "','" + _this.data.lastUpdate + "','','','" + _this.data.phone + "','');";
+        return tx.executeSql(sql);
+      });
+      profile = {
+        name: "",
+        surname: "",
+        phone: this.data.phone,
+        email: this.data.email,
+        image: "",
+        dateUpdate: this.data.lastUpdate
+      };
+      Lungo.Cache.set("credentials", profile);
+      __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
+      __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
+      __Controller.favorites = new __Controller.FavoritesCtrl("section#favorites_s");
+      __Controller.favDriver = new __Controller.FavDriverCtrl("section#favDriver_s");
+      __Controller.chosenTaxi = new __Controller.ChosenTaxiCtrl("section#chosenTaxi_s");
+      __Controller.nearDriver = new __Controller.NearDriverCtrl("section#list_s");
+      __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
+      __Controller.travelDetails = new __Controller.TravelDetailsCtrl("section#travelDetails_s");
+      setTimeout((function() {
+        return __Controller.home = new __Controller.HomeCtrl("section#home_s");
+      }), 1000);
+      this.phone[0].value = "";
       this.email[0].value = "";
       this.pass1[0].value = "";
       return this.pass2[0].value = "";

@@ -154,11 +154,11 @@ aside .list li.profile{
   padding-bottom: 18px;
 }
 aside .list li.profile div{
-  margin-top:3px;
+  margin-top:0px;
 }
 
 aside .list li.profile strong{
-  font-size:14px;
+  font-size:16px;
 }
 
 aside .list li,
@@ -181,7 +181,7 @@ aside .list li .icon {
 }
 aside .list li small {
   color: #bbb;
-  font-size: 12px;
+  font-size: 13px;
 }
 aside .list li strong {
   color: #fff;
@@ -205,7 +205,8 @@ aside .list li img {
   border-radius: 25px;
   position: relative;
   float: left;
-  margin-right:16px;
+  margin-right:13px;
+  margin-top:-1px;
 }
 
 #map_canvas{
@@ -728,7 +729,6 @@ form textarea[disabled],
 .form textarea[disabled],
 form label.select[disabled],
 .form label.select[disabled] {
-  background: #dadada;
   border-color: #dadada;
   color: #a3a3a3;
 }
