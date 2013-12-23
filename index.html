@@ -26,6 +26,7 @@
               </fieldset>
               <fieldset class="radius-bottom" >
                   <input id="login_password" type="password" placeholder="Contraseña">
+                  <input id="csrfmiddlewaretoken" type="hidden" value="57f37ba9b01bdfd535be8764f3329e78">
               </fieldset>
               <button id="login_login_b" class="anchor" data-label="Acceder" />
               <button id="login_register_b" class="anchor accept" data-view-section="register_s" data-label="Registro" />
@@ -71,8 +72,6 @@
             </li>
             <li data-view-section="travelList_s">Trayectos realizados</li>
             <li data-view-section="favorites_s">Taxistas favoritos</li>
-            <li data-view-section="filters_s">Configuración</li>
-            <li data-view-section="payment_s">Formas de pago</li>
             <li data-view-section="faq_s">F.A.Q.</li>
             <li data-view-section="legalAdvice_s">Aviso Legal</li>
             <li data-view-section="login_s">Cerrar sesión</li>
@@ -163,15 +162,15 @@
                     <input id="filters_payment" type="checkbox" checked />
                 </fieldset> 
                 <fieldset> 
-                    <small>Transporte de animales</small>
+                    <small>Permitido el transporte de animales</small>
                     <input id="filters_animals" type="checkbox" />
                 </fieldset> 
                 <fieldset> 
-                    <small>Permitir comer y beber</small>
+                    <small>Permitido comer y beber</small>
                     <input id="filters_food" type="checkbox" checked />
                 </fieldset>
                 <fieldset> 
-                    <small>Permitir fumar</small>
+                    <small>Permitido fumar</small>
                     <input id="filters_smoke" type="checkbox" checked />
                 </fieldset>            
             </div>           
@@ -238,8 +237,8 @@
             <img id="travelDetails_driver" class="topRight driver" src="" />
             <div id="map-canvas2"></div> 
             <div class="form list little_list">
-                <fieldset><small><label>Origen:</label><span id="travelDetails_start" /></small></fieldset>
-                <fieldset><small><label>Destino:</label><span id="travelDetails_end" /></small></fieldset>
+                <fieldset><small><label>De:</label><span id="travelDetails_start" /></small></fieldset>
+                <fieldset><small><label>A:</label><span id="travelDetails_end" /></small></fieldset>
                 <fieldset><small><label>Fecha:</label><span id="travelDetails_date" /></small></fieldset>
                 <fieldset><small><label>Duración:</label><span id="travelDetails_time" /></small></fieldset>
                 <fieldset><small><label>Coste:</label><span id="travelDetails_cost" /></small></fieldset>
@@ -313,7 +312,18 @@
     <script src="components/monocle/monocle.js"></script>
     <script src="components/lungo/lungo.js"></script>
     <script src="https://js.stripe.com/v2/"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
     <script src="app/taxiExpress.js"></script>   
     <script src="cordova.js"></script>
+    <script>
+        (function(jQuery) {
+          jQuery.ajaxSetup({
+            beforeSend: function(xhr) {
+              var token = jQuery('meta[name="_csrf"]').attr('content');
+              xhr.setRequestHeader('X-CSRF-TOKEN', token);
+            }
+          });
+        }(jQuery));
+    </script>
 </html>

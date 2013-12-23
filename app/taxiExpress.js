@@ -282,7 +282,7 @@
     }
 
     Lungo.Service.Settings.error = function(type, xhr) {
-      return console.log(xhr.response);
+      return alert(xhr.response);
     };
 
     return AppCtrl;
@@ -730,7 +730,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.LoginCtrl = (function(_super) {
-    var credentials, db, phone_number;
+    var credentials, db;
 
     __extends(LoginCtrl, _super);
 
@@ -738,11 +738,10 @@
 
     credentials = void 0;
 
-    phone_number = void 0;
-
     LoginCtrl.prototype.elements = {
       "#login_username": "username",
-      "#login_password": "password"
+      "#login_password": "password",
+      "#csrfmiddlewaretoken": "csrfmiddlewaretoken"
     };
 
     LoginCtrl.prototype.events = {
@@ -772,17 +771,17 @@
       this.drop();
       date = new Date("1/1/1970").toISOString().substring(0, 19);
       date = date.replace("T", " ");
-      return this.valideCredentials(this.username[0].value, this.password[0].value, phone_number, date);
+      return this.valideCredentials(this.username[0].value, this.password[0].value, date);
     };
 
-    LoginCtrl.prototype.valideCredentials = function(email, pass, phone, date) {
+    LoginCtrl.prototype.valideCredentials = function(email, pass, date) {
       var data, server, url;
       server = Lungo.Cache.get("server");
       url = server + "client/login";
       data = {
         email: email,
         password: pass,
-        phone: phone_number,
+        phone: "677399899",
         lastUpdate: date
       };
       return this.parseResponse("");
@@ -842,7 +841,7 @@
         return tx.executeSql("SELECT * FROM accessData", [], (function(tx, results) {
           if (results.rows.length > 0) {
             credentials = results.rows.item(0);
-            return _this.valideCredentials(credentials.email, credentials.pass, phone_number, credentials.dateUpdate);
+            return _this.valideCredentials(credentials.email, credentials.pass, credentials.dateUpdate);
           } else {
             return Lungo.Router.section("login_s");
           }
@@ -1192,7 +1191,7 @@
         return alert("Escribe un código válido");
       } else {
         server = Lungo.Cache.get("server");
-        url = server + "client/validateUser";
+        url = server + "client/validate";
         data = {
           phone: this.phone[0].value,
           validationCode: this.code[0].value

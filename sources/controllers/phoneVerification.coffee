@@ -21,7 +21,7 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
       alert "Escribe un código válido"
     else
       server = Lungo.Cache.get "server"
-      url = server + "client/validateUser"
+      url = server + "client/validate"
       data = 
         phone: @phone[0].value
         validationCode: @code[0].value

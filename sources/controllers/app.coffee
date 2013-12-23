@@ -7,7 +7,7 @@ class __Controller.AppCtrl extends Monocle.Controller
     __Controller.register = new __Controller.RegisterCtrl "section#register_s"
 
   Lungo.Service.Settings.error = (type, xhr) ->
-    console.log xhr.response
+    alert xhr.response
     
 $$ ->
   Lungo.init({})

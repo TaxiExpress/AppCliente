@@ -2,11 +2,11 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
   db = undefined
   credentials = undefined
-  phone_number = undefined
 
   elements:
     "#login_username"                              : "username"
     "#login_password"                              : "password"
+    "#csrfmiddlewaretoken"                         : "csrfmiddlewaretoken"
 
   events:
     "tap #login_login_b"                           : "doLogin"
@@ -24,15 +24,15 @@ class __Controller.LoginCtrl extends Monocle.Controller
     @drop()
     date = new Date("1/1/1970").toISOString().substring 0, 19
     date = date.replace "T", " "
-    @valideCredentials(@username[0].value, @password[0].value, phone_number, date)
+    @valideCredentials(@username[0].value, @password[0].value, date)
 
-  valideCredentials: (email, pass, phone, date)=>
+  valideCredentials: (email, pass, date)=>
     server = Lungo.Cache.get "server"
     url = server + "client/login"
     data = 
       email: email
       password: pass
-      phone: phone_number
+      phone: "677399899"
       lastUpdate: date
     #result = Lungo.Service.post(url, data, @parseResponse, "json")
     @parseResponse("")
@@ -76,7 +76,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       tx.executeSql "SELECT * FROM accessData", [], ((tx, results) =>
         if results.rows.length > 0
           credentials = results.rows.item(0)
-          @valideCredentials(credentials.email, credentials.pass, phone_number, credentials.dateUpdate)
+          @valideCredentials(credentials.email, credentials.pass, credentials.dateUpdate)
         else
           Lungo.Router.section "login_s"
       ), null

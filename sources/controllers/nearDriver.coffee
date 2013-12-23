@@ -12,4 +12,4 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
   deleteNearTaxis: =>
     for nearDriver in __Model.Driver.getAll()
       _viewsList[nearDriver.license].remove()
-      _viewsList[nearDriver.license]= undefined
+      _viewsList[nearDriver.license] = undefined

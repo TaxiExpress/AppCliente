@@ -53,7 +53,7 @@ body { height: 100%; margin: 0; padding: 0 }
 .street button.topLeftButton {position:absolute; z-index:2; width:48px!important; height: 48px!important; color: #444; opacity:.9; background: #f5f5f5;left:15px; top:0; border-radius: 4px; border: 1px solid #ddd;}
 .street button.topLeftButton span {margin-left:-2px; font-size:20px;}
 img.topRight {position:absolute; z-index:2; visibility: hidden; width:48px!important; height: 48px!important; right:15px; top:15px; border-radius: 4px; border: 1px solid #ddd;}
-img.driver {visibility: visible!important;  border-radius: 24px; margin-top:46px; margin-right: -8px; background: #f5f5f5}
+img.driver {visibility: visible!important;  border-radius: 24px; margin-top:46px; margin-right: 4px; background: #f5f5f5}
 .initial_form {position:absolute; width:80%; left: 10%; right: 10%; bottom:15%;}
 .payments > strong {font-size: 33px; padding-top: 10px; padding-bottom: 10px; font-weight:400; text-align: center; width: 100%; display: block}
 .payments > span {font-size: 12px; color:red; display: block;padding: 0 0 10px 13px}

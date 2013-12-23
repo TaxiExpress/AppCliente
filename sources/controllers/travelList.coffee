@@ -12,5 +12,5 @@ class __Controller.TravelListCtrl extends Monocle.Controller
 
   deleteTravel: (travel) =>
     _views[travel.id].remove()
-    _views[travel.id]= undefined
+    _views[travel.id] = undefined
     travel.destroy()
