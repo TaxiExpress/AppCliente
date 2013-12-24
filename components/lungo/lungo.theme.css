@@ -158,6 +158,7 @@ aside .list li.profile div{
 }
 
 aside .list li.profile strong{
+  padding-right: 15px;
   font-size:16px;
 }
 

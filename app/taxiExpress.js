@@ -389,6 +389,8 @@
     };
 
     function FavDriverCtrl() {
+      this.removeFavorite = __bind(this.removeFavorite, this);
+      this.addFavorite = __bind(this.addFavorite, this);
       this.changeFavorite = __bind(this.changeFavorite, this);
       this.loadDriverDetails = __bind(this.loadDriverDetails, this);
       FavDriverCtrl.__super__.constructor.apply(this, arguments);
@@ -419,11 +421,28 @@
     };
 
     FavDriverCtrl.prototype.changeFavorite = function(event) {
+      var credentials, data, server, url;
+      server = Lungo.Cache.get("server");
+      credentials = Lungo.Cache.get("credentials");
+      data = {
+        customerEmail: credentials.email,
+        license: this.driverDetails.license
+      };
       if (this.favorite[0].checked) {
-        return __Controller.favorites.addFavorite(this.driverDetails);
+        url = server + "client/addFavoriteDriver";
+        return this.addFavorite("");
       } else {
-        return __Controller.favorites.deleteFavorite(this.driverDetails);
+        url = server + "client/removeFavoriteDriver";
+        return this.removeFavorite("");
       }
+    };
+
+    FavDriverCtrl.prototype.addFavorite = function(result) {
+      return __Controller.favorites.addFavorite(this.driverDetails);
+    };
+
+    FavDriverCtrl.prototype.removeFavorite = function(result) {
+      return __Controller.favorites.deleteFavorite(this.driverDetails);
     };
 
     return FavDriverCtrl;
@@ -504,7 +523,6 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         driver = _ref[_i];
-        console.log(driver.license);
         _views[driver.license].remove();
         _views[driver.license] = void 0;
         _viewsList[driver.license].remove();

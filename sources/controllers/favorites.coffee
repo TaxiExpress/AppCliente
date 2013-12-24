@@ -26,7 +26,6 @@ class __Controller.FavoritesCtrl extends Monocle.Controller
 
   deleteFavoriteTaxis: =>
     for driver in __Model.FavoriteDriver.all()
-      console.log driver.license
       _views[driver.license].remove()
       _views[driver.license]= undefined
       _viewsList[driver.license].remove()
