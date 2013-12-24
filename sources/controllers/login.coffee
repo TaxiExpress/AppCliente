@@ -16,6 +16,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
     @db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024) #2MB
     @db.transaction (tx) =>
       tx.executeSql "CREATE TABLE IF NOT EXISTS accessData (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, dateUpdate STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL )"
+    @db.transaction (tx) =>
+      tx.executeSql "CREATE TABLE IF NOT EXISTS configData (email STRING NOT NULL PRIMARY KEY, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, food STRING NOT NULL, accesible STRING NOT NULL)"
     #@drop()
     @read()
 
@@ -32,10 +34,9 @@ class __Controller.LoginCtrl extends Monocle.Controller
     data = 
       email: email
       password: pass
-      phone: "677399899"
       lastUpdate: date
     #result = Lungo.Service.post(url, data, @parseResponse, "json")
-    @parseResponse("")
+    @parseResponse ""
 
   parseResponse: (result) =>
     if result.email == undefined
@@ -56,6 +57,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     __Controller.nearDriver = new __Controller.NearDriverCtrl "section#list_s"
     __Controller.travelList = new __Controller.TravelListCtrl "section#travelList_s"
     __Controller.travelDetails = new __Controller.TravelDetailsCtrl "section#travelDetails_s"
+    __Controller.filters = new __Controller.FiltersCtrl "section#filters_s"
     setTimeout((=>__Controller.home = new __Controller.HomeCtrl "section#home_s") , 1000)
 
   getProfile: (result) ->

@@ -542,6 +542,96 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+  __Controller.FiltersCtrl = (function(_super) {
+    var credentials, data, db;
+
+    __extends(FiltersCtrl, _super);
+
+    db = void 0;
+
+    credentials = void 0;
+
+    data = void 0;
+
+    FiltersCtrl.prototype.elements = {
+      "#filters_seats": "seats",
+      "#filters_payments": "payments",
+      "#filters_animals": "animals",
+      "#filters_food": "food",
+      "#filters_accesible": "accesible"
+    };
+
+    FiltersCtrl.prototype.events = {
+      "change #filters_seats": "saveFilters",
+      "change #filters_payments": "saveFilters",
+      "change #filters_animals": "saveFilters",
+      "change #filters_food": "saveFilters",
+      "change #filters_accesible": "saveFilters"
+    };
+
+    function FiltersCtrl() {
+      this.parseResponse = __bind(this.parseResponse, this);
+      this.saveFilters = __bind(this.saveFilters, this);
+      this.loadFilters = __bind(this.loadFilters, this);
+      FiltersCtrl.__super__.constructor.apply(this, arguments);
+      this.loadFilters();
+    }
+
+    FiltersCtrl.prototype.loadFilters = function() {
+      var _this = this;
+      this.credentials = Lungo.Cache.get("credentials");
+      this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
+      return this.db.transaction(function(tx) {
+        return tx.executeSql("SELECT * FROM configData", [], (function(tx, results) {
+          var filters;
+          if (results.rows.length > 0) {
+            filters = results.rows.item(0);
+            _this.seats[0].value = filters.seats;
+            _this.payments[0].checked = filters.payments === 'true';
+            _this.food[0].checked = filters.food === 'true';
+            _this.animals[0].checked = filters.animals === 'true';
+            return _this.accesible[0].checked = filters.accesible === 'true';
+          }
+        }), null);
+      });
+    };
+
+    FiltersCtrl.prototype.saveFilters = function(event) {
+      var server, url;
+      this.credentials = Lungo.Cache.get("credentials");
+      server = Lungo.Cache.get("server");
+      url = server + "client/chageFilters";
+      this.data = {
+        email: this.credentials.email,
+        seats: this.seats[0].value,
+        payments: this.payments[0].checked,
+        animals: this.animals[0].checked,
+        food: this.food[0].checked,
+        accesible: this.accesible[0].checked
+      };
+      return this.parseResponse("");
+    };
+
+    FiltersCtrl.prototype.parseResponse = function(result) {
+      var _this = this;
+      return this.db.transaction(function(tx) {
+        var sql;
+        sql = "UPDATE configData SET seats = '" + _this.data.seats + "', payments = '" + _this.data.payments + "', animals = '" + _this.data.animals + "', food = '" + _this.data.food + "' , accesible = '" + _this.data.accesible + "' WHERE email ='" + _this.data.email + "';";
+        return tx.executeSql(sql);
+      });
+    };
+
+    return FiltersCtrl;
+
+  })(Monocle.Controller);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
   __Controller.HomeCtrl = (function(_super) {
     var getStreet, initialize, manageErrors, map, updatePosition,
       _this = this;
@@ -780,6 +870,9 @@
       this.db.transaction(function(tx) {
         return tx.executeSql("CREATE TABLE IF NOT EXISTS accessData (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, dateUpdate STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL )");
       });
+      this.db.transaction(function(tx) {
+        return tx.executeSql("CREATE TABLE IF NOT EXISTS configData (email STRING NOT NULL PRIMARY KEY, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, food STRING NOT NULL, accesible STRING NOT NULL)");
+      });
       this.read();
     }
 
@@ -799,7 +892,6 @@
       data = {
         email: email,
         password: pass,
-        phone: "677399899",
         lastUpdate: date
       };
       return this.parseResponse("");
@@ -829,6 +921,7 @@
       __Controller.nearDriver = new __Controller.NearDriverCtrl("section#list_s");
       __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
       __Controller.travelDetails = new __Controller.TravelDetailsCtrl("section#travelDetails_s");
+      __Controller.filters = new __Controller.FiltersCtrl("section#filters_s");
       return setTimeout((function() {
         return __Controller.home = new __Controller.HomeCtrl("section#home_s");
       }), 1000);
@@ -1131,7 +1224,6 @@
       this.stripeResponseHandler = __bind(this.stripeResponseHandler, this);
       this.doPayment = __bind(this.doPayment, this);
       PaymentCtrl.__super__.constructor.apply(this, arguments);
-      this.loadPayment(23);
     }
 
     PaymentCtrl.prototype.loadPayment = function(amount_payment) {
@@ -1162,7 +1254,7 @@
       if (response.error) {
         return this.errors[0].innerText = "Los datos de la tarjeta no son válidos. Compruébelos.";
       } else {
-        Lungo.Notification.html('<h2 data-icon="spinner">Trayecto pagado</h2>', "Aceptar");
+        alert("Trayecto pagado");
         return Lungo.Router.section("home_s");
       }
     };
@@ -1441,6 +1533,11 @@
         sql = "INSERT INTO accessData (email, pass, dateUpdate, name, surname, phone, image) VALUES ('" + _this.data.email + "','" + _this.data.password + "','" + _this.data.lastUpdate + "','','','" + _this.data.phone + "','');";
         return tx.executeSql(sql);
       });
+      this.db.transaction(function(tx) {
+        var sql;
+        sql = "INSERT INTO configData (email, seats, payments, animals, food, accesible) VALUES ('" + _this.data.email + "','3','false','false','false','false');";
+        return tx.executeSql(sql);
+      });
       profile = {
         name: "",
         surname: "",
@@ -1458,6 +1555,7 @@
       __Controller.nearDriver = new __Controller.NearDriverCtrl("section#list_s");
       __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
       __Controller.travelDetails = new __Controller.TravelDetailsCtrl("section#travelDetails_s");
+      __Controller.filters = new __Controller.FiltersCtrl("section#filters_s");
       setTimeout((function() {
         return __Controller.home = new __Controller.HomeCtrl("section#home_s");
       }), 1000);

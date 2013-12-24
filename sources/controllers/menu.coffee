@@ -11,7 +11,7 @@ class __Controller.MenuCtrl extends Monocle.Controller
 
   updateProfile: ->
     profile = Lungo.Cache.get "credentials"
-    @phone[0].textContent = "Tel. "+ profile.phone
+    @phone[0].textContent = "Tel. " + profile.phone
     if profile.name == ""
       @name[0].textContent = profile.email
     else

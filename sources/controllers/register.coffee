@@ -44,6 +44,9 @@ class __Controller.RegisterCtrl extends Monocle.Controller
     db.transaction (tx) =>
       sql = "INSERT INTO accessData (email, pass, dateUpdate, name, surname, phone, image) VALUES ('"+@data.email+"','"+@data.password+"','"+@data.lastUpdate+"','','','"+@data.phone+"','');"
       tx.executeSql sql
+    @db.transaction (tx) =>
+      sql = "INSERT INTO configData (email, seats, payments, animals, food, accesible) VALUES ('"+@data.email+"','3','false','false','false','false');"
+      tx.executeSql sql
     profile =
       name: ""
       surname: ""
@@ -60,6 +63,7 @@ class __Controller.RegisterCtrl extends Monocle.Controller
     __Controller.nearDriver = new __Controller.NearDriverCtrl "section#list_s"
     __Controller.travelList = new __Controller.TravelListCtrl "section#travelList_s"
     __Controller.travelDetails = new __Controller.TravelDetailsCtrl "section#travelDetails_s"
+    __Controller.filters = new __Controller.FiltersCtrl "section#filters_s"
     setTimeout((=>__Controller.home = new __Controller.HomeCtrl "section#home_s") , 1000)
     @phone[0].value = ""
     @email[0].value = ""

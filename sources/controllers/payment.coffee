@@ -15,7 +15,6 @@ class __Controller.PaymentCtrl extends Monocle.Controller
 
   constructor: ->
     super
-    @loadPayment(23)
 
   loadPayment: (amount_payment) ->
     amount = amount_payment
@@ -43,5 +42,5 @@ class __Controller.PaymentCtrl extends Monocle.Controller
     if response.error      
       @errors[0].innerText = "Los datos de la tarjeta no son válidos. Compruébelos."
     else
-      Lungo.Notification.html '<h2 data-icon="spinner">Trayecto pagado</h2>', "Aceptar"
+      alert "Trayecto pagado"
       Lungo.Router.section "home_s"
