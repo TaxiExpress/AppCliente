@@ -63,7 +63,6 @@ class __Controller.ProfileCtrl extends Monocle.Controller
 
   saveChanges: (event) =>
     server = Lungo.Cache.get "server"
-    url = server + "client/changedetails"
     date = new Date().toISOString().substring 0, 19
     date = date.replace "T", " "
     data =
@@ -72,8 +71,15 @@ class __Controller.ProfileCtrl extends Monocle.Controller
       lastName: @surname[0].value
       newImage: @avatar[0].src
       dateUpdate: date
-    #Lungo.Service.post(url, data, @parseResponse, "json")
     @parseResponse ""
+    $$.ajax
+      type: "POST"
+      url: server + "client/changedetails"
+      data: data
+      success: (result) =>
+        #@parseResponse result
+      error: (xhr, type) =>
+        console.log type.response
 
   parseResponse: (result) =>
     credentials = Lungo.Cache.get "credentials"

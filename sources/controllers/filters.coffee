@@ -39,7 +39,6 @@ class __Controller.FiltersCtrl extends Monocle.Controller
   saveFilters: (event) =>
     @credentials = Lungo.Cache.get "credentials"
     server = Lungo.Cache.get "server"
-    url = server + "client/chageFilters"
     @data =
       email: @credentials.email
       seats: @seats[0].value
@@ -47,8 +46,15 @@ class __Controller.FiltersCtrl extends Monocle.Controller
       animals: @animals[0].checked
       food: @food[0].checked
       accesible: @accesible[0].checked
-    #Lungo.Service.post(url, @data, @parseResponse, "json")
     @parseResponse ""
+    $$.ajax
+      type: "POST"
+      url: server + "client/chageFilters"
+      data: @data
+      success: (result) =>
+        #@parseResponse result
+      error: (xhr, type) =>
+        console.log type.response
   
   parseResponse: (result) =>
     @db.transaction (tx) =>

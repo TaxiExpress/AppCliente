@@ -34,5 +34,4 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
     @animals[0].innerText = "Si" if driver.animals
 
   requestTaxi: (event) =>
-    console.log "solicito taxi"    
-
+    console.log "solicito taxi"

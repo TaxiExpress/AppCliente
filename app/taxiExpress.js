@@ -281,10 +281,6 @@
       __Controller.register = new __Controller.RegisterCtrl("section#register_s");
     }
 
-    Lungo.Service.Settings.error = function(type, xhr) {
-      return alert(xhr.response);
-    };
-
     return AppCtrl;
 
   })(Monocle.Controller);
@@ -421,7 +417,8 @@
     };
 
     FavDriverCtrl.prototype.changeFavorite = function(event) {
-      var credentials, data, server, url;
+      var credentials, data, server,
+        _this = this;
       server = Lungo.Cache.get("server");
       credentials = Lungo.Cache.get("credentials");
       data = {
@@ -429,11 +426,21 @@
         license: this.driverDetails.license
       };
       if (this.favorite[0].checked) {
-        url = server + "client/addFavoriteDriver";
-        return this.addFavorite("");
+        this.addFavorite("");
+        return $$.ajax({
+          type: "POST",
+          url: server + "client/addFavoriteDriver",
+          data: data,
+          success: function(result) {}
+        });
       } else {
-        url = server + "client/removeFavoriteDriver";
-        return this.removeFavorite("");
+        this.removeFavorite("");
+        return $$.ajax({
+          type: "POST",
+          url: server + "client/removeFavoriteDriver",
+          data: data,
+          success: function(result) {}
+        });
       }
     };
 
@@ -597,10 +604,10 @@
     };
 
     FiltersCtrl.prototype.saveFilters = function(event) {
-      var server, url;
+      var server,
+        _this = this;
       this.credentials = Lungo.Cache.get("credentials");
       server = Lungo.Cache.get("server");
-      url = server + "client/chageFilters";
       this.data = {
         email: this.credentials.email,
         seats: this.seats[0].value,
@@ -609,7 +616,16 @@
         food: this.food[0].checked,
         accesible: this.accesible[0].checked
       };
-      return this.parseResponse("");
+      this.parseResponse("");
+      return $$.ajax({
+        type: "POST",
+        url: server + "client/chageFilters",
+        data: this.data,
+        success: function(result) {},
+        error: function(xhr, type) {
+          return console.log(type.response);
+        }
+      });
     };
 
     FiltersCtrl.prototype.parseResponse = function(result) {
@@ -861,7 +877,6 @@
       this.loadFavoriteTaxis = __bind(this.loadFavoriteTaxis, this);
       this.read = __bind(this.read, this);
       this.drop = __bind(this.drop, this);
-      this.parseResponse = __bind(this.parseResponse, this);
       this.valideCredentials = __bind(this.valideCredentials, this);
       this.doLogin = __bind(this.doLogin, this);
       var _this = this;
@@ -886,15 +901,24 @@
     };
 
     LoginCtrl.prototype.valideCredentials = function(email, pass, date) {
-      var data, server, url;
+      var server,
+        _this = this;
       server = Lungo.Cache.get("server");
-      url = server + "client/login";
-      data = {
-        email: email,
-        password: pass,
-        lastUpdate: date
-      };
-      return this.parseResponse("");
+      this.parseResponse("");
+      return $$.ajax({
+        type: "POST",
+        url: server + "client/login",
+        data: {
+          email: email,
+          password: pass,
+          lastUpdate: date
+        },
+        success: function(result) {},
+        error: function(xhr, type) {
+          console.log(type.response);
+          return Lungo.Router.section("login_s");
+        }
+      });
     };
 
     LoginCtrl.prototype.parseResponse = function(result) {
@@ -1151,7 +1175,8 @@
     }
 
     PasswordCtrl.prototype.saveNewPassword = function(event) {
-      var data, server, url;
+      var server,
+        _this = this;
       if (!(this.new_pass1[0].value || this.new_pass2[0].value || this.old_pass[0].value)) {
         return alert("Debes rellenar todos los campos");
       } else if (this.new_pass1[0].value.length < 8 || this.new_pass1[0].value.length > 20) {
@@ -1162,13 +1187,20 @@
         server = Lungo.Cache.get("server");
         credentials = Lungo.Cache.get("credentials");
         if (this.new_pass1[0].value === this.new_pass2[0].value) {
-          url = server + "client/changepassword";
-          data = {
-            email: credentials.email,
-            oldPass: this.old_pass[0].value,
-            newPass: this.new_pass1[0].value
-          };
-          return this.parseResponse("");
+          this.parseResponse("");
+          return $$.ajax({
+            type: "POST",
+            url: server + "client/changepassword",
+            data: {
+              email: credentials.email,
+              oldPass: this.old_pass[0].value,
+              newPass: this.new_pass1[0].value
+            },
+            success: function(result) {},
+            error: function(xhr, type) {
+              return console.log(type.response);
+            }
+          });
         }
       }
     };
@@ -1294,19 +1326,27 @@
     };
 
     PhoneVerificationCtrl.prototype.doVerification = function(event) {
-      var data, server, url;
+      var server,
+        _this = this;
       if (!(this.phone[0].value || this.code[0].value)) {
         return alert("Debes rellenar todos los campos");
       } else if (this.code[0].value.length < 4) {
         return alert("Escribe un código válido");
       } else {
         server = Lungo.Cache.get("server");
-        url = server + "client/validate";
-        data = {
-          phone: this.phone[0].value,
-          validationCode: this.code[0].value
-        };
-        return this.parseResponse("");
+        this.parseResponse("");
+        return $$.ajax({
+          type: "POST",
+          url: server + "client/validate",
+          data: {
+            phone: this.phone[0].value,
+            validationCode: this.code[0].value
+          },
+          success: function(result) {},
+          error: function(xhr, type) {
+            return console.log(type.response);
+          }
+        });
       }
     };
 
@@ -1425,9 +1465,9 @@
     };
 
     ProfileCtrl.prototype.saveChanges = function(event) {
-      var data, server, url;
+      var data, server,
+        _this = this;
       server = Lungo.Cache.get("server");
-      url = server + "client/changedetails";
       date = new Date().toISOString().substring(0, 19);
       date = date.replace("T", " ");
       data = {
@@ -1437,7 +1477,16 @@
         newImage: this.avatar[0].src,
         dateUpdate: date
       };
-      return this.parseResponse("");
+      this.parseResponse("");
+      return $$.ajax({
+        type: "POST",
+        url: server + "client/changedetails",
+        data: data,
+        success: function(result) {},
+        error: function(xhr, type) {
+          return console.log(type.response);
+        }
+      });
     };
 
     ProfileCtrl.prototype.parseResponse = function(result) {
@@ -1496,7 +1545,8 @@
     }
 
     RegisterCtrl.prototype.register = function(event) {
-      var date, server, url;
+      var date, server,
+        _this = this;
       if (!(this.pass1[0].value || this.pass2[0].value || this.email[0].value || this.phone[0].value)) {
         return alert("Debes rellenar todos los campos");
       } else if (this.pass1[0].value.length < 8 || this.pass1[0].value.length > 20) {
@@ -1507,14 +1557,22 @@
         date = new Date().toISOString().substring(0, 19);
         date = date.replace("T", " ");
         server = Lungo.Cache.get("server");
-        url = server + "client/register";
         this.data = {
           email: this.email[0].value,
           password: this.pass1[0].value,
           phone: this.phone[0].value,
           lastUpdate: date
         };
-        return this.parseResponse("");
+        this.parseResponse("");
+        return $$.ajax({
+          type: "POST",
+          url: server + "client/register",
+          data: this.data,
+          success: function(result) {},
+          error: function(xhr, type) {
+            return console.log(type.response);
+          }
+        });
       }
     };
 

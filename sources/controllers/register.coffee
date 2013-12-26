@@ -25,14 +25,20 @@ class __Controller.RegisterCtrl extends Monocle.Controller
       date = new Date().toISOString().substring 0, 19
       date = date.replace "T", " "
       server = Lungo.Cache.get "server"
-      url = server + "client/register"
       @data = 
         email: @email[0].value
         password: @pass1[0].value
         phone: @phone[0].value
         lastUpdate: date
-      #Lungo.Service.post(url, @data, @parseResponse, "json")
       @parseResponse ""
+      $$.ajax
+        type: "POST"
+        url: server + "client/register"
+        data: @data
+        success: (result) =>
+          #@parseResponse result
+        error: (xhr, type) =>
+          console.log type.response
 
   parseResponse: (result) =>
     __Controller.phoneVerification = new __Controller.PhoneVerificationCtrl "section#phoneVerification_s"

@@ -28,17 +28,23 @@ class __Controller.LoginCtrl extends Monocle.Controller
     date = date.replace "T", " "
     @valideCredentials(@username[0].value, @password[0].value, date)
 
-  valideCredentials: (email, pass, date)=>
+  valideCredentials: (email, pass, date) =>
     server = Lungo.Cache.get "server"
-    url = server + "client/login"
-    data = 
-      email: email
-      password: pass
-      lastUpdate: date
-    #result = Lungo.Service.post(url, data, @parseResponse, "json")
     @parseResponse ""
+    $$.ajax
+      type: "POST"
+      url: server + "client/login"
+      data:
+        email: email
+        password: pass
+        lastUpdate: date
+      success: (result) =>
+        #@parseResponse result
+      error: (xhr, type) =>
+        console.log type.response
+        Lungo.Router.section "login_s"
 
-  parseResponse: (result) =>
+  parseResponse: (result) ->
     if result.email == undefined
       profile = @getProfile(credentials) 
     else 

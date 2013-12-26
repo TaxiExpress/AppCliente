@@ -21,12 +21,17 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
       alert "Escribe un código válido"
     else
       server = Lungo.Cache.get "server"
-      url = server + "client/validate"
-      data = 
-        phone: @phone[0].value
-        validationCode: @code[0].value
-      #Lungo.Service.post(url, data, @parseResponse, "json")
       @parseResponse ""
+      $$.ajax
+        type: "POST"
+        url: server + "client/validate"
+        data:
+          phone: @phone[0].value
+          validationCode: @code[0].value
+        success: (result) =>
+          #@parseResponse result
+        error: (xhr, type) =>
+          console.log type.response
 
   parseResponse: (result) =>
     Lungo.Router.section "init_s"

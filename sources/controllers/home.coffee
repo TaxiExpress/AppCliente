@@ -1,6 +1,6 @@
 class __Controller.HomeCtrl extends Monocle.Controller
 
-  map = undefined                     #El mapa
+  map = undefined
 
   elements:
     "#home_refresh_b"                        : "button_refresh"

@@ -34,24 +34,31 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
     @animals[0].innerText = "No"
     @animals[0].innerText = "Si" if driver.animals 
     if __Model.FavoriteDriver.get(driver.license)[0] != undefined
-        @favorite[0].checked = true
+      @favorite[0].checked = true
     else  @favorite[0].checked = false
-
 
   changeFavorite: (event) =>
     server = Lungo.Cache.get "server"
     credentials = Lungo.Cache.get "credentials"
     data = 
-        customerEmail: credentials.email
-        license: @driverDetails.license
+      customerEmail: credentials.email
+      license: @driverDetails.license
     if @favorite[0].checked
-        url = server + "client/addFavoriteDriver"
-        #Lungo.Service.post(url, data, @addFavorite, "json")
-        @addFavorite ""
+      @addFavorite ""
+      $$.ajax
+        type: "POST"
+        url: server + "client/addFavoriteDriver"
+        data: data
+        success: (result) =>
+          #@addFavorite result
     else 
-        url = server + "client/removeFavoriteDriver"
-        #Lungo.Service.post(url, data, @removeFavorite, "json")
-        @removeFavorite ""
+      @removeFavorite ""
+      $$.ajax
+        type: "POST"
+        url: server + "client/removeFavoriteDriver"
+        data: data
+        success: (result) =>
+          #@removeFavorite result
 
   addFavorite: (result) =>
     __Controller.favorites.addFavorite(@driverDetails)
