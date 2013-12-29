@@ -22,11 +22,14 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     @end[0].innerText = travel.destination
     @date[0].innerText = travel.date
     @time[0].innerText = (travel.endtime - travel.starttime) / 60000 + " minutos"
-    @cost[0].innerText = "35 €"
+    @cost[0].innerText = travel.cost + "€"
     @driverDetails = travel.driver
-    @changeValoration()
-    @driver[0].src = travel.driver.image
-  
+    @changeValuation()
+    if travel.driver.image
+      @driver[0].src = travel.driver.image
+    else
+      @driver[0].src = "img/user.png"
+      
   showMap: (travel) =>
     directionsService = new google.maps.DirectionsService()
     directionsDisplay = new google.maps.DirectionsRenderer()
@@ -59,16 +62,16 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     directionsService.route request, (response, status) ->
       directionsDisplay.setDirections response  if status is google.maps.DirectionsStatus.OK
 
-  changeValoration: =>
+  changeValuation: =>
     val = ""
     i = 0
-    while i < @driverDetails.valoration
+    while i < @driverDetails.valuation
       val = val + "★"
       i++
     while i < 5
       val = val + "☆"
       i++
-    @driverDetails.valorationStars = val
+    @driverDetails.valuationStars = val
 
   viewDriver: (event) =>
     __Controller.favDriver.loadDriverDetails(@driverDetails)

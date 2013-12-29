@@ -25,7 +25,6 @@ class __Controller.PasswordCtrl extends Monocle.Controller
       server = Lungo.Cache.get "server"
       credentials = Lungo.Cache.get "credentials"
       if @new_pass1[0].value == @new_pass2[0].value
-        @parseResponse ""
         $$.ajax
           type: "POST"
           url: server + "client/changepassword"
@@ -34,9 +33,9 @@ class __Controller.PasswordCtrl extends Monocle.Controller
             oldPass: @old_pass[0].value
             newPass: @new_pass1[0].value
           success: (result) =>
-            #@parseResponse result
+            @parseResponse result
           error: (xhr, type) =>
-            console.log type.response
+            alert type.response
         
   parseResponse: (result) =>
     alert "Contraseña cambiada"

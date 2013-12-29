@@ -7,7 +7,7 @@ class __View.FavDriver extends Monocle.View
           <img src="{{ image }}" alt="" />
           <div>
               <strong>{{ name }} {{ surname }}</strong>
-              <small><strong>{{ valorationStars }}</strong></small>
+              <small><strong>{{ valuationStars }}</strong></small>
           </div>
       </li>
   """
@@ -19,13 +19,15 @@ class __View.FavDriver extends Monocle.View
     super
     val = ""
     i = 0
-    while i < @model.valoration
+    while i < @model.valuation
       val = val + "★"
       i++
     while i < 5
       val = val + "☆"
       i++
-    @model.valorationStars = val
+    @model.valuationStars = val
+    if @model.image == null
+      @model.image = "img/user.png"
     @prepend @model
 
   onView: (event) ->

@@ -70,16 +70,15 @@ class __Controller.ProfileCtrl extends Monocle.Controller
       firstName: @name[0].value
       lastName: @surname[0].value
       newImage: @avatar[0].src
-      dateUpdate: date
-    @parseResponse ""
+      lastUpdate: date
     $$.ajax
       type: "POST"
       url: server + "client/changedetails"
       data: data
       success: (result) =>
-        #@parseResponse result
+        @parseResponse result
       error: (xhr, type) =>
-        console.log type.response
+        alert type.response
 
   parseResponse: (result) =>
     credentials = Lungo.Cache.get "credentials"

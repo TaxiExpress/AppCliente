@@ -30,13 +30,13 @@ class __Controller.RegisterCtrl extends Monocle.Controller
         password: @pass1[0].value
         phone: @phone[0].value
         lastUpdate: date
-      @parseResponse ""
+      #@parseResponse ""
       $$.ajax
         type: "POST"
         url: server + "client/register"
         data: @data
         success: (result) =>
-          #@parseResponse result
+          @parseResponse result
         error: (xhr, type) =>
           console.log type.response
 

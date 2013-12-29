@@ -1,5 +1,5 @@
 class __Model.Driver extends Monocle.Model
 
-  @fields "license", "name", "surname", "valoration", "position", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment"
+  @fields "email", "name", "surname", "valuation", "position", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment"
 
-  @get: (id) -> @select (driver) -> driver.license is id
+  @get: (id) -> @select (driver) -> driver.email is id

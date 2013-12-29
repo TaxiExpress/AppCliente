@@ -30,7 +30,6 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
   valideCredentials: (email, pass, date) =>
     server = Lungo.Cache.get "server"
-    @parseResponse ""
     $$.ajax
       type: "POST"
       url: server + "client/login"
@@ -39,10 +38,12 @@ class __Controller.LoginCtrl extends Monocle.Controller
         password: pass
         lastUpdate: date
       success: (result) =>
-        #@parseResponse result
+        @parseResponse result
       error: (xhr, type) =>
-        console.log type.response
-        Lungo.Router.section "login_s"
+        setTimeout((=>Lungo.Router.section "login_s") , 500)
+        @password[0].value = ""
+        alert type.response        
+
 
   parseResponse: (result) ->
     if result.email == undefined
@@ -50,11 +51,13 @@ class __Controller.LoginCtrl extends Monocle.Controller
     else 
       profile = @getProfile(result)
       @db.transaction (tx) =>
-        sql = "INSERT INTO accessData (email, pass, dateUpdate, name, surname, phone, image) VALUES ('"+profile.email+"','"+@password[0].value+"','"+profile.dateUpdate+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"');"
+        date = profile.dateUpdate.substring 0, 19
+        date = date.replace "T", " "
+        sql = "INSERT INTO accessData (email, pass, dateUpdate, name, surname, phone, image) VALUES ('"+profile.email+"','"+@password[0].value+"','"+date+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"');"
         tx.executeSql sql
     Lungo.Cache.set "credentials", profile
-    @loadFavoriteTaxis()
-    @loadTravels()
+    @loadFavoriteTaxis(result.favlist)
+    @loadTravels(result.travel_set)
     __Controller.profile = new __Controller.ProfileCtrl "section#profile_s"
     __Controller.payment = new __Controller.PaymentCtrl "section#payment_s"
     __Controller.favorites = new __Controller.FavoritesCtrl "section#favorites_s"
@@ -68,12 +71,12 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
   getProfile: (result) ->
     return profile =
-      name: result.name
-      surname: result.surname
+      name: result.first_name
+      surname: result.last_name
       phone: result.phone
       email: result.email
       image: result.image
-      dateUpdate: result.dateUpdate
+      dateUpdate: result.lastUpdate
 
   drop: =>
     @db.transaction (tx) =>
@@ -89,36 +92,41 @@ class __Controller.LoginCtrl extends Monocle.Controller
           Lungo.Router.section "login_s"
       ), null
 
-  loadFavoriteTaxis: =>
-    i = 0
-    while i < 5
-      license = "DDAS65DAS" + i.toString()
-      name = "Taxista "
-      surname = i.toString()
-      valoration = (i % 5) 
-      position = new google.maps.LatLng(43.271239,-2.9445875)
-      plate = "DVT 78" + i.toString()
-      model = "Opel Corsa"
-      image = "http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG"
-      capacity = 4
-      accesible = false
-      animals = false
-      appPayment = (i % 4 == 0)
-      i++
-      favDriver = __Model.FavoriteDriver.create license: license, name: name, surname: surname, valoration: valoration, position: position, plate: plate, model: model, image: image, capacity: capacity, accesible: accesible, animals: animals, appPayment: appPayment
+  loadFavoriteTaxis: (taxis) =>
+    for taxi in taxis
+      email = taxi.email
+      name = taxi.first_name
+      surname = taxi.last_name
+      valuation = taxi.valuation
+      plate = taxi.car.plate
+      model = taxi.car.company + " " + taxi.car.model
+      image = taxi.image
+      capacity = taxi.car.capacity
+      accesible = taxi.car.accesible
+      animals = taxi.car.animals
+      appPayment = taxi.car.appPayment
+      favDriver = __Model.FavoriteDriver.create email: email, name: name, surname: surname, valuation: valuation, plate: plate, model: model, image: image, capacity: capacity, accesible: accesible, animals: animals, appPayment: appPayment
 
-  loadTravels: =>
+  loadTravels: (travels) =>
     i = 0
-    while i < 2
-      id = i
-      starttime = new Date()
-      endtime = new Date()
-      endtime.setMinutes(endtime.getMinutes()+21)
-      startpoint = new google.maps.LatLng(43.371239,-2.9445875)
-      endpoint = new google.maps.LatLng(43.281239,-2.9445875)
-      origin = "Bilbao"
-      destination = "Bilbao"
-      cost = "DVT 78" + i.toString()
-      driver = __Model.FavoriteDriver.get("DDAS65DAS0")[0]
-      i++
+    for travel in travels
+      id = i++
+      starttime = new Date(travel.starttime)
+      endtime = new Date(travel.endtime)
+      coords = travel.startpoint.substring 7
+      pos = coords.indexOf " "
+      long = coords.substring 0, pos
+      lat = coords.substring pos+1, coords.indexOf ")"
+      startpoint = new google.maps.LatLng(long,lat)
+      coords = travel.endpoint.substring 7
+      pos = coords.indexOf " "
+      long = coords.substring 0, pos
+      lat = coords.substring pos+1, coords.indexOf ")"
+      endpoint = new google.maps.LatLng(long,lat)
+      origin = travel.origin
+      destination = travel.destination
+      cost = travel.cost
+      driver2 = travel.driver
+      model = driver2.car.company + " " + driver2.car.model
+      driver = __Model.Driver.create email: driver2.email, name: driver2.first_name, surname: driver2.last_name, valuation: driver2.valuation, plate: driver2.car.plate, model: model, image: driver2.image, capacity: driver2.car.capacity, accesible: driver2.car.accesible, animals: driver2.car.animals, appPayment: driver2.car.appPayment
       travel = __Model.Travel.create id: id, starttime: starttime, endtime: endtime, startpoint: startpoint, endpoint: endpoint, cost: cost, driver: driver, origin: origin, destination: destination

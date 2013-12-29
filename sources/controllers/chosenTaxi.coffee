@@ -4,9 +4,8 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
 
   elements:
     "#chosenTaxi_name"                              : "name"
-    "#chosenTaxi_valoration"                        : "valoration"
+    "#chosenTaxi_valuation"                         : "valuation"
     "#chosenTaxi_image"                             : "image"
-    "#chosenTaxi_license"                           : "license"
     "#chosenTaxi_model"                             : "model"
     "#chosenTaxi_plate"                             : "plate"
     "#chosenTaxi_capacity"                          : "capacity"
@@ -22,9 +21,8 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
   loadDriverDetails: (driver) =>
     @driverDetails = driver
     @name[0].innerText = driver.name + " " + driver.surname
-    @valoration[0].innerText = driver.valorationStars
+    @valuation[0].innerText = driver.valuationStars
     @image[0].src = driver.image
-    @license[0].innerText = driver.license
     @model[0].innerText = driver.model
     @plate[0].innerText = driver.plate
     @capacity[0].innerText = driver.capacity

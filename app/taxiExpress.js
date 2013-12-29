@@ -11,11 +11,11 @@
       return _ref;
     }
 
-    Driver.fields("license", "name", "surname", "valoration", "position", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
+    Driver.fields("email", "name", "surname", "valuation", "position", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
 
     Driver.get = function(id) {
       return this.select(function(driver) {
-        return driver.license === id;
+        return driver.email === id;
       });
     };
 
@@ -38,11 +38,11 @@
       return _ref;
     }
 
-    FavoriteDriver.fields("license", "name", "surname", "valoration", "position", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
+    FavoriteDriver.fields("email", "name", "surname", "valuation", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
 
     FavoriteDriver.get = function(id) {
       return this.select(function(driver) {
-        return driver.license === id;
+        return driver.email === id;
       });
     };
 
@@ -69,7 +69,7 @@
 
     Travel.get = function(iden) {
       return this.select(function(travel) {
-        return driver.id === iden;
+        return travel.id === iden;
       });
     };
 
@@ -88,7 +88,7 @@
 
     FavDriver.prototype.container = "section #favorites_list";
 
-    FavDriver.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"favDriver_s\">                \n          <img src=\"{{ image }}\" alt=\"\" />\n          <div>\n              <strong>{{ name }} {{ surname }}</strong>\n              <small><strong>{{ valorationStars }}</strong></small>\n          </div>\n      </li>";
+    FavDriver.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"favDriver_s\">                \n          <img src=\"{{ image }}\" alt=\"\" />\n          <div>\n              <strong>{{ name }} {{ surname }}</strong>\n              <small><strong>{{ valuationStars }}</strong></small>\n          </div>\n      </li>";
 
     FavDriver.prototype.events = {
       "singleTap li": "onView"
@@ -99,7 +99,7 @@
       FavDriver.__super__.constructor.apply(this, arguments);
       val = "";
       i = 0;
-      while (i < this.model.valoration) {
+      while (i < this.model.valuation) {
         val = val + "★";
         i++;
       }
@@ -107,7 +107,10 @@
         val = val + "☆";
         i++;
       }
-      this.model.valorationStars = val;
+      this.model.valuationStars = val;
+      if (this.model.image === null) {
+        this.model.image = "img/user.png";
+      }
       this.prepend(this.model);
     }
 
@@ -130,7 +133,7 @@
 
     FavDriverList.prototype.container = "section #favoritesList_a";
 
-    FavDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\">                \n          <img src=\"{{ image }}\" alt=\"\" />\n          <div>\n              <strong>{{ name }} {{ surname }}</strong>\n              <small><strong>{{valorationStars}}</strong></small>\n          </div>\n          {{#appPayment}}<span data-icon=\"credit-card\">\n            <span class=\"icon credit-card\"></span>\n          </span>{{/appPayment}}\n      </li>";
+    FavDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\">                \n          <img src=\"{{ image }}\" alt=\"\" />\n          <div>\n              <strong>{{ name }} {{ surname }}</strong>\n              <small><strong>{{valuationStars}}</strong></small>\n          </div>\n          {{#appPayment}}<span data-icon=\"credit-card\">\n            <span class=\"icon credit-card\"></span>\n          </span>{{/appPayment}}\n      </li>";
 
     FavDriverList.prototype.events = {
       "singleTap li": "onView"
@@ -141,7 +144,7 @@
       FavDriverList.__super__.constructor.apply(this, arguments);
       val = "";
       i = 0;
-      while (i < this.model.valoration) {
+      while (i < this.model.valuation) {
         val = val + "★";
         i++;
       }
@@ -149,7 +152,7 @@
         val = val + "☆";
         i++;
       }
-      this.model.valorationStars = val;
+      this.model.valuationStars = val;
       this.prepend(this.model);
     }
 
@@ -173,7 +176,7 @@
 
     NearDriverList.prototype.container = "section #nearList_a";
 
-    NearDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"chosenTaxi_s\">                \n          <div class=\"on-right\">1 minuto</div>\n          <img src=\"{{image}}\" alt=\"\" />\n          <div>\n              <strong>a 402 metros</strong>\n              <small>{{name}} {{surname}}</small>\n              <small><strong>{{valorationStars}}</strong></small>\n          </div>\n          {{#appPayment}}<span data-icon=\"credit-card\">\n            <span class=\"icon credit-card\"></span>\n          </span>{{/appPayment}}\n      </li>";
+    NearDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"chosenTaxi_s\">                \n          <div class=\"on-right\">1 minuto</div>\n          <img src=\"{{image}}\" alt=\"\" />\n          <div>\n              <strong>a 402 metros</strong>\n              <small>{{name}} {{surname}}</small>\n              <small><strong>{{valuationStars}}</strong></small>\n          </div>\n          {{#appPayment}}<span data-icon=\"credit-card\">\n            <span class=\"icon credit-card\"></span>\n          </span>{{/appPayment}}\n      </li>";
 
     NearDriverList.prototype.events = {
       "singleTap li": "onView"
@@ -184,7 +187,7 @@
       NearDriverList.__super__.constructor.apply(this, arguments);
       val = "";
       i = 0;
-      while (i < this.model.valoration) {
+      while (i < this.model.valuation) {
         val = val + "★";
         i++;
       }
@@ -192,7 +195,7 @@
         val = val + "☆";
         i++;
       }
-      this.model.valorationStars = val;
+      this.model.valuationStars = val;
       this.prepend(this.model);
     }
 
@@ -306,9 +309,8 @@
 
     ChosenTaxiCtrl.prototype.elements = {
       "#chosenTaxi_name": "name",
-      "#chosenTaxi_valoration": "valoration",
+      "#chosenTaxi_valuation": "valuation",
       "#chosenTaxi_image": "image",
-      "#chosenTaxi_license": "license",
       "#chosenTaxi_model": "model",
       "#chosenTaxi_plate": "plate",
       "#chosenTaxi_capacity": "capacity",
@@ -329,9 +331,8 @@
     ChosenTaxiCtrl.prototype.loadDriverDetails = function(driver) {
       this.driverDetails = driver;
       this.name[0].innerText = driver.name + " " + driver.surname;
-      this.valoration[0].innerText = driver.valorationStars;
+      this.valuation[0].innerText = driver.valuationStars;
       this.image[0].src = driver.image;
-      this.license[0].innerText = driver.license;
       this.model[0].innerText = driver.model;
       this.plate[0].innerText = driver.plate;
       this.capacity[0].innerText = driver.capacity;
@@ -369,9 +370,8 @@
 
     FavDriverCtrl.prototype.elements = {
       "#favDriver_name": "name",
-      "#favDriver_valoration": "valoration",
+      "#favDriver_valuation": "valuation",
       "#favDriver_image": "image",
-      "#favDriver_license": "license",
       "#favDriver_model": "model",
       "#favDriver_plate": "plate",
       "#favDriver_capacity": "capacity",
@@ -395,9 +395,7 @@
     FavDriverCtrl.prototype.loadDriverDetails = function(driver) {
       this.driverDetails = driver;
       this.name[0].innerText = driver.name + " " + driver.surname;
-      this.valoration[0].innerText = driver.valorationStars;
-      this.image[0].src = driver.image;
-      this.license[0].innerText = driver.license;
+      this.valuation[0].innerText = driver.valuationStars;
       this.model[0].innerText = driver.model;
       this.plate[0].innerText = driver.plate;
       this.capacity[0].innerText = driver.capacity;
@@ -409,7 +407,12 @@
       if (driver.animals) {
         this.animals[0].innerText = "Si";
       }
-      if (__Model.FavoriteDriver.get(driver.license)[0] !== void 0) {
+      if (driver.image) {
+        this.image[0].src = driver.image;
+      } else {
+        this.image[0].src = "img/user.png";
+      }
+      if (__Model.FavoriteDriver.get(driver.email)[0] !== void 0) {
         return this.favorite[0].checked = true;
       } else {
         return this.favorite[0].checked = false;
@@ -423,7 +426,7 @@
       credentials = Lungo.Cache.get("credentials");
       data = {
         customerEmail: credentials.email,
-        license: this.driverDetails.license
+        taxiEmail: this.driverDetails.email
       };
       if (this.favorite[0].checked) {
         this.addFavorite("");
@@ -487,10 +490,10 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         favDriver = _ref[_i];
-        _views[favDriver.license] = new __View.FavDriver({
+        _views[favDriver.email] = new __View.FavDriver({
           model: favDriver
         });
-        _results.push(_viewsList[favDriver.license] = new __View.FavDriverList({
+        _results.push(_viewsList[favDriver.email] = new __View.FavDriverList({
           model: favDriver
         }));
       }
@@ -498,20 +501,20 @@
     };
 
     FavoritesCtrl.prototype.deleteFavorite = function(driver) {
-      _views[driver.license].remove();
-      _views[driver.license] = void 0;
-      _viewsList[driver.license].remove();
-      _viewsList[driver.license] = void 0;
-      return __Model.FavoriteDriver.get(driver.license)[0].destroy();
+      _views[driver.email].remove();
+      _views[driver.email] = void 0;
+      _viewsList[driver.email].remove();
+      _viewsList[driver.email] = void 0;
+      return __Model.FavoriteDriver.get(driver.email)[0].destroy();
     };
 
     FavoritesCtrl.prototype.addFavorite = function(driver) {
       this.deleteFavoriteTaxis();
       __Model.FavoriteDriver.create({
-        license: driver.license,
+        email: driver.email,
         name: driver.name,
         surname: driver.surname,
-        valoration: driver.valoration,
+        valuation: driver.valuation,
         position: driver.position,
         plate: driver.plate,
         model: driver.model,
@@ -530,10 +533,10 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         driver = _ref[_i];
-        _views[driver.license].remove();
-        _views[driver.license] = void 0;
-        _viewsList[driver.license].remove();
-        _results.push(_viewsList[driver.license] = void 0);
+        _views[driver.email].remove();
+        _views[driver.email] = void 0;
+        _viewsList[driver.email].remove();
+        _results.push(_viewsList[driver.email] = void 0);
       }
       return _results;
     };
@@ -904,7 +907,6 @@
       var server,
         _this = this;
       server = Lungo.Cache.get("server");
-      this.parseResponse("");
       return $$.ajax({
         type: "POST",
         url: server + "client/login",
@@ -913,10 +915,15 @@
           password: pass,
           lastUpdate: date
         },
-        success: function(result) {},
+        success: function(result) {
+          return _this.parseResponse(result);
+        },
         error: function(xhr, type) {
-          console.log(type.response);
-          return Lungo.Router.section("login_s");
+          setTimeout((function() {
+            return Lungo.Router.section("login_s");
+          }), 500);
+          _this.password[0].value = "";
+          return alert(type.response);
         }
       });
     };
@@ -929,14 +936,16 @@
       } else {
         profile = this.getProfile(result);
         this.db.transaction(function(tx) {
-          var sql;
-          sql = "INSERT INTO accessData (email, pass, dateUpdate, name, surname, phone, image) VALUES ('" + profile.email + "','" + _this.password[0].value + "','" + profile.dateUpdate + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "');";
+          var date, sql;
+          date = profile.dateUpdate.substring(0, 19);
+          date = date.replace("T", " ");
+          sql = "INSERT INTO accessData (email, pass, dateUpdate, name, surname, phone, image) VALUES ('" + profile.email + "','" + _this.password[0].value + "','" + date + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "');";
           return tx.executeSql(sql);
         });
       }
       Lungo.Cache.set("credentials", profile);
-      this.loadFavoriteTaxis();
-      this.loadTravels();
+      this.loadFavoriteTaxis(result.favlist);
+      this.loadTravels(result.travel_set);
       __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
       __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
       __Controller.favorites = new __Controller.FavoritesCtrl("section#favorites_s");
@@ -954,12 +963,12 @@
     LoginCtrl.prototype.getProfile = function(result) {
       var profile;
       return profile = {
-        name: result.name,
-        surname: result.surname,
+        name: result.first_name,
+        surname: result.last_name,
         phone: result.phone,
         email: result.email,
         image: result.image,
-        dateUpdate: result.dateUpdate
+        dateUpdate: result.lastUpdate
       };
     };
 
@@ -984,30 +993,27 @@
       });
     };
 
-    LoginCtrl.prototype.loadFavoriteTaxis = function() {
-      var accesible, animals, appPayment, capacity, favDriver, i, image, license, model, name, plate, position, surname, valoration, _results;
-      i = 0;
+    LoginCtrl.prototype.loadFavoriteTaxis = function(taxis) {
+      var accesible, animals, appPayment, capacity, email, favDriver, image, model, name, plate, surname, taxi, valuation, _i, _len, _results;
       _results = [];
-      while (i < 5) {
-        license = "DDAS65DAS" + i.toString();
-        name = "Taxista ";
-        surname = i.toString();
-        valoration = i % 5;
-        position = new google.maps.LatLng(43.271239, -2.9445875);
-        plate = "DVT 78" + i.toString();
-        model = "Opel Corsa";
-        image = "http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG";
-        capacity = 4;
-        accesible = false;
-        animals = false;
-        appPayment = i % 4 === 0;
-        i++;
+      for (_i = 0, _len = taxis.length; _i < _len; _i++) {
+        taxi = taxis[_i];
+        email = taxi.email;
+        name = taxi.first_name;
+        surname = taxi.last_name;
+        valuation = taxi.valuation;
+        plate = taxi.car.plate;
+        model = taxi.car.company + " " + taxi.car.model;
+        image = taxi.image;
+        capacity = taxi.car.capacity;
+        accesible = taxi.car.accesible;
+        animals = taxi.car.animals;
+        appPayment = taxi.car.appPayment;
         _results.push(favDriver = __Model.FavoriteDriver.create({
-          license: license,
+          email: email,
           name: name,
           surname: surname,
-          valoration: valoration,
-          position: position,
+          valuation: valuation,
           plate: plate,
           model: model,
           image: image,
@@ -1020,22 +1026,43 @@
       return _results;
     };
 
-    LoginCtrl.prototype.loadTravels = function() {
-      var cost, destination, driver, endpoint, endtime, i, id, origin, startpoint, starttime, travel, _results;
+    LoginCtrl.prototype.loadTravels = function(travels) {
+      var coords, cost, destination, driver, driver2, endpoint, endtime, i, id, lat, long, model, origin, pos, startpoint, starttime, travel, _i, _len, _results;
       i = 0;
       _results = [];
-      while (i < 2) {
-        id = i;
-        starttime = new Date();
-        endtime = new Date();
-        endtime.setMinutes(endtime.getMinutes() + 21);
-        startpoint = new google.maps.LatLng(43.371239, -2.9445875);
-        endpoint = new google.maps.LatLng(43.281239, -2.9445875);
-        origin = "Bilbao";
-        destination = "Bilbao";
-        cost = "DVT 78" + i.toString();
-        driver = __Model.FavoriteDriver.get("DDAS65DAS0")[0];
-        i++;
+      for (_i = 0, _len = travels.length; _i < _len; _i++) {
+        travel = travels[_i];
+        id = i++;
+        starttime = new Date(travel.starttime);
+        endtime = new Date(travel.endtime);
+        coords = travel.startpoint.substring(7);
+        pos = coords.indexOf(" ");
+        long = coords.substring(0, pos);
+        lat = coords.substring(pos + 1, coords.indexOf(")"));
+        startpoint = new google.maps.LatLng(long, lat);
+        coords = travel.endpoint.substring(7);
+        pos = coords.indexOf(" ");
+        long = coords.substring(0, pos);
+        lat = coords.substring(pos + 1, coords.indexOf(")"));
+        endpoint = new google.maps.LatLng(long, lat);
+        origin = travel.origin;
+        destination = travel.destination;
+        cost = travel.cost;
+        driver2 = travel.driver;
+        model = driver2.car.company + " " + driver2.car.model;
+        driver = __Model.Driver.create({
+          email: driver2.email,
+          name: driver2.first_name,
+          surname: driver2.last_name,
+          valuation: driver2.valuation,
+          plate: driver2.car.plate,
+          model: model,
+          image: driver2.image,
+          capacity: driver2.car.capacity,
+          accesible: driver2.car.accesible,
+          animals: driver2.car.animals,
+          appPayment: driver2.car.appPayment
+        });
         _results.push(travel = __Model.Travel.create({
           id: id,
           starttime: starttime,
@@ -1079,7 +1106,7 @@
       var profile;
       profile = Lungo.Cache.get("credentials");
       this.phone[0].textContent = "Tel. " + profile.phone;
-      if (profile.name === "") {
+      if (profile.name === "" | profile.name === void 0) {
         this.name[0].textContent = profile.email;
       } else {
         this.name[0].textContent = profile.name + " " + profile.surname;
@@ -1187,7 +1214,6 @@
         server = Lungo.Cache.get("server");
         credentials = Lungo.Cache.get("credentials");
         if (this.new_pass1[0].value === this.new_pass2[0].value) {
-          this.parseResponse("");
           return $$.ajax({
             type: "POST",
             url: server + "client/changepassword",
@@ -1196,9 +1222,11 @@
               oldPass: this.old_pass[0].value,
               newPass: this.new_pass1[0].value
             },
-            success: function(result) {},
+            success: function(result) {
+              return _this.parseResponse(result);
+            },
             error: function(xhr, type) {
-              return console.log(type.response);
+              return alert(type.response);
             }
           });
         }
@@ -1475,16 +1503,17 @@
         firstName: this.name[0].value,
         lastName: this.surname[0].value,
         newImage: this.avatar[0].src,
-        dateUpdate: date
+        lastUpdate: date
       };
-      this.parseResponse("");
       return $$.ajax({
         type: "POST",
         url: server + "client/changedetails",
         data: data,
-        success: function(result) {},
+        success: function(result) {
+          return _this.parseResponse(result);
+        },
         error: function(xhr, type) {
-          return console.log(type.response);
+          return alert(type.response);
         }
       });
     };
@@ -1563,12 +1592,13 @@
           phone: this.phone[0].value,
           lastUpdate: date
         };
-        this.parseResponse("");
         return $$.ajax({
           type: "POST",
           url: server + "client/register",
           data: this.data,
-          success: function(result) {},
+          success: function(result) {
+            return _this.parseResponse(result);
+          },
           error: function(xhr, type) {
             return console.log(type.response);
           }
@@ -1656,7 +1686,7 @@
 
     function TravelDetailsCtrl() {
       this.viewDriver = __bind(this.viewDriver, this);
-      this.changeValoration = __bind(this.changeValoration, this);
+      this.changeValuation = __bind(this.changeValuation, this);
       this.showMap = __bind(this.showMap, this);
       this.loadTravelDetails = __bind(this.loadTravelDetails, this);
       TravelDetailsCtrl.__super__.constructor.apply(this, arguments);
@@ -1668,10 +1698,14 @@
       this.end[0].innerText = travel.destination;
       this.date[0].innerText = travel.date;
       this.time[0].innerText = (travel.endtime - travel.starttime) / 60000 + " minutos";
-      this.cost[0].innerText = "35 €";
+      this.cost[0].innerText = travel.cost + "€";
       this.driverDetails = travel.driver;
-      this.changeValoration();
-      return this.driver[0].src = travel.driver.image;
+      this.changeValuation();
+      if (travel.driver.image) {
+        return this.driver[0].src = travel.driver.image;
+      } else {
+        return this.driver[0].src = "img/user.png";
+      }
     };
 
     TravelDetailsCtrl.prototype.showMap = function(travel) {
@@ -1716,11 +1750,11 @@
       });
     };
 
-    TravelDetailsCtrl.prototype.changeValoration = function() {
+    TravelDetailsCtrl.prototype.changeValuation = function() {
       var i, val;
       val = "";
       i = 0;
-      while (i < this.driverDetails.valoration) {
+      while (i < this.driverDetails.valuation) {
         val = val + "★";
         i++;
       }
@@ -1728,7 +1762,7 @@
         val = val + "☆";
         i++;
       }
-      return this.driverDetails.valorationStars = val;
+      return this.driverDetails.valuationStars = val;
     };
 
     TravelDetailsCtrl.prototype.viewDriver = function(event) {

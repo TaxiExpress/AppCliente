@@ -4,9 +4,8 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
 
   elements:
     "#favDriver_name"                              : "name"
-    "#favDriver_valoration"                        : "valoration"
+    "#favDriver_valuation"                        : "valuation"
     "#favDriver_image"                             : "image"
-    "#favDriver_license"                           : "license"
     "#favDriver_model"                             : "model"
     "#favDriver_plate"                             : "plate"
     "#favDriver_capacity"                          : "capacity"
@@ -23,9 +22,7 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
   loadDriverDetails: (driver) =>
     @driverDetails = driver
     @name[0].innerText = driver.name + " " + driver.surname
-    @valoration[0].innerText = driver.valorationStars
-    @image[0].src = driver.image
-    @license[0].innerText = driver.license
+    @valuation[0].innerText = driver.valuationStars
     @model[0].innerText = driver.model
     @plate[0].innerText = driver.plate
     @capacity[0].innerText = driver.capacity
@@ -33,16 +30,21 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
     @accesible[0].innerText = "Si" if driver.accesible
     @animals[0].innerText = "No"
     @animals[0].innerText = "Si" if driver.animals 
-    if __Model.FavoriteDriver.get(driver.license)[0] != undefined
+    if driver.image
+      @image[0].src = driver.image
+    else
+      @image[0].src = "img/user.png"
+    if __Model.FavoriteDriver.get(driver.email)[0] != undefined
       @favorite[0].checked = true
     else  @favorite[0].checked = false
+
 
   changeFavorite: (event) =>
     server = Lungo.Cache.get "server"
     credentials = Lungo.Cache.get "credentials"
     data = 
       customerEmail: credentials.email
-      license: @driverDetails.license
+      taxiEmail: @driverDetails.email
     if @favorite[0].checked
       @addFavorite ""
       $$.ajax
