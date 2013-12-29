@@ -25,12 +25,12 @@ class __Controller.RegisterCtrl extends Monocle.Controller
       date = new Date().toISOString().substring 0, 19
       date = date.replace "T", " "
       server = Lungo.Cache.get "server"
+      phone = "+34" + @phone[0].value
       @data = 
         email: @email[0].value
         password: @pass1[0].value
-        phone: @phone[0].value
+        phone: phone
         lastUpdate: date
-      #@parseResponse ""
       $$.ajax
         type: "POST"
         url: server + "client/register"

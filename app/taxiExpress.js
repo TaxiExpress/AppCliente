@@ -891,6 +891,7 @@
       this.db.transaction(function(tx) {
         return tx.executeSql("CREATE TABLE IF NOT EXISTS configData (email STRING NOT NULL PRIMARY KEY, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, food STRING NOT NULL, accesible STRING NOT NULL)");
       });
+      this.drop();
       this.read();
     }
 
@@ -1226,7 +1227,7 @@
               return _this.parseResponse(result);
             },
             error: function(xhr, type) {
-              return alert(type.response);
+              return console.log(type.response);
             }
           });
         }
@@ -1414,9 +1415,11 @@
     };
 
     ProfileCtrl.prototype.events = {
-      "singleTap #profile_save_b": "saveChanges",
       "singleTap #profile_avatar": "clickAvatar",
-      "change #profile_image": "saveAvatar"
+      "change #profile_image": "saveAvatar",
+      "change #profile_avatar": "mostrar",
+      "change #profile_name": "saveChanges",
+      "change #profile_surname": "saveChanges"
     };
 
     function ProfileCtrl() {
@@ -1448,6 +1451,10 @@
       if (profile.image) {
         return this.avatar[0].src = profile.image;
       }
+    };
+
+    ProfileCtrl.prototype.mostrar = function(event) {
+      return alert("SIIIII");
     };
 
     ProfileCtrl.prototype.saveAvatar = function(event) {
@@ -1495,6 +1502,7 @@
     ProfileCtrl.prototype.saveChanges = function(event) {
       var data, server,
         _this = this;
+      console.log("LLEGO");
       server = Lungo.Cache.get("server");
       date = new Date().toISOString().substring(0, 19);
       date = date.replace("T", " ");
@@ -1505,6 +1513,7 @@
         newImage: this.avatar[0].src,
         lastUpdate: date
       };
+      console.log(this.avatar[0].src);
       return $$.ajax({
         type: "POST",
         url: server + "client/changedetails",
@@ -1513,7 +1522,7 @@
           return _this.parseResponse(result);
         },
         error: function(xhr, type) {
-          return alert(type.response);
+          return _this;
         }
       });
     };
@@ -1534,7 +1543,7 @@
         sql = "UPDATE accessData SET dateUpdate = '" + credentials.dateUpdate + "', name = '" + credentials.name + "', surname = '" + credentials.surname + "', image = '" + credentials.image + "' WHERE email ='" + credentials.email + "';";
         return tx.executeSql(sql);
       });
-      return alert("Perfil actualizado");
+      return alert("CAMBIADO");
     };
 
     return ProfileCtrl;
@@ -1574,7 +1583,7 @@
     }
 
     RegisterCtrl.prototype.register = function(event) {
-      var date, server,
+      var date, phone, server,
         _this = this;
       if (!(this.pass1[0].value || this.pass2[0].value || this.email[0].value || this.phone[0].value)) {
         return alert("Debes rellenar todos los campos");
@@ -1586,10 +1595,11 @@
         date = new Date().toISOString().substring(0, 19);
         date = date.replace("T", " ");
         server = Lungo.Cache.get("server");
+        phone = "+34" + this.phone[0].value;
         this.data = {
           email: this.email[0].value,
           password: this.pass1[0].value,
-          phone: this.phone[0].value,
+          phone: phone,
           lastUpdate: date
         };
         return $$.ajax({

@@ -18,7 +18,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       tx.executeSql "CREATE TABLE IF NOT EXISTS accessData (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, dateUpdate STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL )"
     @db.transaction (tx) =>
       tx.executeSql "CREATE TABLE IF NOT EXISTS configData (email STRING NOT NULL PRIMARY KEY, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, food STRING NOT NULL, accesible STRING NOT NULL)"
-    #@drop()
+    @drop()
     @read()
 
   doLogin: (event) =>
@@ -43,7 +43,6 @@ class __Controller.LoginCtrl extends Monocle.Controller
         setTimeout((=>Lungo.Router.section "login_s") , 500)
         @password[0].value = ""
         alert type.response        
-
 
   parseResponse: (result) ->
     if result.email == undefined

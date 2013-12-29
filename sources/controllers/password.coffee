@@ -35,7 +35,7 @@ class __Controller.PasswordCtrl extends Monocle.Controller
           success: (result) =>
             @parseResponse result
           error: (xhr, type) =>
-            alert type.response
+            console.log type.response
         
   parseResponse: (result) =>
     alert "Contraseña cambiada"
