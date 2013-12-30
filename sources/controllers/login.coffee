@@ -98,6 +98,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       empty_favorites2.style.visibility = "hidden"
     for taxi in taxis
       email = taxi.email
+      phone = taxi.phone
       name = taxi.first_name
       surname = taxi.last_name
       valuation = taxi.valuation
@@ -108,7 +109,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       accesible = taxi.car.accesible
       animals = taxi.car.animals
       appPayment = taxi.car.appPayment
-      favDriver = __Model.FavoriteDriver.create email: email, name: name, surname: surname, valuation: valuation, plate: plate, model: model, image: image, capacity: capacity, accesible: accesible, animals: animals, appPayment: appPayment
+      favDriver = __Model.FavoriteDriver.create email: email, phone: phone, name: name, surname: surname, valuation: valuation, plate: plate, model: model, image: image, capacity: capacity, accesible: accesible, animals: animals, appPayment: appPayment
 
   loadTravels: (travels) =>
     if travels.length > 0

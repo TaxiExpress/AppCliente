@@ -4,7 +4,7 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
 
   elements:
     "#favDriver_name"                              : "name"
-    "#favDriver_valuation"                        : "valuation"
+    "#favDriver_valuation"                         : "valuation"
     "#favDriver_image"                             : "image"
     "#favDriver_model"                             : "model"
     "#favDriver_plate"                             : "plate"
@@ -12,15 +12,18 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
     "#favDriver_accesible"                         : "accesible"
     "#favDriver_animals"                           : "animals"
     "#favDriver_favorite"                          : "favorite"
+    "#favDriver_phone"                             : "phone"
 
   events:
     "change #favDriver_favorite"                   : "changeFavorite"
+    "singleTap #favDriver_phone"                   : "call"
 
   constructor: ->
     super
     
   loadDriverDetails: (driver) =>
     @driverDetails = driver
+    @phone[0].href = "tel:"+driver.phone
     @name[0].innerText = driver.name + " " + driver.surname
     @valuation[0].innerText = driver.valuationStars
     @model[0].innerText = driver.model

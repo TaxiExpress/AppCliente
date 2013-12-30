@@ -20,15 +20,12 @@ class __Controller.TravelListCtrl extends Monocle.Controller
         email: credentials.email
         travel_id: travel.id
       success: (result) =>
-        @parseResponse result
+        _views[travel.id].remove()
+        _views[travel.id] = undefined
+        travel.destroy()
+        @tryEmpty()
       error: (xhr, type) =>
-        console.log type.response
-    @tryEmpty()
-
-  parseResponse: (result) =>
-    _views[travel.id].remove()
-    _views[travel.id] = undefined
-    travel.destroy()
+        @
 
   tryEmpty: =>
     if __Model.Travel.all().length == 0

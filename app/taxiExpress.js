@@ -38,7 +38,7 @@
       return _ref;
     }
 
-    FavoriteDriver.fields("email", "name", "surname", "valuation", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
+    FavoriteDriver.fields("email", "phone", "name", "surname", "valuation", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
 
     FavoriteDriver.get = function(id) {
       return this.select(function(driver) {
@@ -378,11 +378,13 @@
       "#favDriver_capacity": "capacity",
       "#favDriver_accesible": "accesible",
       "#favDriver_animals": "animals",
-      "#favDriver_favorite": "favorite"
+      "#favDriver_favorite": "favorite",
+      "#favDriver_phone": "phone"
     };
 
     FavDriverCtrl.prototype.events = {
-      "change #favDriver_favorite": "changeFavorite"
+      "change #favDriver_favorite": "changeFavorite",
+      "singleTap #favDriver_phone": "call"
     };
 
     function FavDriverCtrl() {
@@ -395,6 +397,7 @@
 
     FavDriverCtrl.prototype.loadDriverDetails = function(driver) {
       this.driverDetails = driver;
+      this.phone[0].href = "tel:" + driver.phone;
       this.name[0].innerText = driver.name + " " + driver.surname;
       this.valuation[0].innerText = driver.valuationStars;
       this.model[0].innerText = driver.model;
@@ -987,7 +990,7 @@
     };
 
     LoginCtrl.prototype.loadFavoriteTaxis = function(taxis) {
-      var accesible, animals, appPayment, capacity, email, favDriver, image, model, name, plate, surname, taxi, valuation, _i, _len, _results;
+      var accesible, animals, appPayment, capacity, email, favDriver, image, model, name, phone, plate, surname, taxi, valuation, _i, _len, _results;
       if (taxis.length > 0) {
         empty_favorites.style.visibility = "hidden";
         empty_favorites2.style.visibility = "hidden";
@@ -996,6 +999,7 @@
       for (_i = 0, _len = taxis.length; _i < _len; _i++) {
         taxi = taxis[_i];
         email = taxi.email;
+        phone = taxi.phone;
         name = taxi.first_name;
         surname = taxi.last_name;
         valuation = taxi.valuation;
@@ -1008,6 +1012,7 @@
         appPayment = taxi.car.appPayment;
         _results.push(favDriver = __Model.FavoriteDriver.create({
           email: email,
+          phone: phone,
           name: name,
           surname: surname,
           valuation: valuation,
@@ -1794,7 +1799,6 @@
 
     function TravelListCtrl() {
       this.tryEmpty = __bind(this.tryEmpty, this);
-      this.parseResponse = __bind(this.parseResponse, this);
       this.deleteTravel = __bind(this.deleteTravel, this);
       this.loadTravelList = __bind(this.loadTravelList, this);
       TravelListCtrl.__super__.constructor.apply(this, arguments);
@@ -1819,7 +1823,7 @@
         _this = this;
       server = Lungo.Cache.get("server");
       credentials = Lungo.Cache.get("credentials");
-      $$.ajax({
+      return $$.ajax({
         type: "POST",
         url: server + "client/removetravel",
         data: {
@@ -1827,19 +1831,15 @@
           travel_id: travel.id
         },
         success: function(result) {
-          return _this.parseResponse(result);
+          _views[travel.id].remove();
+          _views[travel.id] = void 0;
+          travel.destroy();
+          return _this.tryEmpty();
         },
         error: function(xhr, type) {
-          return console.log(type.response);
+          return _this;
         }
       });
-      return this.tryEmpty();
-    };
-
-    TravelListCtrl.prototype.parseResponse = function(result) {
-      _views[travel.id].remove();
-      _views[travel.id] = void 0;
-      return travel.destroy();
     };
 
     TravelListCtrl.prototype.tryEmpty = function() {
