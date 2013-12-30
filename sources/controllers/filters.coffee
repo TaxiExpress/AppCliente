@@ -49,7 +49,7 @@ class __Controller.FiltersCtrl extends Monocle.Controller
     @parseResponse ""
     $$.ajax
       type: "POST"
-      url: server + "client/chageFilters"
+      url: server + "client/chagefilters"
       data: @data
       success: (result) =>
         #@parseResponse result

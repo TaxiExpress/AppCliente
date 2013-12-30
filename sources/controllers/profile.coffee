@@ -13,7 +13,6 @@ class __Controller.ProfileCtrl extends Monocle.Controller
   events:
     "singleTap #profile_avatar"           : "clickAvatar"
     "change #profile_image"               : "saveAvatar"
-    "change #profile_avatar"                : "mostrar"
     "change #profile_name"                : "saveChanges"
     "change #profile_surname"             : "saveChanges"
 
@@ -30,9 +29,6 @@ class __Controller.ProfileCtrl extends Monocle.Controller
     @name[0].value = profile.name if profile.name
     @surname[0].value = profile.surname if profile.surname
     @avatar[0].src = profile.image if profile.image
-
-  mostrar: (event) ->
-    alert "SIIIII"
 
   saveAvatar: (event) ->
     file = @image[0].files[0]
@@ -62,12 +58,12 @@ class __Controller.ProfileCtrl extends Monocle.Controller
         ctx.drawImage this, 0, 0, tempW, tempH
         dataURL = canvas.toDataURL("image/jpeg")
         profile_avatar.src = dataURL
+    setTimeout((=>@saveChanges()) , 500)
 
   clickAvatar: (event) =>
     @image[0].click()
 
   saveChanges: (event) =>
-    console.log "LLEGO"
     server = Lungo.Cache.get "server"
     date = new Date().toISOString().substring 0, 19
     date = date.replace "T", " "
@@ -77,7 +73,6 @@ class __Controller.ProfileCtrl extends Monocle.Controller
       lastName: @surname[0].value
       newImage: @avatar[0].src
       lastUpdate: date
-    console.log @avatar[0].src
     $$.ajax
       type: "POST"
       url: server + "client/changedetails"
@@ -99,4 +94,3 @@ class __Controller.ProfileCtrl extends Monocle.Controller
     @db.transaction (tx) =>
       sql = "UPDATE accessData SET dateUpdate = '"+credentials.dateUpdate+"', name = '"+credentials.name+"', surname = '"+credentials.surname+"', image = '"+credentials.image+"' WHERE email ='"+credentials.email+"';"
       tx.executeSql sql
-    alert "CAMBIADO"

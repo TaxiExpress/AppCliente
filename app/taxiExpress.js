@@ -282,6 +282,7 @@
       Lungo.Cache.set("server", "http://TaxiLoadBalancer-638315338.us-east-1.elb.amazonaws.com/");
       __Controller.login = new __Controller.LoginCtrl("section#login_s");
       __Controller.register = new __Controller.RegisterCtrl("section#register_s");
+      __Controller.phoneVerification = new __Controller.PhoneVerificationCtrl("section#phoneVerification_s");
     }
 
     return AppCtrl;
@@ -426,23 +427,31 @@
       credentials = Lungo.Cache.get("credentials");
       data = {
         customerEmail: credentials.email,
-        taxiEmail: this.driverDetails.email
+        driverEmail: this.driverDetails.email
       };
       if (this.favorite[0].checked) {
-        this.addFavorite("");
         return $$.ajax({
           type: "POST",
-          url: server + "client/addFavoriteDriver",
+          url: server + "client/addfavorite",
           data: data,
-          success: function(result) {}
+          success: function(result) {
+            return _this.addFavorite(result);
+          },
+          error: function(xhr, type) {
+            return _this;
+          }
         });
       } else {
-        this.removeFavorite("");
         return $$.ajax({
           type: "POST",
-          url: server + "client/removeFavoriteDriver",
+          url: server + "client/removefavorite",
           data: data,
-          success: function(result) {}
+          success: function(result) {
+            return _this.removeFavorite(result);
+          },
+          error: function(xhr, type) {
+            return _this;
+          }
         });
       }
     };
@@ -476,6 +485,7 @@
     _viewsList = [];
 
     function FavoritesCtrl() {
+      this.tryEmpty = __bind(this.tryEmpty, this);
       this.deleteFavoriteTaxis = __bind(this.deleteFavoriteTaxis, this);
       this.addFavorite = __bind(this.addFavorite, this);
       this.deleteFavorite = __bind(this.deleteFavorite, this);
@@ -505,7 +515,8 @@
       _views[driver.email] = void 0;
       _viewsList[driver.email].remove();
       _viewsList[driver.email] = void 0;
-      return __Model.FavoriteDriver.get(driver.email)[0].destroy();
+      __Model.FavoriteDriver.get(driver.email)[0].destroy();
+      return this.tryEmpty();
     };
 
     FavoritesCtrl.prototype.addFavorite = function(driver) {
@@ -524,7 +535,8 @@
         animals: driver.animals,
         appPayment: driver.appPayment
       });
-      return this.loadFavoriteTaxis();
+      this.loadFavoriteTaxis();
+      return this.tryEmpty();
     };
 
     FavoritesCtrl.prototype.deleteFavoriteTaxis = function() {
@@ -539,6 +551,16 @@
         _results.push(_viewsList[driver.email] = void 0);
       }
       return _results;
+    };
+
+    FavoritesCtrl.prototype.tryEmpty = function() {
+      if (__Model.FavoriteDriver.all().length === 0) {
+        empty_favorites.style.visibility = "visible";
+        return empty_favorites2.style.visibility = "visible";
+      } else {
+        empty_favorites.style.visibility = "hidden";
+        return empty_favorites2.style.visibility = "hidden";
+      }
     };
 
     return FavoritesCtrl;
@@ -622,7 +644,7 @@
       this.parseResponse("");
       return $$.ajax({
         type: "POST",
-        url: server + "client/chageFilters",
+        url: server + "client/chagefilters",
         data: this.data,
         success: function(result) {},
         error: function(xhr, type) {
@@ -810,37 +832,6 @@
     };
 
     HomeCtrl.prototype.loadNearTaxis = function() {
-      var accesible, animals, appPayment, capacity, i, image, license, model, name, plate, position, surname, valoration;
-      i = 0;
-      while (i < 4) {
-        license = "DDAS65DAS" + i.toString();
-        name = "Taxista ";
-        surname = i.toString();
-        valoration = i % 5;
-        position = new google.maps.LatLng(43.271239, -2.9445875);
-        plate = "DVT 78" + i.toString();
-        model = "Opel Corsa";
-        image = "http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG";
-        capacity = 4;
-        accesible = false;
-        animals = false;
-        appPayment = i % 4 === 0;
-        i++;
-        __Model.Driver.create({
-          license: license,
-          name: name,
-          surname: surname,
-          valoration: valoration,
-          position: position,
-          plate: plate,
-          model: model,
-          image: image,
-          capacity: capacity,
-          accesible: accesible,
-          animals: animals,
-          appPayment: appPayment
-        });
-      }
       __Controller.nearDriver.loadNearTaxis();
       return Lungo.Router.section("list_s");
     };
@@ -936,6 +927,7 @@
         profile = this.getProfile(credentials);
       } else {
         profile = this.getProfile(result);
+        profile.phone = profile.phone.substring(3);
         this.db.transaction(function(tx) {
           var date, sql;
           date = profile.dateUpdate.substring(0, 19);
@@ -996,6 +988,10 @@
 
     LoginCtrl.prototype.loadFavoriteTaxis = function(taxis) {
       var accesible, animals, appPayment, capacity, email, favDriver, image, model, name, plate, surname, taxi, valuation, _i, _len, _results;
+      if (taxis.length > 0) {
+        empty_favorites.style.visibility = "hidden";
+        empty_favorites2.style.visibility = "hidden";
+      }
       _results = [];
       for (_i = 0, _len = taxis.length; _i < _len; _i++) {
         taxi = taxis[_i];
@@ -1028,12 +1024,14 @@
     };
 
     LoginCtrl.prototype.loadTravels = function(travels) {
-      var coords, cost, destination, driver, driver2, endpoint, endtime, i, id, lat, long, model, origin, pos, startpoint, starttime, travel, _i, _len, _results;
-      i = 0;
+      var coords, cost, destination, driver, driver2, endpoint, endtime, id, lat, long, model, origin, pos, startpoint, starttime, travel, _i, _len, _results;
+      if (travels.length > 0) {
+        empty_travels.style.visibility = "hidden";
+      }
       _results = [];
       for (_i = 0, _len = travels.length; _i < _len; _i++) {
         travel = travels[_i];
-        id = i++;
+        id = travel.id;
         starttime = new Date(travel.starttime);
         endtime = new Date(travel.endtime);
         coords = travel.startpoint.substring(7);
@@ -1142,16 +1140,48 @@
     }
 
     NearDriverCtrl.prototype.loadNearTaxis = function() {
-      var nearDriver, _i, _len, _ref, _results;
-      _ref = __Model.Driver.all();
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        nearDriver = _ref[_i];
-        _results.push(_viewsList[nearDriver.license] = new __View.NearDriverList({
-          model: nearDriver
-        }));
+      var accesible, animals, appPayment, capacity, i, image, license, model, name, plate, position, surname, taxi, valoration, _i, _len, _ref, _results;
+      i = 0;
+      if (i === 0) {
+        return empty_near.style.visibility = "visible";
+      } else {
+        empty_near.style.visibility = "hidden";
+        _ref = __Model.Driver.all();
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          taxi = _ref[_i];
+          license = "DDAS65DAS" + i.toString();
+          name = "Taxista ";
+          surname = i.toString();
+          valoration = i % 5;
+          position = new google.maps.LatLng(43.271239, -2.9445875);
+          plate = "DVT 78" + i.toString();
+          model = "Opel Corsa";
+          image = "http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG";
+          capacity = 4;
+          accesible = false;
+          animals = false;
+          appPayment = i % 4 === 0;
+          __Model.Driver.create({
+            license: license,
+            name: name,
+            surname: surname,
+            valoration: valoration,
+            position: position,
+            plate: plate,
+            model: model,
+            image: image,
+            capacity: capacity,
+            accesible: accesible,
+            animals: animals,
+            appPayment: appPayment
+          });
+          _results.push(_viewsList[taxi.license] = new __View.NearDriverList({
+            model: taxi
+          }));
+        }
+        return _results;
       }
-      return _results;
     };
 
     NearDriverCtrl.prototype.deleteNearTaxis = function() {
@@ -1355,32 +1385,34 @@
     };
 
     PhoneVerificationCtrl.prototype.doVerification = function(event) {
-      var server,
+      var data, phone, server,
         _this = this;
       if (!(this.phone[0].value || this.code[0].value)) {
         return alert("Debes rellenar todos los campos");
       } else if (this.code[0].value.length < 4) {
-        return alert("Escribe un código válido");
+        return alert("El código debe tener al menos 4 dígitos");
       } else {
         server = Lungo.Cache.get("server");
-        this.parseResponse("");
+        phone = "+34" + this.phone[0].value;
+        data = {
+          phone: phone,
+          validationCode: this.code[0].value
+        };
         return $$.ajax({
           type: "POST",
           url: server + "client/validate",
-          data: {
-            phone: this.phone[0].value,
-            validationCode: this.code[0].value
+          data: data,
+          success: function(result) {
+            return _this.parseResponse(result);
           },
-          success: function(result) {},
           error: function(xhr, type) {
-            return console.log(type.response);
+            return alert(type.response);
           }
         });
       }
     };
 
     PhoneVerificationCtrl.prototype.parseResponse = function(result) {
-      Lungo.Router.section("init_s");
       __Controller.register.validated();
       this.code[0].value = "";
       this.phone[0].value = "";
@@ -1417,7 +1449,6 @@
     ProfileCtrl.prototype.events = {
       "singleTap #profile_avatar": "clickAvatar",
       "change #profile_image": "saveAvatar",
-      "change #profile_avatar": "mostrar",
       "change #profile_name": "saveChanges",
       "change #profile_surname": "saveChanges"
     };
@@ -1453,17 +1484,14 @@
       }
     };
 
-    ProfileCtrl.prototype.mostrar = function(event) {
-      return alert("SIIIII");
-    };
-
     ProfileCtrl.prototype.saveAvatar = function(event) {
-      var file, imageType, reader;
+      var file, imageType, reader,
+        _this = this;
       file = this.image[0].files[0];
       imageType = /image.*/;
       reader = new FileReader();
       reader.readAsDataURL(file);
-      return reader.onloadend = function() {
+      reader.onloadend = function() {
         var tempImg;
         tempImg = new Image();
         tempImg.src = reader.result;
@@ -1493,6 +1521,9 @@
           return profile_avatar.src = dataURL;
         };
       };
+      return setTimeout((function() {
+        return _this.saveChanges();
+      }), 500);
     };
 
     ProfileCtrl.prototype.clickAvatar = function(event) {
@@ -1502,7 +1533,6 @@
     ProfileCtrl.prototype.saveChanges = function(event) {
       var data, server,
         _this = this;
-      console.log("LLEGO");
       server = Lungo.Cache.get("server");
       date = new Date().toISOString().substring(0, 19);
       date = date.replace("T", " ");
@@ -1513,7 +1543,6 @@
         newImage: this.avatar[0].src,
         lastUpdate: date
       };
-      console.log(this.avatar[0].src);
       return $$.ajax({
         type: "POST",
         url: server + "client/changedetails",
@@ -1538,12 +1567,11 @@
       Lungo.Cache.set("credentials", credentials);
       __Controller.menu.updateProfile();
       this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
-      this.db.transaction(function(tx) {
+      return this.db.transaction(function(tx) {
         var sql;
         sql = "UPDATE accessData SET dateUpdate = '" + credentials.dateUpdate + "', name = '" + credentials.name + "', surname = '" + credentials.surname + "', image = '" + credentials.image + "' WHERE email ='" + credentials.email + "';";
         return tx.executeSql(sql);
       });
-      return alert("CAMBIADO");
     };
 
     return ProfileCtrl;
@@ -1610,57 +1638,23 @@
             return _this.parseResponse(result);
           },
           error: function(xhr, type) {
-            return console.log(type.response);
+            return alert(type.response);
           }
         });
       }
     };
 
     RegisterCtrl.prototype.parseResponse = function(result) {
-      __Controller.phoneVerification = new __Controller.PhoneVerificationCtrl("section#phoneVerification_s");
       __Controller.phoneVerification.setPhone(this.phone[0].value);
       return Lungo.Router.section("phoneVerification_s");
     };
 
     RegisterCtrl.prototype.validated = function() {
-      var db, profile,
-        _this = this;
-      db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
-      db.transaction(function(tx) {
-        var sql;
-        sql = "INSERT INTO accessData (email, pass, dateUpdate, name, surname, phone, image) VALUES ('" + _this.data.email + "','" + _this.data.password + "','" + _this.data.lastUpdate + "','','','" + _this.data.phone + "','');";
-        return tx.executeSql(sql);
-      });
-      this.db.transaction(function(tx) {
-        var sql;
-        sql = "INSERT INTO configData (email, seats, payments, animals, food, accesible) VALUES ('" + _this.data.email + "','3','false','false','false','false');";
-        return tx.executeSql(sql);
-      });
-      profile = {
-        name: "",
-        surname: "",
-        phone: this.data.phone,
-        email: this.data.email,
-        image: "",
-        dateUpdate: this.data.lastUpdate
-      };
-      Lungo.Cache.set("credentials", profile);
-      __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
-      __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
-      __Controller.favorites = new __Controller.FavoritesCtrl("section#favorites_s");
-      __Controller.favDriver = new __Controller.FavDriverCtrl("section#favDriver_s");
-      __Controller.chosenTaxi = new __Controller.ChosenTaxiCtrl("section#chosenTaxi_s");
-      __Controller.nearDriver = new __Controller.NearDriverCtrl("section#list_s");
-      __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
-      __Controller.travelDetails = new __Controller.TravelDetailsCtrl("section#travelDetails_s");
-      __Controller.filters = new __Controller.FiltersCtrl("section#filters_s");
-      setTimeout((function() {
-        return __Controller.home = new __Controller.HomeCtrl("section#home_s");
-      }), 1000);
       this.phone[0].value = "";
       this.email[0].value = "";
       this.pass1[0].value = "";
-      return this.pass2[0].value = "";
+      this.pass2[0].value = "";
+      return Lungo.Router.section("login_s");
     };
 
     return RegisterCtrl;
@@ -1707,8 +1701,8 @@
       this.start[0].innerText = travel.origin;
       this.end[0].innerText = travel.destination;
       this.date[0].innerText = travel.date;
-      this.time[0].innerText = (travel.endtime - travel.starttime) / 60000 + " minutos";
-      this.cost[0].innerText = travel.cost + "€";
+      this.time[0].innerText = Math.floor((travel.endtime - travel.starttime) / 60000) + " minutos";
+      this.cost[0].innerText = (travel.cost.replace(".", ",")) + "€";
       this.driverDetails = travel.driver;
       this.changeValuation();
       if (travel.driver.image) {
@@ -1799,6 +1793,8 @@
     _views = [];
 
     function TravelListCtrl() {
+      this.tryEmpty = __bind(this.tryEmpty, this);
+      this.parseResponse = __bind(this.parseResponse, this);
       this.deleteTravel = __bind(this.deleteTravel, this);
       this.loadTravelList = __bind(this.loadTravelList, this);
       TravelListCtrl.__super__.constructor.apply(this, arguments);
@@ -1819,9 +1815,39 @@
     };
 
     TravelListCtrl.prototype.deleteTravel = function(travel) {
+      var credentials, server,
+        _this = this;
+      server = Lungo.Cache.get("server");
+      credentials = Lungo.Cache.get("credentials");
+      $$.ajax({
+        type: "POST",
+        url: server + "client/removetravel",
+        data: {
+          email: credentials.email,
+          travel_id: travel.id
+        },
+        success: function(result) {
+          return _this.parseResponse(result);
+        },
+        error: function(xhr, type) {
+          return console.log(type.response);
+        }
+      });
+      return this.tryEmpty();
+    };
+
+    TravelListCtrl.prototype.parseResponse = function(result) {
       _views[travel.id].remove();
       _views[travel.id] = void 0;
       return travel.destroy();
+    };
+
+    TravelListCtrl.prototype.tryEmpty = function() {
+      if (__Model.Travel.all().length === 0) {
+        return empty_travels.style.visibility = "visible";
+      } else {
+        return empty_travels.style.visibility = "hidden";
+      }
     };
 
     return TravelListCtrl;

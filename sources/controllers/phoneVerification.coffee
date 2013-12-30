@@ -12,29 +12,29 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
 
   setPhone: (phone) ->
     @phone[0].value = phone
-    @phone[0].disabled= true
+    @phone[0].disabled = true
 
   doVerification: (event) => 
     if !(@phone[0].value || @code[0].value)
       alert "Debes rellenar todos los campos"
     else if @code[0].value.length < 4
-      alert "Escribe un código válido"
+      alert "El código debe tener al menos 4 dígitos"
     else
       server = Lungo.Cache.get "server"
-      @parseResponse ""
+      phone = "+34" + @phone[0].value
+      data =
+        phone: phone
+        validationCode: @code[0].value
       $$.ajax
         type: "POST"
         url: server + "client/validate"
-        data:
-          phone: @phone[0].value
-          validationCode: @code[0].value
+        data: data
         success: (result) =>
-          #@parseResponse result
+          @parseResponse result
         error: (xhr, type) =>
-          console.log type.response
+          alert type.response
 
   parseResponse: (result) =>
-    Lungo.Router.section "init_s"
     __Controller.register.validated()
     @code[0].value = ""
     @phone[0].value = ""

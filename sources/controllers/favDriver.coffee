@@ -44,23 +44,25 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
     credentials = Lungo.Cache.get "credentials"
     data = 
       customerEmail: credentials.email
-      taxiEmail: @driverDetails.email
+      driverEmail: @driverDetails.email
     if @favorite[0].checked
-      @addFavorite ""
       $$.ajax
         type: "POST"
-        url: server + "client/addFavoriteDriver"
+        url: server + "client/addfavorite"
         data: data
         success: (result) =>
-          #@addFavorite result
+          @addFavorite result
+        error: (xhr, type) =>
+          @
     else 
-      @removeFavorite ""
       $$.ajax
         type: "POST"
-        url: server + "client/removeFavoriteDriver"
+        url: server + "client/removefavorite"
         data: data
         success: (result) =>
-          #@removeFavorite result
+          @removeFavorite result
+        error: (xhr, type) =>
+          @
 
   addFavorite: (result) =>
     __Controller.favorites.addFavorite(@driverDetails)

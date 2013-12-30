@@ -49,6 +49,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       profile = @getProfile(credentials) 
     else 
       profile = @getProfile(result)
+      profile.phone = profile.phone.substring 3
       @db.transaction (tx) =>
         date = profile.dateUpdate.substring 0, 19
         date = date.replace "T", " "
@@ -92,6 +93,9 @@ class __Controller.LoginCtrl extends Monocle.Controller
       ), null
 
   loadFavoriteTaxis: (taxis) =>
+    if taxis.length > 0
+      empty_favorites.style.visibility = "hidden"
+      empty_favorites2.style.visibility = "hidden"
     for taxi in taxis
       email = taxi.email
       name = taxi.first_name
@@ -107,9 +111,10 @@ class __Controller.LoginCtrl extends Monocle.Controller
       favDriver = __Model.FavoriteDriver.create email: email, name: name, surname: surname, valuation: valuation, plate: plate, model: model, image: image, capacity: capacity, accesible: accesible, animals: animals, appPayment: appPayment
 
   loadTravels: (travels) =>
-    i = 0
+    if travels.length > 0
+      empty_travels.style.visibility = "hidden"
     for travel in travels
-      id = i++
+      id = travel.id
       starttime = new Date(travel.starttime)
       endtime = new Date(travel.endtime)
       coords = travel.startpoint.substring 7

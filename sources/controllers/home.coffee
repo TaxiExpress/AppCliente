@@ -104,21 +104,5 @@ class __Controller.HomeCtrl extends Monocle.Controller
         home_streetField.value = 'Calle desconocida'
 
   loadNearTaxis: =>
-    i = 0
-    while i < 4
-      license = "DDAS65DAS" + i.toString()
-      name = "Taxista "
-      surname = i.toString()
-      valoration = (i % 5)
-      position = new google.maps.LatLng(43.271239,-2.9445875)
-      plate = "DVT 78" + i.toString()
-      model = "Opel Corsa"
-      image = "http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG"
-      capacity = 4
-      accesible = false
-      animals = false
-      appPayment = (i % 4 == 0)
-      i++
-      __Model.Driver.create license: license, name: name, surname: surname, valoration: valoration, position: position, plate: plate, model: model, image: image, capacity: capacity, accesible: accesible, animals: animals, appPayment: appPayment
     __Controller.nearDriver.loadNearTaxis()
     Lungo.Router.section "list_s"

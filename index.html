@@ -37,8 +37,7 @@
         <header data-title="Registro" data-back="angle-down"></header>    
         <article id="register_a" class="scroll" >
             <div class="form list">
-                <li class="anchor contrast">DETALLES DE CUENTA</li>                
-                <fieldset><input id="register_phone" type="tel" maxlength="9" placeholder="Teléfono" /></fieldset>
+                <br/><fieldset><input id="register_phone" type="tel" maxlength="9" placeholder="Teléfono" /></fieldset>
                 <fieldset><input id="register_email" type="email" maxlength="40" placeholder="Email" /></fieldset>
                 <fieldset><input id="register_pass1" type="password" placeholder="Contraseña" /></fieldset>
                 <fieldset><input id="register_pass2" type="password" placeholder="Repita su contraseña" /></fieldset>
@@ -141,8 +140,19 @@
             <a id="list_taxis_b" href="#" data-view-article="nearList_a" data-label="Los más cercanos"></a>
             <a id="list_favorites_b" href="#" data-view-article="favoritesList_a" data-label="Taxis favoritos"></a>
         </nav>
-        <article id="nearList_a" class="list form active scroll white"></article>
-        <article id="favoritesList_a" class="list meddium_list form scroll white"></article>
+        <article id="nearList_a" class="list form active scroll white">
+            <div id="empty_near" class="empty">
+                <span class="icon search"></span>
+                <strong>No existen taxis cercanos</strong>
+            </div>
+        </article>
+        <article id="favoritesList_a" class="list meddium_list form scroll white">
+            <div id="empty_favorites2" class="empty">
+                <span class="icon user"></span>
+                <strong>Sin taxistas favoritos</strong>
+                <small>Si quiere añadir un taxista favorito, puede hacerlo en el apartado de trayectos realizados.</small>
+            </div>
+        </article>
     </section>    
 
     <section id="filters_s" data-transition="cover">
@@ -197,7 +207,12 @@
     <section id="favorites_s" data-transition="cover">
         <header data-title="Taxistas favoritos" data-back="angle-left"></header>      
         <article id="favorites_a" class="scroll white">
-            <div id="favorites_list" class="form little_list list" />
+            <div id="favorites_list" class="form little_list list"></div>
+            <div id="empty_favorites" class="empty">
+                <span class="icon user"></span>
+                <strong>Sin taxistas favoritos</strong>
+                <small>Si quiere añadir un taxista favorito, puede hacerlo en el apartado de trayectos realizados.</small>
+            </div>
         </article>
     </section>
 
@@ -223,7 +238,12 @@
     <section id="travelList_s" data-transition="cover">
         <header data-title="Trayectos realizados" data-back="angle-left"></header>      
         <article id="travelList_a" class="scroll" >
-            <div id="travelList_list" class="form little_list list" />
+            <div id="travelList_list" class="form little_list list"></div>
+            <div id="empty_travels" class="empty">
+                <span class="icon road"></span>
+                <strong>Sin trayectos realizados</strong>
+                <small>En este apartado se mostrarán los trayectos que haya realizado a través de TaxiExpress.</small>
+            </div>
         </article>
     </section>
 

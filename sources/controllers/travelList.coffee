@@ -11,6 +11,29 @@ class __Controller.TravelListCtrl extends Monocle.Controller
       _views[travel.id] = new __View.Travel model: travel
 
   deleteTravel: (travel) =>
+    server = Lungo.Cache.get "server"
+    credentials = Lungo.Cache.get "credentials"
+    $$.ajax
+      type: "POST"
+      url: server + "client/removetravel"
+      data: 
+        email: credentials.email
+        travel_id: travel.id
+      success: (result) =>
+        @parseResponse result
+      error: (xhr, type) =>
+        console.log type.response
+    @tryEmpty()
+
+  parseResponse: (result) =>
     _views[travel.id].remove()
     _views[travel.id] = undefined
     travel.destroy()
+
+  tryEmpty: =>
+    if __Model.Travel.all().length == 0
+      empty_travels.style.visibility = "visible"
+    else
+      empty_travels.style.visibility = "hidden"
+
+
