@@ -8,6 +8,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
     "#home_driver"                           : "driver"
 
   events:
+    "singleTap #home_driver"                 : "payTaxi"
     "singleTap #home_refresh_b"              : "refresh"
     "singleTap #home_confirm_b"              : "confirm"
     "singleTap #map-canvas"                  : "hideAside"
@@ -48,18 +49,12 @@ class __Controller.HomeCtrl extends Monocle.Controller
       accept:
         label: "El más cercano"
         callback: =>
-          @showAsigning()
+          Lungo.Router.section "waiting_s"
       cancel:
         label: "Elegir taxi"
         callback: =>
           @loadNearTaxis()
   
-  showAsigning: =>
-    Lungo.Notification.hide()
-    setTimeout((=> 
-      Lungo.Notification.html '<h2>Esperando la confirmación del taxi</h2>', 'Cancelar'
-    ) , 250)
-
   hideAside: (event) =>
     Lungo.Aside.hide()
 
@@ -106,3 +101,8 @@ class __Controller.HomeCtrl extends Monocle.Controller
   loadNearTaxis: =>
     __Controller.nearDriver.loadNearTaxis()
     Lungo.Router.section "list_s"
+
+  payTaxi: (event) =>
+    Lungo.Router.section "payment_s"
+
+

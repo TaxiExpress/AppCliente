@@ -58,6 +58,8 @@ img.driver {visibility: visible!important;  border-radius: 24px; margin-top:46px
 .payments > strong {font-size: 33px; padding-top: 10px; padding-bottom: 10px; font-weight:400; text-align: center; width: 100%; display: block}
 .payments > span {font-size: 12px; color:red; display: block;padding: 0 0 10px 13px}
 .white {background: white}
+button.down {bottom:25px;position:absolute!important;background: none!important;color:#888;} 
+button.down > abbr{font-weight: 100!important} 
 
 .list li{list-style-type:none;position:relative;text-align:-webkit-match-parent;line-height:inherit;}
 .list li:not(.big){padding-top:4.5%;padding-bottom:4.5%;padding-left:10px;margin-bottom: 1px;}
@@ -93,7 +95,7 @@ img.driver {visibility: visible!important;  border-radius: 24px; margin-top:46px
 .little_list li.thumb:not(.big) > img{width:35px;height:35px;border-radius:18px;margin-top:0;margin-right:7px;}
 .little_list li.arrow::after{top:47%;}
 .little_list li.thumb:not(.big) > div{padding-left:.2em; padding-top:1px;}
-.little_list li:not(.big){padding-top:3%;padding-bottom:3%;}
+.little_list li:not(.big){padding-top:12px}
 .list li strong{margin-bottom:0px;}
 
 header nav a,header nav button{position:relative;text-align:center;float:left;height:50px;min-width:56px;}
@@ -209,7 +211,7 @@ body > section > article > .empty{display:block;width:80%;margin:0 auto;padding-
 body > section > article > .empty > *{display:block}
 body > section > article > .empty > .icon{font-size:7.5em;line-height:1em}
 body > section > article > .empty > strong{font-size:1.2em;line-height:1.2em}
-body > section > article > .empty > small{font-size:.9em}
+body > section > article > .empty > small{font-size:.9em;margin-top: 5px}
 body > section > article > .empty > button{margin:.5em 0}
 
 form label:not(.select),.form label:not(.select){display:inline-block;font-size:.9em;line-height:inherit;margin:.15em 0}

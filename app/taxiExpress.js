@@ -348,7 +348,7 @@
     };
 
     ChosenTaxiCtrl.prototype.requestTaxi = function(event) {
-      return console.log("solicito taxi");
+      return Lungo.Router.section("waiting_s");
     };
 
     return ChosenTaxiCtrl;
@@ -691,15 +691,16 @@
     };
 
     HomeCtrl.prototype.events = {
+      "singleTap #home_driver": "payTaxi",
       "singleTap #home_refresh_b": "refresh",
       "singleTap #home_confirm_b": "confirm",
       "singleTap #map-canvas": "hideAside"
     };
 
     function HomeCtrl() {
+      this.payTaxi = __bind(this.payTaxi, this);
       this.loadNearTaxis = __bind(this.loadNearTaxis, this);
       this.hideAside = __bind(this.hideAside, this);
-      this.showAsigning = __bind(this.showAsigning, this);
       this.confirm = __bind(this.confirm, this);
       this.refresh = __bind(this.refresh, this);
       var options;
@@ -752,7 +753,7 @@
         accept: {
           label: "El más cercano",
           callback: function() {
-            return _this.showAsigning();
+            return Lungo.Router.section("waiting_s");
           }
         },
         cancel: {
@@ -762,14 +763,6 @@
           }
         }
       });
-    };
-
-    HomeCtrl.prototype.showAsigning = function() {
-      var _this = this;
-      Lungo.Notification.hide();
-      return setTimeout((function() {
-        return Lungo.Notification.html('<h2>Esperando la confirmación del taxi</h2>', 'Cancelar');
-      }), 250);
     };
 
     HomeCtrl.prototype.hideAside = function(event) {
@@ -837,6 +830,10 @@
     HomeCtrl.prototype.loadNearTaxis = function() {
       __Controller.nearDriver.loadNearTaxis();
       return Lungo.Router.section("list_s");
+    };
+
+    HomeCtrl.prototype.payTaxi = function(event) {
+      return Lungo.Router.section("payment_s");
     };
 
     return HomeCtrl;
@@ -946,6 +943,7 @@
       __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
       __Controller.favorites = new __Controller.FavoritesCtrl("section#favorites_s");
       __Controller.favDriver = new __Controller.FavDriverCtrl("section#favDriver_s");
+      __Controller.waiting = new __Controller.WaitingCtrl("section#waiting_s");
       __Controller.chosenTaxi = new __Controller.ChosenTaxiCtrl("section#chosenTaxi_s");
       __Controller.nearDriver = new __Controller.NearDriverCtrl("section#list_s");
       __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
@@ -1351,6 +1349,7 @@
         return this.errors[0].innerText = "Los datos de la tarjeta no son válidos. Compruébelos.";
       } else {
         alert("Trayecto pagado");
+        home_driver.style.visibility = "hidden";
         return Lungo.Router.section("home_s");
       }
     };
@@ -1851,6 +1850,39 @@
     };
 
     return TravelListCtrl;
+
+  })(Monocle.Controller);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Controller.WaitingCtrl = (function(_super) {
+    __extends(WaitingCtrl, _super);
+
+    WaitingCtrl.prototype.elements = {
+      "#waiting_cancel_b": "button_cancel"
+    };
+
+    WaitingCtrl.prototype.events = {
+      "singleTap #waiting_cancel_b": "cancel"
+    };
+
+    function WaitingCtrl() {
+      this.cancel = __bind(this.cancel, this);
+      WaitingCtrl.__super__.constructor.apply(this, arguments);
+    }
+
+    WaitingCtrl.prototype.cancel = function(event) {
+      home_driver.src = "img/user.png";
+      home_driver.style.visibility = "visible";
+      return Lungo.Router.section("home_s");
+    };
+
+    return WaitingCtrl;
 
   })(Monocle.Controller);
 

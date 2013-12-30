@@ -43,4 +43,5 @@ class __Controller.PaymentCtrl extends Monocle.Controller
       @errors[0].innerText = "Los datos de la tarjeta no son válidos. Compruébelos."
     else
       alert "Trayecto pagado"
+      home_driver.style.visibility = "hidden"
       Lungo.Router.section "home_s"
