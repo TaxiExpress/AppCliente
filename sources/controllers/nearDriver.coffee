@@ -6,28 +6,38 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
     super
 
   loadNearTaxis: =>
-    i = 0
-    if i == 0
-      empty_near.style.visibility = "visible"
-    else
-      empty_near.style.visibility = "hidden"
-      for taxi in __Model.Driver.all()
-        license = "DDAS65DAS" + i.toString()
-        name = "Taxista "
-        surname = i.toString()
-        valoration = (i % 5)
+    @deleteNearTaxis()
+    position = Lungo.Cache.get "geoPosition"
+    server = Lungo.Cache.get "server"
+    $$.ajax
+      type: "GET"
+      url: server + "client/getTaxis"
+      data:
+        longitud: position.nb
+        latitud: position.ob
+      error: (xhr, type) =>
+        console.log type.response
+      success: (result) =>
+        taxi = result
+        #for taxi in result
+        email = taxi.email
+        name = taxi.first_name
+        surname = taxi.last_name
+        valuation = taxi.valuation
         position = new google.maps.LatLng(43.271239,-2.9445875)
-        plate = "DVT 78" + i.toString()
-        model = "Opel Corsa"
-        image = "http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG"
-        capacity = 4
-        accesible = false
-        animals = false
-        appPayment = (i % 4 == 0)
-        __Model.Driver.create license: license, name: name, surname: surname, valoration: valoration, position: position, plate: plate, model: model, image: image, capacity: capacity, accesible: accesible, animals: animals, appPayment: appPayment
-        _viewsList[taxi.license] = new __View.NearDriverList model: taxi      
+        plate = taxi.car.plate
+        model = taxi.car.company + " " + taxi.car.model
+        if taxi.image != null && taxi.image != undefined
+          image = taxi.image 
+        else image = "img/user.png"
+        capacity = taxi.car.capacity
+        accesible = taxi.car.accesible
+        animals = taxi.car.animals
+        appPayment = taxi.car.appPayment
+        driver = __Model.NearDriver.create email: email, name: name, surname: surname, position: position, valuation: valuation, plate: plate, model: model, image: image, capacity: capacity, accesible: accesible, animals: animals, appPayment: appPayment
+        _viewsList[taxi.email] = new __View.NearDriverList model: driver      
 
   deleteNearTaxis: =>
-    for nearDriver in __Model.Driver.getAll()
-      _viewsList[nearDriver.license].remove()
-      _viewsList[nearDriver.license] = undefined
+    for nearDriver in __Model.NearDriver.all()
+      _viewsList[nearDriver.email].remove()
+      _viewsList[nearDriver.email] = undefined

@@ -11,7 +11,7 @@
       return _ref;
     }
 
-    Driver.fields("email", "name", "surname", "valuation", "position", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
+    Driver.fields("email", "name", "surname", "valuation", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
 
     Driver.get = function(id) {
       return this.select(function(driver) {
@@ -47,6 +47,33 @@
     };
 
     return FavoriteDriver;
+
+  })(Monocle.Model);
+
+}).call(this);
+
+(function() {
+  var _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Model.NearDriver = (function(_super) {
+    __extends(NearDriver, _super);
+
+    function NearDriver() {
+      _ref = NearDriver.__super__.constructor.apply(this, arguments);
+      return _ref;
+    }
+
+    NearDriver.fields("email", "name", "surname", "valuation", "position", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
+
+    NearDriver.get = function(id) {
+      return this.select(function(neardriver) {
+        return neardriver.email === id;
+      });
+    };
+
+    return NearDriver;
 
   })(Monocle.Model);
 
@@ -168,7 +195,8 @@
 }).call(this);
 
 (function() {
-  var __hasProp = {}.hasOwnProperty,
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __View.NearDriverList = (function(_super) {
@@ -176,13 +204,14 @@
 
     NearDriverList.prototype.container = "section #nearList_a";
 
-    NearDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"chosenTaxi_s\">                \n          <div class=\"on-right\">1 minuto</div>\n          <img src=\"{{image}}\" alt=\"\" />\n          <div>\n              <strong>a 402 metros</strong>\n              <small>{{name}} {{surname}}</small>\n              <small><strong>{{valuationStars}}</strong></small>\n          </div>\n          {{#appPayment}}<span data-icon=\"credit-card\">\n            <span class=\"icon credit-card\"></span>\n          </span>{{/appPayment}}\n      </li>";
+    NearDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"chosenTaxi_s\">                \n          <div class=\"on-right\">{{time}} minutos</div>\n          <img src=\"{{image}}\" alt=\"\" />\n          <div>\n              <strong>a {{distance}} km</strong>\n              <small>{{name}} {{surname}}</small>\n              <small><strong>{{valuationStars}}</strong></small>\n          </div>\n          {{#appPayment}}<span data-icon=\"credit-card\">\n            <span class=\"icon credit-card\"></span>\n          </span>{{/appPayment}}\n      </li>";
 
     NearDriverList.prototype.events = {
       "singleTap li": "onView"
     };
 
     function NearDriverList() {
+      this.getDistanceAndTime = __bind(this.getDistanceAndTime, this);
       var i, val;
       NearDriverList.__super__.constructor.apply(this, arguments);
       val = "";
@@ -195,13 +224,35 @@
         val = val + "☆";
         i++;
       }
+      this.getDistanceAndTime();
       this.model.valuationStars = val;
-      this.prepend(this.model);
     }
 
     NearDriverList.prototype.onView = function(event) {
       __Controller.chosenTaxi.loadDriverDetails(this.model);
       return Lungo.Router.section("chosenTaxi_s");
+    };
+
+    NearDriverList.prototype.getDistanceAndTime = function() {
+      var directionsService, position, request, wp,
+        _this = this;
+      position = Lungo.Cache.get("geoPosition");
+      wp = new Array();
+      wp[0] = new google.maps.LatLng(this.model.position.nb, this.model.position.ob);
+      wp[1] = new google.maps.LatLng(position.nb, position.ob);
+      directionsService = new google.maps.DirectionsService();
+      request = {
+        origin: wp[0],
+        destination: wp[1],
+        travelMode: google.maps.DirectionsTravelMode.DRIVING
+      };
+      return directionsService.route(request, function(response, status) {
+        if (status === google.maps.DirectionsStatus.OK) {
+          _this.model.distance = (response.routes[0].legs[0].distance.value / 1000).toFixed(2);
+          _this.model.time = Math.round(response.routes[0].legs[0].duration.value / 60);
+          return _this.prepend(_this.model);
+        }
+      });
     };
 
     return NearDriverList;
@@ -677,12 +728,14 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.HomeCtrl = (function(_super) {
-    var getStreet, initialize, manageErrors, map, updatePosition,
+    var getStreet, initialize, manageErrors, map, position, updatePosition,
       _this = this;
 
     __extends(HomeCtrl, _super);
 
     map = void 0;
+
+    position = void 0;
 
     HomeCtrl.prototype.elements = {
       "#home_refresh_b": "button_refresh",
@@ -811,6 +864,7 @@
 
     getStreet = function(pos) {
       var geocoder;
+      Lungo.Cache.set("geoPosition", pos);
       geocoder = new google.maps.Geocoder();
       return geocoder.geocode({
         latLng: pos
@@ -1143,34 +1197,46 @@
     }
 
     NearDriverCtrl.prototype.loadNearTaxis = function() {
-      var accesible, animals, appPayment, capacity, i, image, license, model, name, plate, position, surname, taxi, valoration, _i, _len, _ref, _results;
-      i = 0;
-      if (i === 0) {
-        return empty_near.style.visibility = "visible";
-      } else {
-        empty_near.style.visibility = "hidden";
-        _ref = __Model.Driver.all();
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          taxi = _ref[_i];
-          license = "DDAS65DAS" + i.toString();
-          name = "Taxista ";
-          surname = i.toString();
-          valoration = i % 5;
+      var position, server,
+        _this = this;
+      this.deleteNearTaxis();
+      position = Lungo.Cache.get("geoPosition");
+      server = Lungo.Cache.get("server");
+      return $$.ajax({
+        type: "GET",
+        url: server + "client/getTaxis",
+        data: {
+          longitud: position.nb,
+          latitud: position.ob
+        },
+        error: function(xhr, type) {
+          return console.log(type.response);
+        },
+        success: function(result) {
+          var accesible, animals, appPayment, capacity, driver, email, image, model, name, plate, surname, taxi, valuation;
+          taxi = result;
+          email = taxi.email;
+          name = taxi.first_name;
+          surname = taxi.last_name;
+          valuation = taxi.valuation;
           position = new google.maps.LatLng(43.271239, -2.9445875);
-          plate = "DVT 78" + i.toString();
-          model = "Opel Corsa";
-          image = "http://www.futbolsalaragon.com/imagenes/alfonsorodriguez2012.JPG";
-          capacity = 4;
-          accesible = false;
-          animals = false;
-          appPayment = i % 4 === 0;
-          __Model.Driver.create({
-            license: license,
+          plate = taxi.car.plate;
+          model = taxi.car.company + " " + taxi.car.model;
+          if (taxi.image !== null && taxi.image !== void 0) {
+            image = taxi.image;
+          } else {
+            image = "img/user.png";
+          }
+          capacity = taxi.car.capacity;
+          accesible = taxi.car.accesible;
+          animals = taxi.car.animals;
+          appPayment = taxi.car.appPayment;
+          driver = __Model.NearDriver.create({
+            email: email,
             name: name,
             surname: surname,
-            valoration: valoration,
             position: position,
+            valuation: valuation,
             plate: plate,
             model: model,
             image: image,
@@ -1179,22 +1245,21 @@
             animals: animals,
             appPayment: appPayment
           });
-          _results.push(_viewsList[taxi.license] = new __View.NearDriverList({
-            model: taxi
-          }));
+          return _viewsList[taxi.email] = new __View.NearDriverList({
+            model: driver
+          });
         }
-        return _results;
-      }
+      });
     };
 
     NearDriverCtrl.prototype.deleteNearTaxis = function() {
       var nearDriver, _i, _len, _ref, _results;
-      _ref = __Model.Driver.getAll();
+      _ref = __Model.NearDriver.all();
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         nearDriver = _ref[_i];
-        _viewsList[nearDriver.license].remove();
-        _results.push(_viewsList[nearDriver.license] = void 0);
+        _viewsList[nearDriver.email].remove();
+        _results.push(_viewsList[nearDriver.email] = void 0);
       }
       return _results;
     };
@@ -1330,17 +1395,21 @@
     };
 
     PaymentCtrl.prototype.doPayment = function(event) {
-      this.button[0].disabled = true;
-      Stripe.setPublishableKey("pk_test_VdRyFEwU3Ap84cUaLp5S8yBC");
-      return Stripe.createToken({
-        name: "David Lallana",
-        email: "davidlallana@gmail.com",
-        description: "descripcion de prueba",
-        number: "4242424242424242",
-        cvc: "123",
-        exp_month: "12",
-        exp_year: "2014"
-      }, amount, this.stripeResponseHandler);
+      if (!(this.creditCard.val() && this.cvc.val() && this.expires.val())) {
+        return alert("Debes completar todos los detalles de la tarjeta");
+      } else {
+        this.button[0].disabled = true;
+        Stripe.setPublishableKey("pk_test_VdRyFEwU3Ap84cUaLp5S8yBC");
+        return Stripe.createToken({
+          name: "David Lallana",
+          email: "davidlallana@gmail.com",
+          description: "descripcion de prueba",
+          number: "4242424242424242",
+          cvc: "123",
+          exp_month: "12",
+          exp_year: "2014"
+        }, amount, this.stripeResponseHandler);
+      }
     };
 
     PaymentCtrl.prototype.stripeResponseHandler = function(status, response) {

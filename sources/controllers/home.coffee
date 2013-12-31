@@ -1,6 +1,7 @@
 class __Controller.HomeCtrl extends Monocle.Controller
 
   map = undefined
+  position = undefined
 
   elements:
     "#home_refresh_b"                        : "button_refresh"
@@ -86,6 +87,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
         getStreet(map.getCenter())
 
   getStreet = (pos) =>
+    Lungo.Cache.set "geoPosition", pos
     geocoder = new google.maps.Geocoder()
     geocoder.geocode
       latLng: pos

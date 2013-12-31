@@ -25,17 +25,20 @@ class __Controller.PaymentCtrl extends Monocle.Controller
     @button[0].disabled = false
 
   doPayment: (event) =>
-    @button[0].disabled = true
-    Stripe.setPublishableKey "pk_test_VdRyFEwU3Ap84cUaLp5S8yBC"
-    Stripe.createToken
-      name: "David Lallana"
-      email: "davidlallana@gmail.com"
-      description: "descripcion de prueba"
-      number: "4242424242424242"#@creditCard.val()
-      cvc: "123"#@cvc.val()
-      exp_month: "12"#@expires.val().substring 0, 3
-      exp_year: "2014"#@expires.val().substring 4, 8
-    , amount,  @stripeResponseHandler
+    if !(@creditCard.val() && @cvc.val() && @expires.val())
+      alert "Debes completar todos los detalles de la tarjeta"
+    else
+      @button[0].disabled = true
+      Stripe.setPublishableKey "pk_test_VdRyFEwU3Ap84cUaLp5S8yBC"
+      Stripe.createToken
+        name: "David Lallana"
+        email: "davidlallana@gmail.com"
+        description: "descripcion de prueba"
+        number: "4242424242424242"#@creditCard.val()
+        cvc: "123"#@cvc.val()
+        exp_month: "12"#@expires.val().substring 0, 3
+        exp_year: "2014"#@expires.val().substring 4, 8
+      , amount,  @stripeResponseHandler
  
   stripeResponseHandler: (status, response) =>
     @button[0].disabled = false
