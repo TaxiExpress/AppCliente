@@ -22,11 +22,14 @@ class __Controller.LoginCtrl extends Monocle.Controller
     @read()
 
   doLogin: (event) =>
-    Lungo.Router.section "init_s"
-    @drop()
-    date = new Date("1/1/1970").toISOString().substring 0, 19
-    date = date.replace "T", " "
-    @valideCredentials(@username[0].value, @password[0].value, date)
+    if (@username[0].value && @password[0].value)
+      Lungo.Router.section "init_s"
+      @drop()
+      date = new Date("1/1/1970").toISOString().substring 0, 19
+      date = date.replace "T", " "
+      @valideCredentials(@username[0].value, @password[0].value, date)
+    else
+      alert "Debe rellenar el email y la contraseña"
 
   valideCredentials: (email, pass, date) =>
     server = Lungo.Cache.get "server"

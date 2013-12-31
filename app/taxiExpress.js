@@ -942,11 +942,15 @@
 
     LoginCtrl.prototype.doLogin = function(event) {
       var date;
-      Lungo.Router.section("init_s");
-      this.drop();
-      date = new Date("1/1/1970").toISOString().substring(0, 19);
-      date = date.replace("T", " ");
-      return this.valideCredentials(this.username[0].value, this.password[0].value, date);
+      if (this.username[0].value && this.password[0].value) {
+        Lungo.Router.section("init_s");
+        this.drop();
+        date = new Date("1/1/1970").toISOString().substring(0, 19);
+        date = date.replace("T", " ");
+        return this.valideCredentials(this.username[0].value, this.password[0].value, date);
+      } else {
+        return alert("Debe rellenar el email y la contraseña");
+      }
     };
 
     LoginCtrl.prototype.valideCredentials = function(email, pass, date) {
