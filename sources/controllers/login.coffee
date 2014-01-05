@@ -6,7 +6,6 @@ class __Controller.LoginCtrl extends Monocle.Controller
   elements:
     "#login_username"                              : "username"
     "#login_password"                              : "password"
-    "#csrfmiddlewaretoken"                         : "csrfmiddlewaretoken"
 
   events:
     "tap #login_login_b"                           : "doLogin"
@@ -17,7 +16,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     @db.transaction (tx) =>
       tx.executeSql "CREATE TABLE IF NOT EXISTS accessData (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, dateUpdate STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL )"
     @db.transaction (tx) =>
-      tx.executeSql "CREATE TABLE IF NOT EXISTS configData (email STRING NOT NULL PRIMARY KEY, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, food STRING NOT NULL, accesible STRING NOT NULL)"
+      tx.executeSql "CREATE TABLE IF NOT EXISTS configData (email STRING NOT NULL PRIMARY KEY, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, food STRING NOT NULL, accessible STRING NOT NULL)"
     @drop()
     @read()
 
@@ -71,7 +70,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     __Controller.travelList = new __Controller.TravelListCtrl "section#travelList_s"
     __Controller.travelDetails = new __Controller.TravelDetailsCtrl "section#travelDetails_s"
     __Controller.filters = new __Controller.FiltersCtrl "section#filters_s"
-    __Controller.filters.loadFilters(5, true, true, true)
+    __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible)
     setTimeout((=>__Controller.home = new __Controller.HomeCtrl "section#home_s") , 1000)
 
   getProfile: (result) ->
@@ -99,8 +98,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
   loadFavoriteTaxis: (taxis) =>
     if taxis.length > 0
-      empty_favorites.style.visibility = "hidden"
-      empty_favorites2.style.visibility = "hidden"
+      empty_favorites.style.display = "none"
+      empty_favorites2.style.display = "none"
     for taxi in taxis
       email = taxi.email
       phone = taxi.phone
@@ -111,14 +110,14 @@ class __Controller.LoginCtrl extends Monocle.Controller
       model = taxi.car.company + " " + taxi.car.model
       image = taxi.image
       capacity = taxi.car.capacity
-      accesible = taxi.car.accesible
+      accessible = taxi.car.accessible
       animals = taxi.car.animals
       appPayment = taxi.car.appPayment
-      favDriver = __Model.FavoriteDriver.create email: email, phone: phone, name: name, surname: surname, valuation: valuation, plate: plate, model: model, image: image, capacity: capacity, accesible: accesible, animals: animals, appPayment: appPayment
+      favDriver = __Model.FavoriteDriver.create email: email, phone: phone, name: name, surname: surname, valuation: valuation, plate: plate, model: model, image: image, capacity: capacity, accessible: accessible, animals: animals, appPayment: appPayment
 
   loadTravels: (travels) =>
     if travels.length > 0
-      empty_travels.style.visibility = "hidden"
+      empty_travels.style.display = "none"
     for travel in travels
       id = travel.id
       starttime = new Date(travel.starttime)
@@ -138,5 +137,5 @@ class __Controller.LoginCtrl extends Monocle.Controller
       cost = travel.cost
       driver2 = travel.driver
       model = driver2.car.company + " " + driver2.car.model
-      driver = __Model.Driver.create email: driver2.email, name: driver2.first_name, surname: driver2.last_name, valuation: driver2.valuation, plate: driver2.car.plate, model: model, image: driver2.image, capacity: driver2.car.capacity, accesible: driver2.car.accesible, animals: driver2.car.animals, appPayment: driver2.car.appPayment
+      driver = __Model.Driver.create email: driver2.email, name: driver2.first_name, surname: driver2.last_name, valuation: driver2.valuation, plate: driver2.car.plate, model: model, image: driver2.image, capacity: driver2.car.capacity, accessible: driver2.car.accessible, animals: driver2.car.animals, appPayment: driver2.car.appPayment
       travel = __Model.Travel.create id: id, starttime: starttime, endtime: endtime, startpoint: startpoint, endpoint: endpoint, cost: cost, driver: driver, origin: origin, destination: destination

@@ -4,37 +4,37 @@ class __Controller.FiltersCtrl extends Monocle.Controller
     "#filters_seats"                                : "seats"
     "#filters_payments"                             : "payments"
     "#filters_animals"                              : "animals"
-    "#filters_accesible"                            : "accesible"
+    "#filters_accessible"                           : "accessible"
 
   events:
     "change #filters_seats"                         : "saveFilters"
     "change #filters_payments"                      : "saveFilters"
     "change #filters_animals"                       : "saveFilters"
-    "change #filters_accesible"                     : "saveFilters"
+    "change #filters_accessible"                    : "saveFilters"
 
   constructor: ->
     super
 
-  loadFilters: (seats, payments, animals, accesible) =>
+  loadFilters: (seats, payments, animals, accessible) =>
     @seats[0].value = seats
     @payments[0].checked = payments
     @animals[0].checked = animals
-    @accesible[0].checked = accesible
+    @accessible[0].checked = accessible
 
   saveFilters: (event) =>
     credentials = Lungo.Cache.get "credentials"
     server = Lungo.Cache.get "server"
     data =
-      email: @credentials.email
-      seats: @seats[0].value
-      payments: @payments[0].checked
+      email: credentials.email
+      capacity: @seats[0].value
+      appPayment: @payments[0].checked
       animals: @animals[0].checked
-      accesible: @accesible[0].checked
+      accessible: @accessible[0].checked
     $$.ajax
       type: "POST"
-      url: server + "client/chagefilters"
+      url: server + "client/changefilters"
       data: data
       success: (result) =>
-        alert "FILTROS ACTUALIZADOS (QUITAR)"
+        @
       error: (xhr, type) =>
-        console.log type.response
+        @

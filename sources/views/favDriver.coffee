@@ -26,7 +26,7 @@ class __View.FavDriver extends Monocle.View
       val = val + "☆"
       i++
     @model.valuationStars = val
-    if @model.image == null
+    if @model.image == null || @model.image == ""
       @model.image = "img/user.png"
     @prepend @model
 

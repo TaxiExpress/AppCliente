@@ -70,6 +70,7 @@
             </li>
             <li data-view-section="travelList_s">Trayectos realizados</li>
             <li data-view-section="favorites_s">Taxistas favoritos</li>
+            <li data-view-section="filters_s">Configuración</li>
             <li data-view-section="faq_s">F.A.Q.</li>
             <li data-view-section="legalAdvice_s">Aviso Legal</li>
             <li data-view-section="login_s">Cerrar sesión</li>
@@ -123,7 +124,7 @@
             <div class="marker"><img src="img/poi1.png" alt="" /></div>
             <div class="location">
                 <span id="home_refresh_b" class="icon screenshot"></span>
-                <input id="home_streetField" type="text" readonly="readonly" />
+                <input id="home_streetField" type="text" readonly="readonly" value="Localizando ..."/>
                 <button id="home_confirm_b" class="anchor" data-label="Confirmar posición" />
             </div>
             <div id="map-canvas" />
@@ -133,14 +134,20 @@
     <section id="list_s" data-transition="slide">        
         <header data-back="angle-left" data-title="Elegir taxi">
             <nav class="on-right">
-                <a href="#" data-view-section="filters_s" data-icon="bookmark-empty"></a>
+                <a href="#" id="list_refresh_b" data-icon="refresh"></a>
             </nav>
         </header>
         <nav data-control="groupbar">
             <a id="list_taxis_b" href="#" data-view-article="nearList_a" data-label="Los más cercanos"></a>
             <a id="list_favorites_b" href="#" data-view-article="favoritesList_a" data-label="Taxis favoritos"></a>
         </nav>
-        <article id="nearList_a" class="list form active scroll white"></article>
+        <article id="nearList_a" class="list form active scroll white">
+            <div id="empty_nearTaxies" class="empty">
+                <span class="icon search"></span>
+                <strong>No hay taxis para tus preferencias</strong>
+                <small>Si deseas pedir algún taxi ahora, prueba a modificar alguno de los filtros en el apartado de Configuración.</small>
+            </div>
+        </article>
         <article id="favoritesList_a" class="list meddium_list form scroll white">
             <div id="empty_favorites2" class="empty">
                 <span class="icon user"></span>
@@ -150,28 +157,27 @@
         </article>
     </section>    
 
-    <section id="filters_s" data-transition="cover">
-        <header data-title="Configurar búsqueda" data-back="angle-down"></header>      
+    <section id="filters_s" data-transition="slide">
+        <header data-title="Configuración" data-back="angle-left"></header>      
         <article id="filters_a" class="scroll">
             <div class="form list">
-                <li class="anchor contrast">CARACTERÍSTICAS DEL VEHÍCULO</li>
+                <li class="anchor contrast">CARACTERÍSTICAS DEL TAXI A BUSCAR</li>
                 <fieldset> 
-                    <small>Mínimo número de plazas</small>
-                    <input id="filters_seats" type="number" min="3" />
+                    <small>Número de plazas necesarias</small>
+                    <input id="filters_seats" type="number" min="1" />
                 </fieldset> 
-                <li class="anchor contrast">PERMISOS</li>
                 <fieldset> 
-                    <small>Pago a través de la App</small>
+                    <small>Permitido pago a través de la App</small>
                     <input id="filters_payments" type="checkbox" />
                 </fieldset> 
-                <fieldset> 
-                    <small>Habilitado para minusválidos</small>
-                    <input id="filters_accesible" type="checkbox" />
-                </fieldset>      
                 <fieldset> 
                     <small>Permitido el transporte de animales</small>
                     <input id="filters_animals" type="checkbox" />
                 </fieldset>   
+                <fieldset> 
+                    <small>Habilitado para minusválidos</small>
+                    <input id="filters_accessible" type="checkbox" />
+                </fieldset>
             </div>           
         </article>
     </section>
@@ -187,9 +193,10 @@
                 <li class="anchor contrast">DATOS DEL VEHÍCULO</li>
                 <fieldset><small><label>Vehículo:</label><span id="chosenTaxi_model" /></small></fieldset>
                 <fieldset><small><label>Matricula:</label><span id="chosenTaxi_plate" /></small></fieldset>  
-                <fieldset><small><label>Número de plazas:</label><span id="chosenTaxi_capacity" /></small></fieldset>
-                <fieldset><small><label>Habilitado para minusválidos:</label><span id="chosenTaxi_accesible" /></small></fieldset>
+                <fieldset><small><label>Número de plazas disponibles:</label><span id="chosenTaxi_capacity" /></small></fieldset>
+                <fieldset><small><label>Habilitado para minusválidos:</label><span id="chosenTaxi_accessible" /></small></fieldset>
                 <fieldset><small><label>Viaje con animales:</label><span id="chosenTaxi_animals" /></small></fieldset>
+                <fieldset><small><label>Permite el pago a través de App:</label><span id="chosenTaxi_appPayment" /></small></fieldset>
                 <button id="chosenTaxi_request" class="anchor accept" data-label="Solicitar taxi" />
             </div>          
         </article>
@@ -223,9 +230,10 @@
                 <li class="anchor contrast">DATOS DEL VEHÍCULO</li>
                 <fieldset><small><label>Vehículo:</label><span id="favDriver_model" /></small></fieldset>
                 <fieldset><small><label>Matricula:</label><span id="favDriver_plate" /></small></fieldset>  
-                <fieldset><small><label>Número de plazas:</label><span id="favDriver_capacity" /></small></fieldset>
-                <fieldset><small><label>Habilitado para minusválidos:</label><span id="favDriver_accesible" /></small></fieldset>
+                <fieldset><small><label>Número de plazas disponibles:</label><span id="favDriver_capacity" /></small></fieldset>
+                <fieldset><small><label>Habilitado para minusválidos:</label><span id="favDriver_accessible" /></small></fieldset>
                 <fieldset><small><label>Viaje con animales:</label><span id="favDriver_animals" /></small></fieldset>
+                <fieldset><small><label>Permite el pago a través de App:</label><span id="favDriver_appPayment" /></small></fieldset>
             </div>          
         </article>
     </section>

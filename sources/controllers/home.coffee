@@ -50,11 +50,11 @@ class __Controller.HomeCtrl extends Monocle.Controller
       accept:
         label: "El más cercano"
         callback: =>
-          Lungo.Router.section "waiting_s"
+          @getTaxi()
       cancel:
         label: "Elegir taxi"
         callback: =>
-          @loadNearTaxis()
+          __Controller.nearDriver.loadNearTaxis()
   
   hideAside: (event) =>
     Lungo.Aside.hide()
@@ -102,9 +102,23 @@ class __Controller.HomeCtrl extends Monocle.Controller
       else
         home_streetField.value = 'Calle desconocida'
 
-  loadNearTaxis: =>
-    __Controller.nearDriver.loadNearTaxis()
-    Lungo.Router.section "list_s"
+  getTaxi: =>
+    console.log "llego"
+    credentials = Lungo.Cache.get "credentials"
+    position = Lungo.Cache.get "geoPosition"
+    server = Lungo.Cache.get "server"
+    $$.ajax
+      type: "GET"
+      url: server + "client/getTaxi"
+      data:
+        email: credentials.email
+        longitud: position.nb
+        latitud: position.ob
+      error: (xhr, type) =>
+        console.log type.response
+      success: (result) =>
+        console.log result
+        Lungo.Router.section "waiting_s"
 
   payTaxi: (event) =>
     Lungo.Router.section "payment_s"

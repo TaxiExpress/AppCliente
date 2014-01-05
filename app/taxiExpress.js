@@ -11,7 +11,7 @@
       return _ref;
     }
 
-    Driver.fields("email", "name", "surname", "valuation", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
+    Driver.fields("email", "name", "surname", "valuation", "plate", "model", "image", "capacity", "accessible", "animals", "appPayment");
 
     Driver.get = function(id) {
       return this.select(function(driver) {
@@ -38,7 +38,7 @@
       return _ref;
     }
 
-    FavoriteDriver.fields("email", "phone", "name", "surname", "valuation", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
+    FavoriteDriver.fields("email", "phone", "name", "surname", "valuation", "plate", "model", "image", "capacity", "accessible", "animals", "appPayment");
 
     FavoriteDriver.get = function(id) {
       return this.select(function(driver) {
@@ -65,7 +65,7 @@
       return _ref;
     }
 
-    NearDriver.fields("email", "name", "surname", "valuation", "position", "plate", "model", "image", "capacity", "accesible", "animals", "appPayment");
+    NearDriver.fields("email", "name", "surname", "valuation", "position", "plate", "model", "image", "capacity", "accessible", "animals", "appPayment", "distance", "time");
 
     NearDriver.get = function(id) {
       return this.select(function(neardriver) {
@@ -135,7 +135,7 @@
         i++;
       }
       this.model.valuationStars = val;
-      if (this.model.image === null) {
+      if (this.model.image === null || this.model.image === "") {
         this.model.image = "img/user.png";
       }
       this.prepend(this.model);
@@ -195,8 +195,7 @@
 }).call(this);
 
 (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = {}.hasOwnProperty,
+  var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __View.NearDriverList = (function(_super) {
@@ -211,7 +210,6 @@
     };
 
     function NearDriverList() {
-      this.getDistanceAndTime = __bind(this.getDistanceAndTime, this);
       var i, val;
       NearDriverList.__super__.constructor.apply(this, arguments);
       val = "";
@@ -224,35 +222,13 @@
         val = val + "☆";
         i++;
       }
-      this.getDistanceAndTime();
       this.model.valuationStars = val;
+      this.append(this.model);
     }
 
     NearDriverList.prototype.onView = function(event) {
       __Controller.chosenTaxi.loadDriverDetails(this.model);
       return Lungo.Router.section("chosenTaxi_s");
-    };
-
-    NearDriverList.prototype.getDistanceAndTime = function() {
-      var directionsService, position, request, wp,
-        _this = this;
-      position = Lungo.Cache.get("geoPosition");
-      wp = new Array();
-      wp[0] = new google.maps.LatLng(this.model.position.nb, this.model.position.ob);
-      wp[1] = new google.maps.LatLng(position.nb, position.ob);
-      directionsService = new google.maps.DirectionsService();
-      request = {
-        origin: wp[0],
-        destination: wp[1],
-        travelMode: google.maps.DirectionsTravelMode.DRIVING
-      };
-      return directionsService.route(request, function(response, status) {
-        if (status === google.maps.DirectionsStatus.OK) {
-          _this.model.distance = (response.routes[0].legs[0].distance.value / 1000).toFixed(2);
-          _this.model.time = Math.round(response.routes[0].legs[0].duration.value / 60);
-          return _this.prepend(_this.model);
-        }
-      });
     };
 
     return NearDriverList;
@@ -366,8 +342,9 @@
       "#chosenTaxi_model": "model",
       "#chosenTaxi_plate": "plate",
       "#chosenTaxi_capacity": "capacity",
-      "#chosenTaxi_accesible": "accesible",
-      "#chosenTaxi_animals": "animals"
+      "#chosenTaxi_accessible": "accessible",
+      "#chosenTaxi_animals": "animals",
+      "#chosenTaxi_appPayment": "appPayment"
     };
 
     ChosenTaxiCtrl.prototype.events = {
@@ -388,13 +365,17 @@
       this.model[0].innerText = driver.model;
       this.plate[0].innerText = driver.plate;
       this.capacity[0].innerText = driver.capacity;
-      this.accesible[0].innerText = "No";
-      if (driver.accesible) {
-        this.accesible[0].innerText = "Si";
+      this.accessible[0].innerText = "No";
+      if (driver.accessible) {
+        this.accessible[0].innerText = "Si";
       }
       this.animals[0].innerText = "No";
       if (driver.animals) {
-        return this.animals[0].innerText = "Si";
+        this.animals[0].innerText = "Si";
+      }
+      this.appPayment[0].innerText = "No";
+      if (driver.appPayment) {
+        return this.appPayment[0].innerText = "Si";
       }
     };
 
@@ -427,10 +408,11 @@
       "#favDriver_model": "model",
       "#favDriver_plate": "plate",
       "#favDriver_capacity": "capacity",
-      "#favDriver_accesible": "accesible",
+      "#favDriver_accessible": "accessible",
       "#favDriver_animals": "animals",
       "#favDriver_favorite": "favorite",
-      "#favDriver_phone": "phone"
+      "#favDriver_phone": "phone",
+      "#favDriver_appPayment": "appPayment"
     };
 
     FavDriverCtrl.prototype.events = {
@@ -454,9 +436,13 @@
       this.model[0].innerText = driver.model;
       this.plate[0].innerText = driver.plate;
       this.capacity[0].innerText = driver.capacity;
-      this.accesible[0].innerText = "No";
-      if (driver.accesible) {
-        this.accesible[0].innerText = "Si";
+      this.accessible[0].innerText = "No";
+      if (driver.accessible) {
+        this.accessible[0].innerText = "Si";
+      }
+      this.appPayment[0].innerText = "No";
+      if (driver.appPayment) {
+        this.appPayment[0].innerText = "Si";
       }
       this.animals[0].innerText = "No";
       if (driver.animals) {
@@ -585,7 +571,7 @@
         model: driver.model,
         image: driver.image,
         capacity: driver.capacity,
-        accesible: driver.accesible,
+        accessible: driver.accessible,
         animals: driver.animals,
         appPayment: driver.appPayment
       });
@@ -609,11 +595,11 @@
 
     FavoritesCtrl.prototype.tryEmpty = function() {
       if (__Model.FavoriteDriver.all().length === 0) {
-        empty_favorites.style.visibility = "visible";
-        return empty_favorites2.style.visibility = "visible";
+        empty_favorites.style.display = "block";
+        return empty_favorites2.style.display = "block";
       } else {
-        empty_favorites.style.visibility = "hidden";
-        return empty_favorites2.style.visibility = "hidden";
+        empty_favorites.style.display = "none";
+        return empty_favorites2.style.display = "none";
       }
     };
 
@@ -635,14 +621,14 @@
       "#filters_seats": "seats",
       "#filters_payments": "payments",
       "#filters_animals": "animals",
-      "#filters_accesible": "accesible"
+      "#filters_accessible": "accessible"
     };
 
     FiltersCtrl.prototype.events = {
       "change #filters_seats": "saveFilters",
       "change #filters_payments": "saveFilters",
       "change #filters_animals": "saveFilters",
-      "change #filters_accesible": "saveFilters"
+      "change #filters_accessible": "saveFilters"
     };
 
     function FiltersCtrl() {
@@ -651,11 +637,11 @@
       FiltersCtrl.__super__.constructor.apply(this, arguments);
     }
 
-    FiltersCtrl.prototype.loadFilters = function(seats, payments, animals, accesible) {
+    FiltersCtrl.prototype.loadFilters = function(seats, payments, animals, accessible) {
       this.seats[0].value = seats;
       this.payments[0].checked = payments;
       this.animals[0].checked = animals;
-      return this.accesible[0].checked = accesible;
+      return this.accessible[0].checked = accessible;
     };
 
     FiltersCtrl.prototype.saveFilters = function(event) {
@@ -664,21 +650,21 @@
       credentials = Lungo.Cache.get("credentials");
       server = Lungo.Cache.get("server");
       data = {
-        email: this.credentials.email,
-        seats: this.seats[0].value,
-        payments: this.payments[0].checked,
+        email: credentials.email,
+        capacity: this.seats[0].value,
+        appPayment: this.payments[0].checked,
         animals: this.animals[0].checked,
-        accesible: this.accesible[0].checked
+        accessible: this.accessible[0].checked
       };
       return $$.ajax({
         type: "POST",
-        url: server + "client/chagefilters",
+        url: server + "client/changefilters",
         data: data,
         success: function(result) {
-          return alert("FILTROS ACTUALIZADOS (QUITAR)");
+          return _this;
         },
         error: function(xhr, type) {
-          return console.log(type.response);
+          return _this;
         }
       });
     };
@@ -719,7 +705,7 @@
 
     function HomeCtrl() {
       this.payTaxi = __bind(this.payTaxi, this);
-      this.loadNearTaxis = __bind(this.loadNearTaxis, this);
+      this.getTaxi = __bind(this.getTaxi, this);
       this.hideAside = __bind(this.hideAside, this);
       this.confirm = __bind(this.confirm, this);
       this.refresh = __bind(this.refresh, this);
@@ -773,13 +759,13 @@
         accept: {
           label: "El más cercano",
           callback: function() {
-            return Lungo.Router.section("waiting_s");
+            return _this.getTaxi();
           }
         },
         cancel: {
           label: "Elegir taxi",
           callback: function() {
-            return _this.loadNearTaxis();
+            return __Controller.nearDriver.loadNearTaxis();
           }
         }
       });
@@ -852,9 +838,29 @@
       });
     };
 
-    HomeCtrl.prototype.loadNearTaxis = function() {
-      __Controller.nearDriver.loadNearTaxis();
-      return Lungo.Router.section("list_s");
+    HomeCtrl.prototype.getTaxi = function() {
+      var credentials, server,
+        _this = this;
+      console.log("llego");
+      credentials = Lungo.Cache.get("credentials");
+      position = Lungo.Cache.get("geoPosition");
+      server = Lungo.Cache.get("server");
+      return $$.ajax({
+        type: "GET",
+        url: server + "client/getTaxi",
+        data: {
+          email: credentials.email,
+          longitud: position.nb,
+          latitud: position.ob
+        },
+        error: function(xhr, type) {
+          return console.log(type.response);
+        },
+        success: function(result) {
+          console.log(result);
+          return Lungo.Router.section("waiting_s");
+        }
+      });
     };
 
     HomeCtrl.prototype.payTaxi = function(event) {
@@ -883,8 +889,7 @@
 
     LoginCtrl.prototype.elements = {
       "#login_username": "username",
-      "#login_password": "password",
-      "#csrfmiddlewaretoken": "csrfmiddlewaretoken"
+      "#login_password": "password"
     };
 
     LoginCtrl.prototype.events = {
@@ -905,7 +910,7 @@
         return tx.executeSql("CREATE TABLE IF NOT EXISTS accessData (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, dateUpdate STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL )");
       });
       this.db.transaction(function(tx) {
-        return tx.executeSql("CREATE TABLE IF NOT EXISTS configData (email STRING NOT NULL PRIMARY KEY, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, food STRING NOT NULL, accesible STRING NOT NULL)");
+        return tx.executeSql("CREATE TABLE IF NOT EXISTS configData (email STRING NOT NULL PRIMARY KEY, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, food STRING NOT NULL, accessible STRING NOT NULL)");
       });
       this.drop();
       this.read();
@@ -978,7 +983,7 @@
       __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
       __Controller.travelDetails = new __Controller.TravelDetailsCtrl("section#travelDetails_s");
       __Controller.filters = new __Controller.FiltersCtrl("section#filters_s");
-      __Controller.filters.loadFilters(5, true, true, true);
+      __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible);
       return setTimeout((function() {
         return __Controller.home = new __Controller.HomeCtrl("section#home_s");
       }), 1000);
@@ -1018,10 +1023,10 @@
     };
 
     LoginCtrl.prototype.loadFavoriteTaxis = function(taxis) {
-      var accesible, animals, appPayment, capacity, email, favDriver, image, model, name, phone, plate, surname, taxi, valuation, _i, _len, _results;
+      var accessible, animals, appPayment, capacity, email, favDriver, image, model, name, phone, plate, surname, taxi, valuation, _i, _len, _results;
       if (taxis.length > 0) {
-        empty_favorites.style.visibility = "hidden";
-        empty_favorites2.style.visibility = "hidden";
+        empty_favorites.style.display = "none";
+        empty_favorites2.style.display = "none";
       }
       _results = [];
       for (_i = 0, _len = taxis.length; _i < _len; _i++) {
@@ -1035,7 +1040,7 @@
         model = taxi.car.company + " " + taxi.car.model;
         image = taxi.image;
         capacity = taxi.car.capacity;
-        accesible = taxi.car.accesible;
+        accessible = taxi.car.accessible;
         animals = taxi.car.animals;
         appPayment = taxi.car.appPayment;
         _results.push(favDriver = __Model.FavoriteDriver.create({
@@ -1048,7 +1053,7 @@
           model: model,
           image: image,
           capacity: capacity,
-          accesible: accesible,
+          accessible: accessible,
           animals: animals,
           appPayment: appPayment
         }));
@@ -1059,7 +1064,7 @@
     LoginCtrl.prototype.loadTravels = function(travels) {
       var coords, cost, destination, driver, driver2, endpoint, endtime, id, lat, long, model, origin, pos, startpoint, starttime, travel, _i, _len, _results;
       if (travels.length > 0) {
-        empty_travels.style.visibility = "hidden";
+        empty_travels.style.display = "none";
       }
       _results = [];
       for (_i = 0, _len = travels.length; _i < _len; _i++) {
@@ -1091,7 +1096,7 @@
           model: model,
           image: driver2.image,
           capacity: driver2.car.capacity,
-          accesible: driver2.car.accesible,
+          accessible: driver2.car.accessible,
           animals: driver2.car.animals,
           appPayment: driver2.car.appPayment
         });
@@ -1160,28 +1165,40 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.NearDriverCtrl = (function(_super) {
-    var _viewsList;
+    var position, _viewsList;
 
     __extends(NearDriverCtrl, _super);
 
     _viewsList = [];
 
+    position = void 0;
+
+    NearDriverCtrl.prototype.events = {
+      "singleTap #list_refresh_b": "doRefresh"
+    };
+
     function NearDriverCtrl() {
+      this.showTaxies = __bind(this.showTaxies, this);
+      this.getDistanceAndTime = __bind(this.getDistanceAndTime, this);
+      this.doRefresh = __bind(this.doRefresh, this);
       this.deleteNearTaxis = __bind(this.deleteNearTaxis, this);
       this.loadNearTaxis = __bind(this.loadNearTaxis, this);
       NearDriverCtrl.__super__.constructor.apply(this, arguments);
     }
 
     NearDriverCtrl.prototype.loadNearTaxis = function() {
-      var position, server,
+      var credentials, server,
         _this = this;
       this.deleteNearTaxis();
+      Lungo.Router.section("list_s");
+      credentials = Lungo.Cache.get("credentials");
       position = Lungo.Cache.get("geoPosition");
       server = Lungo.Cache.get("server");
       return $$.ajax({
         type: "GET",
-        url: server + "client/getTaxis",
+        url: server + "client/getNearTaxies",
         data: {
+          email: credentials.email,
           longitud: position.nb,
           latitud: position.ob
         },
@@ -1189,41 +1206,59 @@
           return console.log(type.response);
         },
         success: function(result) {
-          var accesible, animals, appPayment, capacity, driver, email, image, model, name, plate, surname, taxi, valuation;
-          taxi = result;
-          email = taxi.email;
-          name = taxi.first_name;
-          surname = taxi.last_name;
-          valuation = taxi.valuation;
-          position = new google.maps.LatLng(43.271239, -2.9445875);
-          plate = taxi.car.plate;
-          model = taxi.car.company + " " + taxi.car.model;
-          if (taxi.image !== null && taxi.image !== void 0) {
-            image = taxi.image;
+          var accessible, animals, appPayment, capacity, cont, coords, driver, email, image, lastDriver, lat, long, model, name, plate, pos, surname, taxi, valuation, _i, _len, _results;
+          if (result.length === 0) {
+            empty_nearTaxies.style.display = "block";
           } else {
-            image = "img/user.png";
+            empty_nearTaxies.style.display = "none";
           }
-          capacity = taxi.car.capacity;
-          accesible = taxi.car.accesible;
-          animals = taxi.car.animals;
-          appPayment = taxi.car.appPayment;
-          driver = __Model.NearDriver.create({
-            email: email,
-            name: name,
-            surname: surname,
-            position: position,
-            valuation: valuation,
-            plate: plate,
-            model: model,
-            image: image,
-            capacity: capacity,
-            accesible: accesible,
-            animals: animals,
-            appPayment: appPayment
-          });
-          return _viewsList[taxi.email] = new __View.NearDriverList({
-            model: driver
-          });
+          _this.position = Lungo.Cache.get("geoPosition");
+          cont = 0;
+          lastDriver = false;
+          _results = [];
+          for (_i = 0, _len = result.length; _i < _len; _i++) {
+            taxi = result[_i];
+            email = taxi.email;
+            name = taxi.first_name;
+            surname = taxi.last_name;
+            valuation = taxi.valuation;
+            coords = taxi.geom.substring(7);
+            pos = coords.indexOf(" ");
+            long = coords.substring(0, pos);
+            lat = coords.substring(pos + 1, coords.indexOf(")"));
+            position = new google.maps.LatLng(long, lat);
+            plate = taxi.car.plate;
+            model = taxi.car.company + " " + taxi.car.model;
+            if (taxi.image !== null && taxi.image !== "") {
+              image = taxi.image;
+            } else {
+              image = "img/user.png";
+            }
+            capacity = taxi.car.capacity;
+            accessible = taxi.car.accessible;
+            animals = taxi.car.animals;
+            appPayment = taxi.car.appPayment;
+            driver = __Model.NearDriver.create({
+              email: email,
+              name: name,
+              surname: surname,
+              position: position,
+              valuation: valuation,
+              plate: plate,
+              model: model,
+              image: image,
+              capacity: capacity,
+              accessible: accessible,
+              animals: animals,
+              appPayment: appPayment
+            });
+            cont++;
+            if (result.length === cont) {
+              lastDriver = true;
+            }
+            _results.push(_this.getDistanceAndTime(driver, lastDriver));
+          }
+          return _results;
         }
       });
     };
@@ -1234,10 +1269,55 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         nearDriver = _ref[_i];
-        if (_viewsList[nearDriver.email]) {
-          _viewsList[nearDriver.email].remove();
+        _viewsList[nearDriver.email].remove();
+        _viewsList[nearDriver.email] = void 0;
+        _results.push(nearDriver.destroy());
+      }
+      return _results;
+    };
+
+    NearDriverCtrl.prototype.doRefresh = function(event) {
+      return __Controller.nearDriver.loadNearTaxis();
+    };
+
+    NearDriverCtrl.prototype.getDistanceAndTime = function(driver, lastDriver) {
+      var directionsService, request, wp,
+        _this = this;
+      wp = new Array();
+      wp[0] = new google.maps.LatLng(driver.position.nb, driver.position.ob);
+      wp[1] = new google.maps.LatLng(this.position.nb, this.position.ob);
+      directionsService = new google.maps.DirectionsService();
+      request = {
+        origin: wp[0],
+        destination: wp[1],
+        travelMode: google.maps.DirectionsTravelMode.DRIVING
+      };
+      return directionsService.route(request, function(response, status) {
+        var distance, time;
+        if (status === google.maps.DirectionsStatus.OK) {
+          distance = (response.routes[0].legs[0].distance.value / 1000).toFixed(2);
+          time = Math.round(response.routes[0].legs[0].duration.value / 60);
+          driver.distance = distance;
+          driver.time = time;
+          driver.save();
+          if (lastDriver) {
+            return _this.showTaxies();
+          }
         }
-        _results.push(_viewsList[nearDriver.email] = void 0);
+      });
+    };
+
+    NearDriverCtrl.prototype.showTaxies = function() {
+      var driver, taxies, _i, _len, _results;
+      taxies = __Model.NearDriver.all().sort(function(a, b) {
+        return parseFloat(a.distance) - parseFloat(b.distance);
+      });
+      _results = [];
+      for (_i = 0, _len = taxies.length; _i < _len; _i++) {
+        driver = taxies[_i];
+        _results.push(_viewsList[driver.email] = new __View.NearDriverList({
+          model: driver
+        }));
       }
       return _results;
     };
@@ -1890,9 +1970,9 @@
 
     TravelListCtrl.prototype.tryEmpty = function() {
       if (__Model.Travel.all().length === 0) {
-        return empty_travels.style.visibility = "visible";
+        return empty_travels.style.display = "block";
       } else {
-        return empty_travels.style.visibility = "hidden";
+        return empty_travels.style.display = "none";
       }
     };
 

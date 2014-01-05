@@ -29,8 +29,8 @@ class __Controller.TravelListCtrl extends Monocle.Controller
 
   tryEmpty: =>
     if __Model.Travel.all().length == 0
-      empty_travels.style.visibility = "visible"
+      empty_travels.style.display = "block"
     else
-      empty_travels.style.visibility = "hidden"
+      empty_travels.style.display = "none"
 
 

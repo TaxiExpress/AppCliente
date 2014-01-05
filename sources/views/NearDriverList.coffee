@@ -30,28 +30,9 @@ class __View.NearDriverList extends Monocle.View
     while i < 5
       val = val + "☆"
       i++
-    @getDistanceAndTime()
     @model.valuationStars = val
+    @append @model
 
   onView: (event) ->
     __Controller.chosenTaxi.loadDriverDetails(@model)
     Lungo.Router.section "chosenTaxi_s"
-
-  getDistanceAndTime: =>
-    position = Lungo.Cache.get "geoPosition"
-    wp = new Array()
-    wp[0] = new google.maps.LatLng(@model.position.nb, @model.position.ob)
-    wp[1] = new google.maps.LatLng(position.nb, position.ob)
-
-    directionsService = new google.maps.DirectionsService()
-    request =
-      origin: wp[0]
-      destination: wp[1]
-      travelMode: google.maps.DirectionsTravelMode.DRIVING
-
-    directionsService.route request, (response, status) =>
-      if status is google.maps.DirectionsStatus.OK
-        @model.distance = (response.routes[0].legs[0].distance.value/1000).toFixed(2)
-        @model.time = Math.round(response.routes[0].legs[0].duration.value/60)
-        @prepend @model
-

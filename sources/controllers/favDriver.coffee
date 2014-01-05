@@ -9,10 +9,11 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
     "#favDriver_model"                             : "model"
     "#favDriver_plate"                             : "plate"
     "#favDriver_capacity"                          : "capacity"
-    "#favDriver_accesible"                         : "accesible"
+    "#favDriver_accessible"                        : "accessible"
     "#favDriver_animals"                           : "animals"
     "#favDriver_favorite"                          : "favorite"
     "#favDriver_phone"                             : "phone"
+    "#favDriver_appPayment"                        : "appPayment"
 
   events:
     "change #favDriver_favorite"                   : "changeFavorite"
@@ -29,8 +30,10 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
     @model[0].innerText = driver.model
     @plate[0].innerText = driver.plate
     @capacity[0].innerText = driver.capacity
-    @accesible[0].innerText = "No"
-    @accesible[0].innerText = "Si" if driver.accesible
+    @accessible[0].innerText = "No"
+    @accessible[0].innerText = "Si" if driver.accessible
+    @appPayment[0].innerText = "No"
+    @appPayment[0].innerText = "Si" if driver.appPayment
     @animals[0].innerText = "No"
     @animals[0].innerText = "Si" if driver.animals 
     if driver.image

@@ -128,7 +128,7 @@ section .list li a .on-right:not(.tag) {
 }
 section .list li .on-right,
 section .list li a .on-right {
-  font-weight: 400;
+  font-weight: 200;
 }
 section .list li:not(.big) img {
   -webkit-border-radius: 8px;

@@ -9,8 +9,9 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
     "#chosenTaxi_model"                             : "model"
     "#chosenTaxi_plate"                             : "plate"
     "#chosenTaxi_capacity"                          : "capacity"
-    "#chosenTaxi_accesible"                         : "accesible"
+    "#chosenTaxi_accessible"                        : "accessible"
     "#chosenTaxi_animals"                           : "animals"
+    "#chosenTaxi_appPayment"                        : "appPayment"
 
   events:
     "singleTap #chosenTaxi_request"                 : "requestTaxi"
@@ -26,10 +27,12 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
     @model[0].innerText = driver.model
     @plate[0].innerText = driver.plate
     @capacity[0].innerText = driver.capacity
-    @accesible[0].innerText = "No"
-    @accesible[0].innerText = "Si" if driver.accesible
+    @accessible[0].innerText = "No"
+    @accessible[0].innerText = "Si" if driver.accessible
     @animals[0].innerText = "No"
     @animals[0].innerText = "Si" if driver.animals
+    @appPayment[0].innerText = "No"
+    @appPayment[0].innerText = "Si" if driver.appPayment
 
   requestTaxi: (event) =>
     Lungo.Router.section "waiting_s"

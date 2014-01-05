@@ -53,12 +53,10 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     bounds.extend(origin)
     bounds.extend(destination)
     map.fitBounds(bounds)
-
     request = 
       origin: origin
       destination: destination
       travelMode: google.maps.DirectionsTravelMode.DRIVING
-
     directionsService.route request, (response, status) ->
       directionsDisplay.setDirections response  if status is google.maps.DirectionsStatus.OK
 
