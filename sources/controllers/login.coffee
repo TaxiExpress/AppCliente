@@ -71,6 +71,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     __Controller.travelList = new __Controller.TravelListCtrl "section#travelList_s"
     __Controller.travelDetails = new __Controller.TravelDetailsCtrl "section#travelDetails_s"
     __Controller.filters = new __Controller.FiltersCtrl "section#filters_s"
+    __Controller.filters.loadFilters(5, true, true, true)
     setTimeout((=>__Controller.home = new __Controller.HomeCtrl "section#home_s") , 1000)
 
   getProfile: (result) ->

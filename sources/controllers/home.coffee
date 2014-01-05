@@ -73,7 +73,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
         mapTypeControl:false
         zoomControl:false
         styles: [
-          featureType: "poi.business"
+          featureType: "poi"
           elementType: "labels"
           stylers: [visibility: "off"]
         ]
@@ -94,7 +94,9 @@ class __Controller.HomeCtrl extends Monocle.Controller
     , (results, status) =>
       if status is google.maps.GeocoderStatus.OK
         if results[1]
-          home_streetField.value = results[0].address_components[1].short_name + ", " +results[0].address_components[0].short_name
+          if results[0].address_components[1].short_name == results[0].address_components[0].short_name
+            home_streetField.value = results[0].address_components[1].short_name
+          else home_streetField.value = results[0].address_components[1].short_name + ", " +results[0].address_components[0].short_name
         else
           home_streetField.value = 'Calle desconocida'
       else

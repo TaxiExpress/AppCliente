@@ -204,7 +204,7 @@
 
     NearDriverList.prototype.container = "section #nearList_a";
 
-    NearDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"chosenTaxi_s\">                \n          <div class=\"on-right\">{{time}} minutos</div>\n          <img src=\"{{image}}\" alt=\"\" />\n          <div>\n              <strong>a {{distance}} km</strong>\n              <small>{{name}} {{surname}}</small>\n              <small><strong>{{valuationStars}}</strong></small>\n          </div>\n          {{#appPayment}}<span data-icon=\"credit-card\">\n            <span class=\"icon credit-card\"></span>\n          </span>{{/appPayment}}\n      </li>";
+    NearDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"chosenTaxi_s\">                \n          <div class=\"on-right\">{{time}} mins aprox</div>\n          <img src=\"{{image}}\" alt=\"\" />\n          <div>\n              <strong>a {{distance}} km</strong>\n              <small>{{name}} {{surname}}</small>\n              <small><strong>{{valuationStars}}</strong></small>\n          </div>\n          {{#appPayment}}<span data-icon=\"credit-card\">\n            <span class=\"icon credit-card\"></span>\n          </span>{{/appPayment}}\n      </li>";
 
     NearDriverList.prototype.events = {
       "singleTap li": "onView"
@@ -629,21 +629,12 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.FiltersCtrl = (function(_super) {
-    var credentials, data, db;
-
     __extends(FiltersCtrl, _super);
-
-    db = void 0;
-
-    credentials = void 0;
-
-    data = void 0;
 
     FiltersCtrl.prototype.elements = {
       "#filters_seats": "seats",
       "#filters_payments": "payments",
       "#filters_animals": "animals",
-      "#filters_food": "food",
       "#filters_accesible": "accesible"
     };
 
@@ -651,68 +642,44 @@
       "change #filters_seats": "saveFilters",
       "change #filters_payments": "saveFilters",
       "change #filters_animals": "saveFilters",
-      "change #filters_food": "saveFilters",
       "change #filters_accesible": "saveFilters"
     };
 
     function FiltersCtrl() {
-      this.parseResponse = __bind(this.parseResponse, this);
       this.saveFilters = __bind(this.saveFilters, this);
       this.loadFilters = __bind(this.loadFilters, this);
       FiltersCtrl.__super__.constructor.apply(this, arguments);
-      this.loadFilters();
     }
 
-    FiltersCtrl.prototype.loadFilters = function() {
-      var _this = this;
-      this.credentials = Lungo.Cache.get("credentials");
-      this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
-      return this.db.transaction(function(tx) {
-        return tx.executeSql("SELECT * FROM configData", [], (function(tx, results) {
-          var filters;
-          if (results.rows.length > 0) {
-            filters = results.rows.item(0);
-            _this.seats[0].value = filters.seats;
-            _this.payments[0].checked = filters.payments === 'true';
-            _this.food[0].checked = filters.food === 'true';
-            _this.animals[0].checked = filters.animals === 'true';
-            return _this.accesible[0].checked = filters.accesible === 'true';
-          }
-        }), null);
-      });
+    FiltersCtrl.prototype.loadFilters = function(seats, payments, animals, accesible) {
+      this.seats[0].value = seats;
+      this.payments[0].checked = payments;
+      this.animals[0].checked = animals;
+      return this.accesible[0].checked = accesible;
     };
 
     FiltersCtrl.prototype.saveFilters = function(event) {
-      var server,
+      var credentials, data, server,
         _this = this;
-      this.credentials = Lungo.Cache.get("credentials");
+      credentials = Lungo.Cache.get("credentials");
       server = Lungo.Cache.get("server");
-      this.data = {
+      data = {
         email: this.credentials.email,
         seats: this.seats[0].value,
         payments: this.payments[0].checked,
         animals: this.animals[0].checked,
-        food: this.food[0].checked,
         accesible: this.accesible[0].checked
       };
-      this.parseResponse("");
       return $$.ajax({
         type: "POST",
         url: server + "client/chagefilters",
-        data: this.data,
-        success: function(result) {},
+        data: data,
+        success: function(result) {
+          return alert("FILTROS ACTUALIZADOS (QUITAR)");
+        },
         error: function(xhr, type) {
           return console.log(type.response);
         }
-      });
-    };
-
-    FiltersCtrl.prototype.parseResponse = function(result) {
-      var _this = this;
-      return this.db.transaction(function(tx) {
-        var sql;
-        sql = "UPDATE configData SET seats = '" + _this.data.seats + "', payments = '" + _this.data.payments + "', animals = '" + _this.data.animals + "', food = '" + _this.data.food + "' , accesible = '" + _this.data.accesible + "' WHERE email ='" + _this.data.email + "';";
-        return tx.executeSql(sql);
       });
     };
 
@@ -838,7 +805,7 @@
           zoomControl: false,
           styles: [
             {
-              featureType: "poi.business",
+              featureType: "poi",
               elementType: "labels",
               stylers: [
                 {
@@ -871,7 +838,11 @@
       }, function(results, status) {
         if (status === google.maps.GeocoderStatus.OK) {
           if (results[1]) {
-            return home_streetField.value = results[0].address_components[1].short_name + ", " + results[0].address_components[0].short_name;
+            if (results[0].address_components[1].short_name === results[0].address_components[0].short_name) {
+              return home_streetField.value = results[0].address_components[1].short_name;
+            } else {
+              return home_streetField.value = results[0].address_components[1].short_name + ", " + results[0].address_components[0].short_name;
+            }
           } else {
             return home_streetField.value = 'Calle desconocida';
           }
@@ -1007,6 +978,7 @@
       __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
       __Controller.travelDetails = new __Controller.TravelDetailsCtrl("section#travelDetails_s");
       __Controller.filters = new __Controller.FiltersCtrl("section#filters_s");
+      __Controller.filters.loadFilters(5, true, true, true);
       return setTimeout((function() {
         return __Controller.home = new __Controller.HomeCtrl("section#home_s");
       }), 1000);
@@ -1262,7 +1234,9 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         nearDriver = _ref[_i];
-        _viewsList[nearDriver.email].remove();
+        if (_viewsList[nearDriver.email]) {
+          _viewsList[nearDriver.email].remove();
+        }
         _results.push(_viewsList[nearDriver.email] = void 0);
       }
       return _results;

@@ -189,7 +189,7 @@ body > section > article.splash{text-align:center;padding:1.3333333333333333em; 
 body > section > article.splash .logo{position:absolute; left:0px;bottom:55%; width:100%;}
 body > section > article.splash .logo img {max-width:80%;margin:50px auto; float:center; position:relative;max-height:25%}
 body > section > article.splash .load{position:absolute; left:0px;bottom:30%; width:100%;}
-body > section > article.splash .load img {margin:0 auto; float:center; position:relative;}
+body > section > article.splash .load img {margin:0 auto; float:center; position:relative;width:35px;}
 body > section > article.splash .name{bottom:15px; position:absolute; text-align: center; left:0px; width:100%; font-size:1em; color:#444; letter-spacing: 0px;}
 body > section > article.splash .button,body > section > article.splash button{}
 body > section > article.splash .copyright{position:absolute;width:100%;bottom:8px;left:0;font-size:11px;padding:0}
