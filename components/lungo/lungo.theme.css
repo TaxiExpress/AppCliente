@@ -323,7 +323,6 @@ body > section > header {
 body > section > nav[data-control=groupbar],
 body > section > footer {
   background-color: #444;
-  border-bottom: 1px solid #555;
 }
 
 body > section > article,

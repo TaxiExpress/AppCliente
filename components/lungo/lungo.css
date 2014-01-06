@@ -52,8 +52,8 @@ body { height: 100%; margin: 0; padding: 0 }
 .street .location span {z-index:2!important; position:absolute; bottom: 60px; left:12px; padding-bottom:6px;padding-top:6px; color:#444; width:48px; height:32px;text-align:center; border-right:1px solid #ddd;}
 .street button.topLeftButton {position:absolute; z-index:2; width:48px!important; height: 48px!important; color: #444; opacity:.9; background: #f5f5f5;left:15px; top:0; border-radius: 4px; border: 1px solid #ddd;}
 .street button.topLeftButton span {margin-left:-2px; font-size:20px;}
-img.topRight {position:absolute; z-index:2; visibility: hidden; width:48px!important; height: 48px!important; right:15px; top:15px; border-radius: 4px; border: 1px solid #ddd;}
-img.driver {visibility: visible!important;  border-radius: 24px; margin-top:46px; margin-right: -8px; background: #f5f5f5}
+img.topRight {position:absolute; z-index:2; visibility: hidden; width:48px!important; height: 48px!important; right:15px; top:15px; border-radius: 4px; border: 1px solid #ddd; opacity:.9; background: #f5f5f5; padding:10px;}
+img.driver {visibility: visible!important;  border-radius: 24px; margin-top:46px; margin-right: -8px; background: #f5f5f5; padding: 0;}
 .initial_form {position:absolute; width:80%; left: 10%; right: 10%; bottom:15%;}
 .payments > strong {font-size: 33px; padding-top: 10px; padding-bottom: 10px; font-weight:400; text-align: center; width: 100%; display: block}
 .payments > span {font-size: 12px; color:red; display: block;padding: 0 0 10px 13px}
@@ -92,9 +92,9 @@ button.down > abbr{font-weight: 100!important}
 
 .little_list li {height:55px!important;}
 .little_list li  > span {margin-top:12px; color: #ffcc00;}
-.little_list li.thumb:not(.big) > img{width:35px;height:35px;border-radius:18px;margin-top:0;margin-right:7px;}
+.little_list li.thumb:not(.big) > img{width:35px;height:35px;border-radius:18px;margin-top:-2px;margin-right:7px;}
 .little_list li.arrow::after{top:47%;}
-.little_list li.thumb:not(.big) > div{padding-left:.2em; padding-top:1px;}
+.little_list li.thumb:not(.big) > div{padding-left:.2em; padding-top:0px;}
 .little_list li:not(.big){padding-top:12px}
 .list li strong{margin-bottom:0px;margin-right: 25px}
 

@@ -10,6 +10,6 @@ class __Controller.WaitingCtrl extends Monocle.Controller
     super 
    
   cancel: (event) =>
-    home_driver.src = "img/user.png"
+    home_driver.src = "img/payment.png"
     home_driver.style.visibility = "visible"
     Lungo.Router.section "home_s"

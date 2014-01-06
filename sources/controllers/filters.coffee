@@ -29,7 +29,7 @@ class __Controller.FiltersCtrl extends Monocle.Controller
       capacity: @seats[0].value
       appPayment: @payments[0].checked
       animals: @animals[0].checked
-      accessible: @accessible[0].checked
+      accesible: @accessible[0].checked
     $$.ajax
       type: "POST"
       url: server + "client/changefilters"

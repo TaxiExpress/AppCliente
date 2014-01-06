@@ -654,7 +654,7 @@
         capacity: this.seats[0].value,
         appPayment: this.payments[0].checked,
         animals: this.animals[0].checked,
-        accessible: this.accessible[0].checked
+        accesible: this.accessible[0].checked
       };
       return $$.ajax({
         type: "POST",
@@ -2004,7 +2004,7 @@
     }
 
     WaitingCtrl.prototype.cancel = function(event) {
-      home_driver.src = "img/user.png";
+      home_driver.src = "img/payment.png";
       home_driver.style.visibility = "visible";
       return Lungo.Router.section("home_s");
     };
