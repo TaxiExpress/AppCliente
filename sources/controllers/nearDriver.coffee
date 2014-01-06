@@ -81,7 +81,7 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
         driver.distance = distance
         driver.time = time
         driver.save()
-        @showTaxies() if lastDriver
+        setTimeout((=> @showTaxies()) , 50) if lastDriver
 
   showTaxies: =>
     taxies = __Model.NearDriver.all().sort (a, b) ->

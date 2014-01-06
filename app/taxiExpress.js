@@ -841,7 +841,6 @@
     HomeCtrl.prototype.getTaxi = function() {
       var credentials, server,
         _this = this;
-      console.log("llego");
       credentials = Lungo.Cache.get("credentials");
       position = Lungo.Cache.get("geoPosition");
       server = Lungo.Cache.get("server");
@@ -1301,7 +1300,9 @@
           driver.time = time;
           driver.save();
           if (lastDriver) {
-            return _this.showTaxies();
+            return setTimeout((function() {
+              return _this.showTaxies();
+            }), 50);
           }
         }
       });

@@ -103,7 +103,6 @@ class __Controller.HomeCtrl extends Monocle.Controller
         home_streetField.value = 'Calle desconocida'
 
   getTaxi: =>
-    console.log "llego"
     credentials = Lungo.Cache.get "credentials"
     position = Lungo.Cache.get "geoPosition"
     server = Lungo.Cache.get "server"
