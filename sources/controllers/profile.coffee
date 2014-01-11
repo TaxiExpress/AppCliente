@@ -65,14 +65,14 @@ class __Controller.ProfileCtrl extends Monocle.Controller
 
   saveChanges: (event) =>
     server = Lungo.Cache.get "server"
-    date = new Date().toISOString().substring 0, 19
-    date = date.replace "T", " "
+    @date = new Date().toISOString().substring 0, 19
+    @date = date.replace "T", " "
     data =
       email: @email[0].innerText
       firstName: @name[0].value
       lastName: @surname[0].value
       newImage: @avatar[0].src
-      lastUpdate: date
+      lastUpdate: @date
     $$.ajax
       type: "POST"
       url: server + "client/changedetails"
@@ -87,10 +87,9 @@ class __Controller.ProfileCtrl extends Monocle.Controller
     credentials.name = @name[0].value
     credentials.surname = @surname[0].value
     credentials.image = @avatar[0].src
-    credentials.dateUpdate = date
     Lungo.Cache.set "credentials", credentials
     __Controller.menu.updateProfile()
-    @db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024)
-    @db.transaction (tx) =>
-      sql = "UPDATE accessData SET dateUpdate = '"+credentials.dateUpdate+"', name = '"+credentials.name+"', surname = '"+credentials.surname+"', image = '"+credentials.image+"' WHERE email ='"+credentials.email+"';"
+    db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024)
+    db.transaction (tx) =>
+      sql = "UPDATE profile SET lastUpdate = '"+@date+"', name = '"+credentials.name+"', surname = '"+credentials.surname+"', image = '"+credentials.image+"' WHERE email ='"+credentials.email+"';"
       tx.executeSql sql

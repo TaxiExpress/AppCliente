@@ -14,10 +14,11 @@ class __Controller.LoginCtrl extends Monocle.Controller
     super
     @db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024) #2MB
     @db.transaction (tx) =>
-      tx.executeSql "CREATE TABLE IF NOT EXISTS accessData (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, dateUpdate STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL )"
-    @db.transaction (tx) =>
-      tx.executeSql "CREATE TABLE IF NOT EXISTS configData (email STRING NOT NULL PRIMARY KEY, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, food STRING NOT NULL, accessible STRING NOT NULL)"
-    @drop()
+      tx.executeSql "CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateFavorites STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )"
+      tx.executeSql "CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL)"
+      tx.executeSql "CREATE TABLE IF NOT EXISTS favorites (email STRING NOT NULL PRIMARY KEY, phone STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)"
+      tx.executeSql "CREATE TABLE IF NOT EXISTS drivers (email STRING NOT NULL PRIMARY KEY, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)"
+    #@drop()
     @read()
 
   doLogin: (event) =>
@@ -30,7 +31,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     else
       alert "Debe rellenar el email y la contraseña"
 
-  valideCredentials: (email, pass, date) =>
+  valideCredentials: (email, pass, date, dateFavorites, dateTravels) =>
     server = Lungo.Cache.get "server"
     $$.ajax
       type: "POST"
@@ -39,6 +40,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
         email: email
         password: pass
         lastUpdate: date
+        lastUpdateFavorites: dateFavorites
+        lastUpdateTravels: dateTravels
       success: (result) =>
         @parseResponse result
       error: (xhr, type) =>
@@ -48,18 +51,34 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
   parseResponse: (result) ->
     if result.email == undefined
-      profile = @getProfile(credentials) 
+      profile =
+        name: credentials.name
+        surname: credentials.surname
+        phone: credentials.phone
+        email: credentials.email
+        image: credentials.image
+      __Controller.filters.loadFilters(credentials.fCapacity, credentials.fAppPayment, credentials.fAnimals, credentials.fAccessible)
     else 
-      profile = @getProfile(result)
-      profile.phone = profile.phone.substring 3
+      profile =
+        name: result.first_name
+        surname: result.last_name
+        phone: result.phone.substring 3
+        email: result.email
+        image: result.image
       @db.transaction (tx) =>
-        date = profile.dateUpdate.substring 0, 19
-        date = date.replace "T", " "
-        sql = "INSERT INTO accessData (email, pass, dateUpdate, name, surname, phone, image) VALUES ('"+profile.email+"','"+@password[0].value+"','"+date+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"');"
+        date = 
+        sql = "INSERT INTO profile (email, pass, lastUpdate, lastUpdateFavorites, lastUpdateTravels, name, surname, phone, image, seats, payments, animals, accessible) VALUES ('"+profile.email+"','"+@password[0].value+"','"+result.lastUpdate+"','"+result.lastUpdateFavorites+"','"+result.lastUpdateTravels+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"','"+result.fCapacity+"','"+result.fAppPayment+"','"+result.fAnimals+"','"+result.fAccessible+"');"
         tx.executeSql sql
+      __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible)
     Lungo.Cache.set "credentials", profile
-    @loadFavoriteTaxis(result.favlist)
-    @loadTravels(result.travel_set)
+    if result.favlist
+      @loadFavoriteTaxis(result.favlist) 
+    else
+      @getFavoritesSQL()
+    if result.travel_set
+      @loadTravels(result.travel_set)
+    else
+      @getDriversAndTravelsSQL()
     __Controller.profile = new __Controller.ProfileCtrl "section#profile_s"
     __Controller.payment = new __Controller.PaymentCtrl "section#payment_s"
     __Controller.favorites = new __Controller.FavoritesCtrl "section#favorites_s"
@@ -70,31 +89,24 @@ class __Controller.LoginCtrl extends Monocle.Controller
     __Controller.travelList = new __Controller.TravelListCtrl "section#travelList_s"
     __Controller.travelDetails = new __Controller.TravelDetailsCtrl "section#travelDetails_s"
     __Controller.filters = new __Controller.FiltersCtrl "section#filters_s"
-    __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible)
     setTimeout((=>__Controller.home = new __Controller.HomeCtrl "section#home_s") , 1000)
-
-  getProfile: (result) ->
-    return profile =
-      name: result.first_name
-      surname: result.last_name
-      phone: result.phone
-      email: result.email
-      image: result.image
-      dateUpdate: result.lastUpdate
-
-  drop: =>
-    @db.transaction (tx) =>
-      tx.executeSql "DELETE FROM accessData"
 
   read: =>
     @db.transaction (tx) =>
-      tx.executeSql "SELECT * FROM accessData", [], ((tx, results) =>
+      tx.executeSql "SELECT * FROM profile", [], ((tx, results) =>
         if results.rows.length > 0
           credentials = results.rows.item(0)
-          @valideCredentials(credentials.email, credentials.pass, credentials.dateUpdate)
+          @valideCredentials(credentials.email, credentials.pass, credentials.lastUpdate, credentials.lastUpdateFavorites, credentials.lastUpdateTravels)
         else
           Lungo.Router.section "login_s"
       ), null
+
+  drop: =>
+    @db.transaction (tx) =>
+      tx.executeSql "DELETE FROM profile"
+      tx.executeSql "DELETE FROM travels"
+      tx.executeSql "DELETE FROM favorites"
+      tx.executeSql "DELETE FROM drivers"
 
   loadFavoriteTaxis: (taxis) =>
     if taxis.length > 0
@@ -139,3 +151,34 @@ class __Controller.LoginCtrl extends Monocle.Controller
       model = driver2.car.company + " " + driver2.car.model
       driver = __Model.Driver.create email: driver2.email, name: driver2.first_name, surname: driver2.last_name, valuation: driver2.valuation, plate: driver2.car.plate, model: model, image: driver2.image, capacity: driver2.car.capacity, accessible: driver2.car.accessible, animals: driver2.car.animals, appPayment: driver2.car.appPayment
       travel = __Model.Travel.create id: id, starttime: starttime, endtime: endtime, startpoint: startpoint, endpoint: endpoint, cost: cost, driver: driver, origin: origin, destination: destination
+
+  getFavoritesSQL: =>
+    alert "CARGO FAVORITOS DESDE WEBSQL"
+    @db.transaction (tx) =>
+      tx.executeSql "SELECT * FROM favorites", [], ((tx, results) =>
+        i = 0
+        while i <= results.rows.length
+          fav = results.rows.item(i)
+          __Model.FavoriteDriver.create email: fav.email, phone: fav.phone, name: fav.name, surname: fav.surname, valuation: fav.valuation, plate: fav.plate, model: fav.model, image: fav.image, capacity: fav.capacity, accessible: fav.accessible, animals: fav.animals, appPayment: fav.appPayment
+          i++
+      ), null
+
+  getDriversAndTravelsSQL: =>
+    alert "CARGO VIAJES DESDE WEBSQL"
+    @db.transaction (tx) =>
+      tx.executeSql "SELECT * FROM drivers", [], ((tx, results) =>
+        i = 0
+        while i <= results.rows.length
+          driver2 = results.rows.item(i)
+          __Model.Driver.create email: driver2.email, name: driver2.first_name, surname: driver2.last_name, valuation: driver2.valuation, plate: driver2.car.plate, model: model, image: driver2.image, capacity: driver2.car.capacity, accessible: driver2.car.accessible, animals: driver2.car.animals, appPayment: driver2.car.appPayment
+          i++
+      ), null
+    @db.transaction (tx) =>
+      tx.executeSql "SELECT * FROM travels", [], ((tx, results) =>
+        i = 0
+        while i <= results.rows.length
+          travel = results.rows.item(i)
+          driver = __Model.Driver.get(travel.driver)
+          __Model.Travel.create id: travel.id, starttime: travel.starttime, endtime: travel.endtime, startpoint: travel.startpoint, endpoint: travel.endpoint, cost: travel.cost, driver: driver, origin: travel.origin, destination: travel.destination
+          i++
+      ), null

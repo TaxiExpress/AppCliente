@@ -24,17 +24,27 @@ class __Controller.FiltersCtrl extends Monocle.Controller
   saveFilters: (event) =>
     credentials = Lungo.Cache.get "credentials"
     server = Lungo.Cache.get "server"
+    date = new Date().toISOString().substring 0, 19
+    date = date.replace "T", " "
     data =
       email: credentials.email
       capacity: @seats[0].value
       appPayment: @payments[0].checked
       animals: @animals[0].checked
       accesible: @accessible[0].checked
+      lastUpdate: date
     $$.ajax
       type: "POST"
       url: server + "client/changefilters"
       data: data
       success: (result) =>
-        @
+        @parseResponse result, date
       error: (xhr, type) =>
         @
+
+  parseResponse: (result, date) =>
+    credentials = Lungo.Cache.get "credentials"
+    db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024)
+    db.transaction (tx) =>
+      sql = "UPDATE profile SET lastUpdate = '"+date+"', seats = '"+@seats[0].value+"', animals = '"+@animals[0].checked+"', payments = '"+@payments[0].checked+"', accessible = '"+@accessible[0].checked+"' WHERE email ='"+credentials.email+"';"
+      tx.executeSql sql

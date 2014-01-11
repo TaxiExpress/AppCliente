@@ -6,6 +6,7 @@ class __Controller.AppCtrl extends Monocle.Controller
     __Controller.login = new __Controller.LoginCtrl "section#login_s"
     __Controller.register = new __Controller.RegisterCtrl "section#register_s"
     __Controller.phoneVerification = new __Controller.PhoneVerificationCtrl "section#phoneVerification_s"
+    __Controller.sendSMS = new __Controller.SendSMSCtrl "section#sendSMS_s"
     
 $$ ->
   Lungo.init({})

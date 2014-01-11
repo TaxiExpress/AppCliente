@@ -42,7 +42,8 @@
                 <fieldset><input id="register_pass1" type="password" placeholder="Contraseña" /></fieldset>
                 <fieldset><input id="register_pass2" type="password" placeholder="Repita su contraseña" /></fieldset>
                 <button id="register_register_b" class="anchor accept" data-label="Registrar en TaxiExpress" />
-                <button id="register_active_b" class="anchor accept" data-label="Verificar cuenta" data-view-section="phoneVerification_s" />
+                <button class="anchor accept" data-label="Verificar cuenta" data-view-section="phoneVerification_s" />
+                <button class="anchor accept" data-label="Reenviar SMS" data-view-section="sendSMS_s" />
             </div>
         </article>
     </section>
@@ -55,6 +56,18 @@
                 <fieldset><input id="phoneVerification_phone" type="tel" maxlength="9" placeholder="Teléfono" /></fieldset>
                 <fieldset><input id="phoneVerification_code" type="text" maxlength="4" placeholder="Código de verificación" /></fieldset>
                 <button id="phoneVerification_b" class="anchor accept" data-label="Verificar cuenta" />
+            </div>
+        </article>
+    </section>
+
+
+    <section id="sendSMS_s" data-transition="cover">
+        <header data-title="Registro" data-back="angle-down"></header>    
+        <article id="sendSMS_a" class="scroll" >
+            <div class="form list">
+                <li class="anchor contrast">INSERTAR EL TELÉFONO A VALIDAR</li>                
+                <fieldset><input id="sendSMS_phone" type="tel" maxlength="9" placeholder="Teléfono" /></fieldset>
+                <button id="sendSMS_b" class="anchor accept" data-label="Enviar SMS de validación" />
             </div>
         </article>
     </section>

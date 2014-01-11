@@ -310,6 +310,7 @@
       __Controller.login = new __Controller.LoginCtrl("section#login_s");
       __Controller.register = new __Controller.RegisterCtrl("section#register_s");
       __Controller.phoneVerification = new __Controller.PhoneVerificationCtrl("section#phoneVerification_s");
+      __Controller.sendSMS = new __Controller.SendSMSCtrl("section#sendSMS_s");
     }
 
     return AppCtrl;
@@ -395,11 +396,17 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.FavDriverCtrl = (function(_super) {
-    var driverDetails;
+    var credentials, date, db, driverDetails;
 
     __extends(FavDriverCtrl, _super);
 
+    db = void 0;
+
     driverDetails = void 0;
+
+    date = void 0;
+
+    credentials = void 0;
 
     FavDriverCtrl.prototype.elements = {
       "#favDriver_name": "name",
@@ -421,11 +428,13 @@
     };
 
     function FavDriverCtrl() {
-      this.removeFavorite = __bind(this.removeFavorite, this);
-      this.addFavorite = __bind(this.addFavorite, this);
+      this.removeFavoriteSQL = __bind(this.removeFavoriteSQL, this);
+      this.addFavoriteSQL = __bind(this.addFavoriteSQL, this);
+      this.updateLastUpdateFavorite = __bind(this.updateLastUpdateFavorite, this);
       this.changeFavorite = __bind(this.changeFavorite, this);
       this.loadDriverDetails = __bind(this.loadDriverDetails, this);
       FavDriverCtrl.__super__.constructor.apply(this, arguments);
+      this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
     }
 
     FavDriverCtrl.prototype.loadDriverDetails = function(driver) {
@@ -461,13 +470,16 @@
     };
 
     FavDriverCtrl.prototype.changeFavorite = function(event) {
-      var credentials, data, server,
+      var data, server,
         _this = this;
       server = Lungo.Cache.get("server");
-      credentials = Lungo.Cache.get("credentials");
+      this.credentials = Lungo.Cache.get("credentials");
+      this.date = new Date().toISOString().substring(0, 19);
+      this.date = date.replace("T", " ");
       data = {
-        customerEmail: credentials.email,
-        driverEmail: this.driverDetails.email
+        customerEmail: this.credentials.email,
+        driverEmail: this.driverDetails.email,
+        lastUpdateFavorites: this.date
       };
       if (this.favorite[0].checked) {
         return $$.ajax({
@@ -475,7 +487,9 @@
           url: server + "client/addfavorite",
           data: data,
           success: function(result) {
-            return _this.addFavorite(result);
+            __Controller.favorites.addFavorite(_this.driverDetails);
+            _this.updateLastUpdateFavorite();
+            return _this.addFavoriteSQL();
           },
           error: function(xhr, type) {
             return _this;
@@ -487,7 +501,9 @@
           url: server + "client/removefavorite",
           data: data,
           success: function(result) {
-            return _this.removeFavorite(result);
+            __Controller.favorites.deleteFavorite(_this.driverDetails);
+            _this.updateLastUpdateFavorite();
+            return _this.removeFavoriteSQL();
           },
           error: function(xhr, type) {
             return _this;
@@ -496,12 +512,31 @@
       }
     };
 
-    FavDriverCtrl.prototype.addFavorite = function(result) {
-      return __Controller.favorites.addFavorite(this.driverDetails);
+    FavDriverCtrl.prototype.updateLastUpdateFavorite = function() {
+      var _this = this;
+      return this.db.transaction(function(tx) {
+        var sql;
+        sql = "UPDATE profile SET lastUpdateFavorites = '" + _this.date + "' WHERE email ='" + _this.credentials.email + "';";
+        return tx.executeSql(sql);
+      });
     };
 
-    FavDriverCtrl.prototype.removeFavorite = function(result) {
-      return __Controller.favorites.deleteFavorite(this.driverDetails);
+    FavDriverCtrl.prototype.addFavoriteSQL = function() {
+      var _this = this;
+      return this.db.transaction(function(tx) {
+        var sql;
+        sql = "INSERT INTO favorites  (email, phone, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment)         VALUES ('" + _this.driverDetails.email + "','" + _this.driverDetails.phone + "','" + _this.driverDetails.name + "','" + _this.driverDetails.surname + "',        '" + _this.driverDetails.valuation + "','" + _this.driverDetails.plate + "','" + _this.driverDetails.model + "','" + _this.driverDetails.image + "',        '" + _this.driverDetails.capacity + "','" + _this.driverDetails.accessible + "','" + _this.driverDetails.animals + "','" + _this.driverDetails.appPayment + "');";
+        return tx.executeSql(sql);
+      });
+    };
+
+    FavDriverCtrl.prototype.removeFavoriteSQL = function() {
+      var _this = this;
+      return this.db.transaction(function(tx) {
+        var sql;
+        sql = "DELETE FROM favorites WHERE email ='" + _this.driverDetails.email + "';";
+        return tx.executeSql(sql);
+      });
     };
 
     return FavDriverCtrl;
@@ -632,6 +667,7 @@
     };
 
     function FiltersCtrl() {
+      this.parseResponse = __bind(this.parseResponse, this);
       this.saveFilters = __bind(this.saveFilters, this);
       this.loadFilters = __bind(this.loadFilters, this);
       FiltersCtrl.__super__.constructor.apply(this, arguments);
@@ -645,27 +681,42 @@
     };
 
     FiltersCtrl.prototype.saveFilters = function(event) {
-      var credentials, data, server,
+      var credentials, data, date, server,
         _this = this;
       credentials = Lungo.Cache.get("credentials");
       server = Lungo.Cache.get("server");
+      date = new Date().toISOString().substring(0, 19);
+      date = date.replace("T", " ");
       data = {
         email: credentials.email,
         capacity: this.seats[0].value,
         appPayment: this.payments[0].checked,
         animals: this.animals[0].checked,
-        accesible: this.accessible[0].checked
+        accesible: this.accessible[0].checked,
+        lastUpdate: date
       };
       return $$.ajax({
         type: "POST",
         url: server + "client/changefilters",
         data: data,
         success: function(result) {
-          return _this;
+          return _this.parseResponse(result, date);
         },
         error: function(xhr, type) {
           return _this;
         }
+      });
+    };
+
+    FiltersCtrl.prototype.parseResponse = function(result, date) {
+      var credentials, db,
+        _this = this;
+      credentials = Lungo.Cache.get("credentials");
+      db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
+      return db.transaction(function(tx) {
+        var sql;
+        sql = "UPDATE profile SET lastUpdate = '" + date + "', seats = '" + _this.seats[0].value + "', animals = '" + _this.animals[0].checked + "', payments = '" + _this.payments[0].checked + "', accessible = '" + _this.accessible[0].checked + "' WHERE email ='" + credentials.email + "';";
+        return tx.executeSql(sql);
       });
     };
 
@@ -896,22 +947,23 @@
     };
 
     function LoginCtrl() {
+      this.getDriversAndTravelsSQL = __bind(this.getDriversAndTravelsSQL, this);
+      this.getFavoritesSQL = __bind(this.getFavoritesSQL, this);
       this.loadTravels = __bind(this.loadTravels, this);
       this.loadFavoriteTaxis = __bind(this.loadFavoriteTaxis, this);
-      this.read = __bind(this.read, this);
       this.drop = __bind(this.drop, this);
+      this.read = __bind(this.read, this);
       this.valideCredentials = __bind(this.valideCredentials, this);
       this.doLogin = __bind(this.doLogin, this);
       var _this = this;
       LoginCtrl.__super__.constructor.apply(this, arguments);
       this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
       this.db.transaction(function(tx) {
-        return tx.executeSql("CREATE TABLE IF NOT EXISTS accessData (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, dateUpdate STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL )");
+        tx.executeSql("CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateFavorites STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )");
+        tx.executeSql("CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL)");
+        tx.executeSql("CREATE TABLE IF NOT EXISTS favorites (email STRING NOT NULL PRIMARY KEY, phone STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)");
+        return tx.executeSql("CREATE TABLE IF NOT EXISTS drivers (email STRING NOT NULL PRIMARY KEY, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)");
       });
-      this.db.transaction(function(tx) {
-        return tx.executeSql("CREATE TABLE IF NOT EXISTS configData (email STRING NOT NULL PRIMARY KEY, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, food STRING NOT NULL, accessible STRING NOT NULL)");
-      });
-      this.drop();
       this.read();
     }
 
@@ -928,7 +980,7 @@
       }
     };
 
-    LoginCtrl.prototype.valideCredentials = function(email, pass, date) {
+    LoginCtrl.prototype.valideCredentials = function(email, pass, date, dateFavorites, dateTravels) {
       var server,
         _this = this;
       server = Lungo.Cache.get("server");
@@ -938,7 +990,9 @@
         data: {
           email: email,
           password: pass,
-          lastUpdate: date
+          lastUpdate: date,
+          lastUpdateFavorites: dateFavorites,
+          lastUpdateTravels: dateTravels
         },
         success: function(result) {
           return _this.parseResponse(result);
@@ -957,21 +1011,40 @@
       var profile,
         _this = this;
       if (result.email === void 0) {
-        profile = this.getProfile(credentials);
+        profile = {
+          name: credentials.name,
+          surname: credentials.surname,
+          phone: credentials.phone,
+          email: credentials.email,
+          image: credentials.image
+        };
+        __Controller.filters.loadFilters(credentials.fCapacity, credentials.fAppPayment, credentials.fAnimals, credentials.fAccessible);
       } else {
-        profile = this.getProfile(result);
-        profile.phone = profile.phone.substring(3);
+        profile = {
+          name: result.first_name,
+          surname: result.last_name,
+          phone: result.phone.substring(3),
+          email: result.email,
+          image: result.image
+        };
         this.db.transaction(function(tx) {
           var date, sql;
-          date = profile.dateUpdate.substring(0, 19);
-          date = date.replace("T", " ");
-          sql = "INSERT INTO accessData (email, pass, dateUpdate, name, surname, phone, image) VALUES ('" + profile.email + "','" + _this.password[0].value + "','" + date + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "');";
+          date = sql = "INSERT INTO profile (email, pass, lastUpdate, lastUpdateFavorites, lastUpdateTravels, name, surname, phone, image, seats, payments, animals, accessible) VALUES ('" + profile.email + "','" + _this.password[0].value + "','" + result.lastUpdate + "','" + result.lastUpdateFavorites + "','" + result.lastUpdateTravels + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "');";
           return tx.executeSql(sql);
         });
+        __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible);
       }
       Lungo.Cache.set("credentials", profile);
-      this.loadFavoriteTaxis(result.favlist);
-      this.loadTravels(result.travel_set);
+      if (result.favlist) {
+        this.loadFavoriteTaxis(result.favlist);
+      } else {
+        this.getFavoritesSQL();
+      }
+      if (result.travel_set) {
+        this.loadTravels(result.travel_set);
+      } else {
+        this.getDriversAndTravelsSQL();
+      }
       __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
       __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
       __Controller.favorites = new __Controller.FavoritesCtrl("section#favorites_s");
@@ -982,42 +1055,32 @@
       __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
       __Controller.travelDetails = new __Controller.TravelDetailsCtrl("section#travelDetails_s");
       __Controller.filters = new __Controller.FiltersCtrl("section#filters_s");
-      __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible);
       return setTimeout((function() {
         return __Controller.home = new __Controller.HomeCtrl("section#home_s");
       }), 1000);
     };
 
-    LoginCtrl.prototype.getProfile = function(result) {
-      var profile;
-      return profile = {
-        name: result.first_name,
-        surname: result.last_name,
-        phone: result.phone,
-        email: result.email,
-        image: result.image,
-        dateUpdate: result.lastUpdate
-      };
+    LoginCtrl.prototype.read = function() {
+      var _this = this;
+      return this.db.transaction(function(tx) {
+        return tx.executeSql("SELECT * FROM profile", [], (function(tx, results) {
+          if (results.rows.length > 0) {
+            credentials = results.rows.item(0);
+            return _this.valideCredentials(credentials.email, credentials.pass, credentials.lastUpdate, credentials.lastUpdateFavorites, credentials.lastUpdateTravels);
+          } else {
+            return Lungo.Router.section("login_s");
+          }
+        }), null);
+      });
     };
 
     LoginCtrl.prototype.drop = function() {
       var _this = this;
       return this.db.transaction(function(tx) {
-        return tx.executeSql("DELETE FROM accessData");
-      });
-    };
-
-    LoginCtrl.prototype.read = function() {
-      var _this = this;
-      return this.db.transaction(function(tx) {
-        return tx.executeSql("SELECT * FROM accessData", [], (function(tx, results) {
-          if (results.rows.length > 0) {
-            credentials = results.rows.item(0);
-            return _this.valideCredentials(credentials.email, credentials.pass, credentials.dateUpdate);
-          } else {
-            return Lungo.Router.section("login_s");
-          }
-        }), null);
+        tx.executeSql("DELETE FROM profile");
+        tx.executeSql("DELETE FROM travels");
+        tx.executeSql("DELETE FROM favorites");
+        return tx.executeSql("DELETE FROM drivers");
       });
     };
 
@@ -1112,6 +1175,91 @@
         }));
       }
       return _results;
+    };
+
+    LoginCtrl.prototype.getFavoritesSQL = function() {
+      var _this = this;
+      alert("CARGO FAVORITOS DESDE WEBSQL");
+      return this.db.transaction(function(tx) {
+        return tx.executeSql("SELECT * FROM favorites", [], (function(tx, results) {
+          var fav, i, _results;
+          i = 0;
+          _results = [];
+          while (i <= results.rows.length) {
+            fav = results.rows.item(i);
+            __Model.FavoriteDriver.create({
+              email: fav.email,
+              phone: fav.phone,
+              name: fav.name,
+              surname: fav.surname,
+              valuation: fav.valuation,
+              plate: fav.plate,
+              model: fav.model,
+              image: fav.image,
+              capacity: fav.capacity,
+              accessible: fav.accessible,
+              animals: fav.animals,
+              appPayment: fav.appPayment
+            });
+            _results.push(i++);
+          }
+          return _results;
+        }), null);
+      });
+    };
+
+    LoginCtrl.prototype.getDriversAndTravelsSQL = function() {
+      var _this = this;
+      alert("CARGO VIAJES DESDE WEBSQL");
+      this.db.transaction(function(tx) {
+        return tx.executeSql("SELECT * FROM drivers", [], (function(tx, results) {
+          var driver2, i, _results;
+          i = 0;
+          _results = [];
+          while (i <= results.rows.length) {
+            driver2 = results.rows.item(i);
+            __Model.Driver.create({
+              email: driver2.email,
+              name: driver2.first_name,
+              surname: driver2.last_name,
+              valuation: driver2.valuation,
+              plate: driver2.car.plate,
+              model: model,
+              image: driver2.image,
+              capacity: driver2.car.capacity,
+              accessible: driver2.car.accessible,
+              animals: driver2.car.animals,
+              appPayment: driver2.car.appPayment
+            });
+            _results.push(i++);
+          }
+          return _results;
+        }), null);
+      });
+      return this.db.transaction(function(tx) {
+        return tx.executeSql("SELECT * FROM travels", [], (function(tx, results) {
+          var driver, i, travel, _results;
+          i = 0;
+          _results = [];
+          while (i <= results.rows.length) {
+            travel = results.rows.item(i);
+            driver = __Model.Driver.get(travel.driver);
+            __Model.Travel.create({
+              id: travel.id,
+              starttime: travel.starttime,
+              endtime: travel.endtime,
+              startpoint: travel.startpoint,
+              endpoint: travel.endpoint,
+              cost: travel.cost,
+              driver: driver,
+              origin: travel.origin,
+              destination: travel.destination
+            });
+            _results.push(i++);
+          }
+          return _results;
+        }), null);
+      });
     };
 
     return LoginCtrl;
@@ -1335,13 +1483,11 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.PasswordCtrl = (function(_super) {
-    var credentials, newpass;
+    var credentials;
 
     __extends(PasswordCtrl, _super);
 
     credentials = void 0;
-
-    newpass = void 0;
 
     PasswordCtrl.prototype.elements = {
       "#password_old_pass": "old_pass",
@@ -1392,15 +1538,15 @@
     };
 
     PasswordCtrl.prototype.parseResponse = function(result) {
-      var _this = this;
-      alert("Contraseña cambiada");
-      this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
-      this.newpass = this.new_pass1[0].value;
-      this.db.transaction(function(tx) {
+      var db,
+        _this = this;
+      db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
+      db.transaction(function(tx) {
         var sql;
-        sql = "UPDATE accessData SET pass = '" + _this.newpass + "' WHERE email ='" + credentials.email + "';";
+        sql = "UPDATE profile SET pass = '" + _this.new_pass1[0].value + "' WHERE email ='" + credentials.email + "';";
         return tx.executeSql(sql);
       });
+      alert("Contraseña cambiada");
       Lungo.Router.back();
       this.new_pass1[0].value = "";
       this.new_pass2[0].value = "";
@@ -1666,14 +1812,14 @@
       var data, server,
         _this = this;
       server = Lungo.Cache.get("server");
-      date = new Date().toISOString().substring(0, 19);
-      date = date.replace("T", " ");
+      this.date = new Date().toISOString().substring(0, 19);
+      this.date = date.replace("T", " ");
       data = {
         email: this.email[0].innerText,
         firstName: this.name[0].value,
         lastName: this.surname[0].value,
         newImage: this.avatar[0].src,
-        lastUpdate: date
+        lastUpdate: this.date
       };
       return $$.ajax({
         type: "POST",
@@ -1689,19 +1835,18 @@
     };
 
     ProfileCtrl.prototype.parseResponse = function(result) {
-      var credentials,
+      var credentials, db,
         _this = this;
       credentials = Lungo.Cache.get("credentials");
       credentials.name = this.name[0].value;
       credentials.surname = this.surname[0].value;
       credentials.image = this.avatar[0].src;
-      credentials.dateUpdate = date;
       Lungo.Cache.set("credentials", credentials);
       __Controller.menu.updateProfile();
-      this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
-      return this.db.transaction(function(tx) {
+      db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
+      return db.transaction(function(tx) {
         var sql;
-        sql = "UPDATE accessData SET dateUpdate = '" + credentials.dateUpdate + "', name = '" + credentials.name + "', surname = '" + credentials.surname + "', image = '" + credentials.image + "' WHERE email ='" + credentials.email + "';";
+        sql = "UPDATE profile SET lastUpdate = '" + _this.date + "', name = '" + credentials.name + "', surname = '" + credentials.surname + "', image = '" + credentials.image + "' WHERE email ='" + credentials.email + "';";
         return tx.executeSql(sql);
       });
     };
@@ -1790,6 +1935,64 @@
     };
 
     return RegisterCtrl;
+
+  })(Monocle.Controller);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Controller.SendSMSCtrl = (function(_super) {
+    __extends(SendSMSCtrl, _super);
+
+    SendSMSCtrl.prototype.elements = {
+      "#sendSMS_phone": "phone"
+    };
+
+    SendSMSCtrl.prototype.events = {
+      "singleTap #sendSMS_b": "sendSMS"
+    };
+
+    function SendSMSCtrl() {
+      this.parseResponse = __bind(this.parseResponse, this);
+      this.sendSMS = __bind(this.sendSMS, this);
+      SendSMSCtrl.__super__.constructor.apply(this, arguments);
+    }
+
+    SendSMSCtrl.prototype.sendSMS = function(event) {
+      var data, phone, server,
+        _this = this;
+      if (!this.phone[0].value) {
+        return alert("Debes introducir un teléfono válido");
+      } else {
+        server = Lungo.Cache.get("server");
+        phone = "+34" + this.phone[0].value;
+        data = {
+          phone: phone
+        };
+        return $$.ajax({
+          type: "POST",
+          url: server + "client/recovervalidationcode",
+          data: data,
+          success: function(result) {
+            return _this.parseResponse(result);
+          },
+          error: function(xhr, type) {
+            return alert(type.response);
+          }
+        });
+      }
+    };
+
+    SendSMSCtrl.prototype.parseResponse = function(result) {
+      Lungo.Router.back();
+      return this.phone[0].value = "";
+    };
+
+    return SendSMSCtrl;
 
   })(Monocle.Controller);
 
@@ -1918,13 +2121,18 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.TravelListCtrl = (function(_super) {
-    var _views;
+    var credentials, date, _views;
 
     __extends(TravelListCtrl, _super);
 
     _views = [];
 
+    date = void 0;
+
+    credentials = void 0;
+
     function TravelListCtrl() {
+      this.updateLastUpdateTravel = __bind(this.updateLastUpdateTravel, this);
       this.tryEmpty = __bind(this.tryEmpty, this);
       this.deleteTravel = __bind(this.deleteTravel, this);
       this.loadTravelList = __bind(this.loadTravelList, this);
@@ -1946,22 +2154,26 @@
     };
 
     TravelListCtrl.prototype.deleteTravel = function(travel) {
-      var credentials, server,
+      var server,
         _this = this;
       server = Lungo.Cache.get("server");
-      credentials = Lungo.Cache.get("credentials");
+      this.credentials = Lungo.Cache.get("credentials");
+      this.date = new Date().toISOString().substring(0, 19);
+      this.date = date.replace("T", " ");
       return $$.ajax({
         type: "POST",
         url: server + "client/removetravel",
         data: {
-          email: credentials.email,
-          travel_id: travel.id
+          email: this.credentials.email,
+          travel_id: travel.id,
+          lastUpdateTravels: this.date
         },
         success: function(result) {
           _views[travel.id].remove();
           _views[travel.id] = void 0;
           travel.destroy();
-          return _this.tryEmpty();
+          _this.tryEmpty();
+          return _this.updateLastUpdateTravel(travel.id);
         },
         error: function(xhr, type) {
           return _this;
@@ -1975,6 +2187,19 @@
       } else {
         return empty_travels.style.display = "none";
       }
+    };
+
+    TravelListCtrl.prototype.updateLastUpdateTravel = function(id) {
+      var db,
+        _this = this;
+      db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024);
+      return db.transaction(function(tx) {
+        var sql;
+        sql = "UPDATE profile SET lastUpdateTravels = '" + _this.date + "' WHERE email ='" + _this.credentials.email + "';";
+        tx.executeSql(sql);
+        sql = "DELETE FROM travels WHERE id ='" + id + "';";
+        return tx.executeSql(sql);
+      });
     };
 
     return TravelListCtrl;
