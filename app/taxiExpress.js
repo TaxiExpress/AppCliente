@@ -966,7 +966,6 @@
         tx.executeSql("CREATE TABLE IF NOT EXISTS favorites (email STRING NOT NULL PRIMARY KEY, phone STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)");
         return tx.executeSql("CREATE TABLE IF NOT EXISTS drivers (email STRING NOT NULL PRIMARY KEY, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)");
       });
-      this.drop();
       this.read();
     }
 
@@ -1796,6 +1795,7 @@
 
     ProfileCtrl.prototype.events = {
       "singleTap #profile_avatar": "clickAvatar",
+      "singleTap #profile_header": "clickHeader",
       "change #profile_image": "saveAvatar",
       "change #profile_name": "saveChanges",
       "change #profile_surname": "saveChanges"
@@ -1804,6 +1804,7 @@
     function ProfileCtrl() {
       this.parseResponse = __bind(this.parseResponse, this);
       this.saveChanges = __bind(this.saveChanges, this);
+      this.clickHeader = __bind(this.clickHeader, this);
       this.clickAvatar = __bind(this.clickAvatar, this);
       this.loadProfile = __bind(this.loadProfile, this);
       ProfileCtrl.__super__.constructor.apply(this, arguments);
@@ -1878,13 +1879,20 @@
       return this.image[0].click();
     };
 
+    ProfileCtrl.prototype.clickHeader = function(event) {
+      var input;
+      input = document.getElementById("profile_name");
+      input.blur();
+      input = document.getElementById("profile_surname");
+      return input.blur();
+    };
+
     ProfileCtrl.prototype.saveChanges = function(event) {
       var avatar, data, server,
         _this = this;
       server = Lungo.Cache.get("server");
       this.date = new Date().toISOString().substring(0, 19);
       this.date = this.date.replace("T", " ");
-      console.log(this.date);
       avatar = this.avatar[0].src;
       if (this.avatar[0].src.indexOf("user.png") !== -1) {
         avatar = "";

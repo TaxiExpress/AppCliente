@@ -12,6 +12,7 @@ class __Controller.ProfileCtrl extends Monocle.Controller
 
   events:
     "singleTap #profile_avatar"           : "clickAvatar"
+    "singleTap #profile_header"           : "clickHeader"
     "change #profile_image"               : "saveAvatar"
     "change #profile_name"                : "saveChanges"
     "change #profile_surname"             : "saveChanges"
@@ -67,11 +68,17 @@ class __Controller.ProfileCtrl extends Monocle.Controller
     @image[0].click()
 
 
+  clickHeader: (event) =>
+    input = document.getElementById("profile_name")
+    input.blur()
+    input = document.getElementById("profile_surname")
+    input.blur()
+
+
   saveChanges: (event) =>
     server = Lungo.Cache.get "server"
     @date = new Date().toISOString().substring 0, 19
     @date = @date.replace "T", " "
-    console.log @date
     avatar = @avatar[0].src
     avatar = "" if @avatar[0].src.indexOf("user.png") != -1
     data =
