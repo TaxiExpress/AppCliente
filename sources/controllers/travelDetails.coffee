@@ -15,21 +15,23 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
 
   constructor: ->
     super
-    
+
+
   loadTravelDetails: (travel) =>
     @showMap(travel)
     @start[0].innerText = travel.origin
     @end[0].innerText = travel.destination
     @date[0].innerText = travel.date
     @time[0].innerText = Math.floor((travel.endtime - travel.starttime) / 60000 ) + " minutos"
-    @cost[0].innerText = (travel.cost.replace ".", ",") + "€"
+    @cost[0].innerText = (travel.cost.toString().replace ".", ",") + "€"
     @driverDetails = travel.driver
     @changeValuation()
     if travel.driver.image
       @driver[0].src = travel.driver.image
     else
       @driver[0].src = "img/user.png"
-      
+
+
   showMap: (travel) =>
     directionsService = new google.maps.DirectionsService()
     directionsDisplay = new google.maps.DirectionsRenderer()
@@ -48,8 +50,8 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     )
     directionsDisplay.setMap map
     bounds = new google.maps.LatLngBounds()
-    origin = new google.maps.LatLng(travel.startpoint.nb, travel.startpoint.ob)
-    destination = new google.maps.LatLng(travel.endpoint.nb, travel.endpoint.ob)
+    origin = new google.maps.LatLng(travel.startpoint.b, travel.startpoint.d)
+    destination = new google.maps.LatLng(travel.endpoint.b, travel.endpoint.d)
     bounds.extend(origin)
     bounds.extend(destination)
     map.fitBounds(bounds)
@@ -59,6 +61,7 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
       travelMode: google.maps.DirectionsTravelMode.DRIVING
     directionsService.route request, (response, status) ->
       directionsDisplay.setDirections response  if status is google.maps.DirectionsStatus.OK
+
 
   changeValuation: =>
     val = ""
@@ -71,6 +74,8 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
       i++
     @driverDetails.valuationStars = val
 
+
   viewDriver: (event) =>
     __Controller.favDriver.loadDriverDetails(@driverDetails)
     Lungo.Router.section "favDriver_s"
+

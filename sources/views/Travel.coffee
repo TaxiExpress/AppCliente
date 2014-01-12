@@ -24,8 +24,10 @@ class __View.Travel extends Monocle.View
     @model.date = date + time
     @prepend @model
 
+
   onView: (event) ->
     __Controller.travelDetails.loadTravelDetails(@model)
+
 
   deleteTravel: (event) ->
     Lungo.Notification.confirm

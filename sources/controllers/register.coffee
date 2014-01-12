@@ -14,6 +14,7 @@ class __Controller.RegisterCtrl extends Monocle.Controller
   constructor: ->
     super
 
+
   register: (event) =>
     if !(@pass1[0].value || @pass2[0].value || @email[0].value || @phone[0].value)
       alert "Debes rellenar todos los campos"
@@ -40,9 +41,11 @@ class __Controller.RegisterCtrl extends Monocle.Controller
         error: (xhr, type) =>
           alert type.response
 
+
   parseResponse: (result) =>
     __Controller.phoneVerification.setPhone(@phone[0].value)
     Lungo.Router.section "phoneVerification_s"
+
 
   validated: =>
     @phone[0].value = ""

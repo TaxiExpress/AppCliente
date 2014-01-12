@@ -8,7 +8,8 @@ class __Controller.WaitingCtrl extends Monocle.Controller
 
   constructor: ->
     super 
-   
+
+
   cancel: (event) =>
     home_driver.src = "img/payment.png"
     home_driver.style.visibility = "visible"

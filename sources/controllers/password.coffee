@@ -13,6 +13,7 @@ class __Controller.PasswordCtrl extends Monocle.Controller
   constructor: ->
     super
 
+
   saveNewPassword: (event) =>
     if !(@new_pass1[0].value || @new_pass2[0].value || @old_pass[0].value )
       alert "Debes rellenar todos los campos"
@@ -36,8 +37,9 @@ class __Controller.PasswordCtrl extends Monocle.Controller
           error: (xhr, type) =>
             console.log type.response
         
+
   parseResponse: (result) =>
-    db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024)
+    db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024)
     db.transaction (tx) =>
       sql = "UPDATE profile SET pass = '"+@new_pass1[0].value+"' WHERE email ='"+credentials.email+"';"
       tx.executeSql sql
@@ -46,3 +48,4 @@ class __Controller.PasswordCtrl extends Monocle.Controller
     @new_pass1[0].value = ""
     @new_pass2[0].value = ""
     @old_pass[0].value = ""
+

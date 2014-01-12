@@ -18,7 +18,8 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
 
   constructor: ->
     super
-    
+
+
   loadDriverDetails: (driver) =>
     @driverDetails = driver
     @name[0].innerText = driver.name + " " + driver.surname
@@ -33,6 +34,7 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
     @animals[0].innerText = "Si" if driver.animals
     @appPayment[0].innerText = "No"
     @appPayment[0].innerText = "Si" if driver.appPayment
+
 
   requestTaxi: (event) =>
     Lungo.Router.section "waiting_s"

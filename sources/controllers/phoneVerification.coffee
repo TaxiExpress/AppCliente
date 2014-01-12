@@ -10,9 +10,11 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
   constructor: ->
     super
 
+
   setPhone: (phone) ->
     @phone[0].value = phone
     @phone[0].disabled = true
+
 
   doVerification: (event) => 
     if !(@phone[0].value || @code[0].value)
@@ -27,15 +29,17 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
         validationCode: @code[0].value
       $$.ajax
         type: "POST"
-        url: server + "client/validate"
+        url: server + "client/validateuser"
         data: data
         success: (result) =>
           @parseResponse result
         error: (xhr, type) =>
           alert type.response
 
+
   parseResponse: (result) =>
     __Controller.register.validated()
     @code[0].value = ""
     @phone[0].value = ""
     @phone[0].disabled = false
+

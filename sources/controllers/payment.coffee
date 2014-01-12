@@ -16,6 +16,7 @@ class __Controller.PaymentCtrl extends Monocle.Controller
   constructor: ->
     super
 
+
   loadPayment: (amount_payment) ->
     amount = amount_payment
     @amount_text[0].innerText = "A pagar: "+amount+" €"
@@ -23,6 +24,7 @@ class __Controller.PaymentCtrl extends Monocle.Controller
     @cvc.val("")
     @expires.val("")
     @button[0].disabled = false
+
 
   doPayment: (event) =>
     if !(@creditCard.val() && @cvc.val() && @expires.val())
@@ -40,6 +42,7 @@ class __Controller.PaymentCtrl extends Monocle.Controller
         exp_year: "2014"#@expires.val().substring 4, 8
       , amount,  @stripeResponseHandler
  
+
   stripeResponseHandler: (status, response) =>
     @button[0].disabled = false
     if response.error      
@@ -48,3 +51,5 @@ class __Controller.PaymentCtrl extends Monocle.Controller
       alert "Trayecto pagado"
       home_driver.style.visibility = "hidden"
       Lungo.Router.section "home_s"
+
+      

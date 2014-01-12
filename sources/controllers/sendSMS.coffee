@@ -9,6 +9,7 @@ class __Controller.SendSMSCtrl extends Monocle.Controller
   constructor: ->
     super
 
+
   sendSMS: (event) => 
     if !@phone[0].value
       alert "Debes introducir un teléfono válido"
@@ -19,13 +20,14 @@ class __Controller.SendSMSCtrl extends Monocle.Controller
         phone: phone
       $$.ajax
         type: "POST"
-        url: server + "client/recovervalidationcode"
+        url: server + "client/recovervalidationcodecustomer"
         data: data
         success: (result) =>
           @parseResponse result
         error: (xhr, type) =>
-          alert type.response
+          console.log type.response
+
 
   parseResponse: (result) =>
-    Lungo.Router.back()
+    Lungo.Router.router "login_s"
     @phone[0].value = ""

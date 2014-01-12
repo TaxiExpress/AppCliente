@@ -5,9 +5,13 @@ class __Controller.MenuCtrl extends Monocle.Controller
     "#menu_profile_phone"                      : "phone"
     "#menu_profile_name"                       : "name"
 
+  events:
+    "tap #menu_logout"                         : "doLogOut"
+
   constructor: ->
     super
     @updateProfile()
+
 
   updateProfile: ->
     profile = Lungo.Cache.get "credentials"

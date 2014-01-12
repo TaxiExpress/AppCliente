@@ -23,9 +23,11 @@ class __Controller.HomeCtrl extends Monocle.Controller
         maximumAge: 0
       navigator.geolocation.getCurrentPosition initialize, manageErrors
 
+
   manageErrors = (err) ->
     alert "Error de localización GPS"
     setTimeout((=> navigator.geolocation.getCurrentPosition initialize, manageErrors) , 5000)
+
 
   refresh: (event) =>
     Lungo.Aside.hide()
@@ -36,11 +38,13 @@ class __Controller.HomeCtrl extends Monocle.Controller
         timeout: 5000,
         maximumAge: 0
       navigator.geolocation.getCurrentPosition updatePosition, manageErrors
-    
+
+
   updatePosition = (location) ->
     currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude)
     map.setCenter(currentLocation)
     getStreet(currentLocation)
+
 
   confirm: (event) =>
     Lungo.Aside.hide()
@@ -55,9 +59,11 @@ class __Controller.HomeCtrl extends Monocle.Controller
         label: "Elegir taxi"
         callback: =>
           __Controller.nearDriver.loadNearTaxis()
-  
+
+
   hideAside: (event) =>
     Lungo.Aside.hide()
+
 
   initialize = (location) =>
     Lungo.Router.section "home_s"
@@ -86,6 +92,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
       google.maps.event.addListener map, "zoom_changed", (event) ->
         getStreet(map.getCenter())
 
+
   getStreet = (pos) =>
     Lungo.Cache.set "geoPosition", pos
     geocoder = new google.maps.Geocoder()
@@ -102,22 +109,24 @@ class __Controller.HomeCtrl extends Monocle.Controller
       else
         home_streetField.value = 'Calle desconocida'
 
+
   getTaxi: =>
     credentials = Lungo.Cache.get "credentials"
     position = Lungo.Cache.get "geoPosition"
     server = Lungo.Cache.get "server"
     $$.ajax
       type: "GET"
-      url: server + "client/getTaxi"
+      url: server + "client/gettaxi"
       data:
         email: credentials.email
-        longitud: position.nb
-        latitud: position.ob
+        longitud: position.b
+        latitud: position.d
       error: (xhr, type) =>
         console.log type.response
       success: (result) =>
         console.log result
         Lungo.Router.section "waiting_s"
+
 
   payTaxi: (event) =>
     Lungo.Router.section "payment_s"

@@ -30,5 +30,6 @@ class __View.FavDriver extends Monocle.View
       @model.image = "img/user.png"
     @prepend @model
 
+
   onView: (event) ->
     __Controller.favDriver.loadDriverDetails(@model)

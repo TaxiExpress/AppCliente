@@ -15,11 +15,13 @@ class __Controller.FiltersCtrl extends Monocle.Controller
   constructor: ->
     super
 
+
   loadFilters: (seats, payments, animals, accessible) =>
     @seats[0].value = seats
-    @payments[0].checked = payments
-    @animals[0].checked = animals
-    @accessible[0].checked = accessible
+    @payments[0].checked = (payments.toString() == "true")
+    @animals[0].checked = (animals.toString() == "true")    
+    @accessible[0].checked = (accessible.toString() == "true")
+
 
   saveFilters: (event) =>
     credentials = Lungo.Cache.get "credentials"
@@ -42,9 +44,11 @@ class __Controller.FiltersCtrl extends Monocle.Controller
       error: (xhr, type) =>
         @
 
+
   parseResponse: (result, date) =>
     credentials = Lungo.Cache.get "credentials"
-    db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024)
+    db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024)
     db.transaction (tx) =>
       sql = "UPDATE profile SET lastUpdate = '"+date+"', seats = '"+@seats[0].value+"', animals = '"+@animals[0].checked+"', payments = '"+@payments[0].checked+"', accessible = '"+@accessible[0].checked+"' WHERE email ='"+credentials.email+"';"
       tx.executeSql sql
+

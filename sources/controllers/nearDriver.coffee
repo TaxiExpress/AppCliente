@@ -9,6 +9,7 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
   constructor: ->
     super
 
+
   loadNearTaxis: =>
     @deleteNearTaxis()
     Lungo.Router.section "list_s"
@@ -17,11 +18,11 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
     server = Lungo.Cache.get "server"
     $$.ajax
       type: "GET"
-      url: server + "client/getNearTaxies"
+      url: server + "client/getneartaxies"
       data:
         email: credentials.email
-        longitud: position.nb
-        latitud: position.ob
+        longitud: position.b
+        latitud: position.d
       error: (xhr, type) =>
         console.log type.response
       success: (result) =>
@@ -56,19 +57,22 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
           lastDriver = true if result.length == cont
           @getDistanceAndTime(driver, lastDriver)
 
+
   deleteNearTaxis: =>
     for nearDriver in __Model.NearDriver.all()
       _viewsList[nearDriver.email].remove()
       _viewsList[nearDriver.email] = undefined
       nearDriver.destroy()
 
+
   doRefresh: (event) => 
     __Controller.nearDriver.loadNearTaxis()
 
+
   getDistanceAndTime: (driver, lastDriver) =>
     wp = new Array()
-    wp[0] = new google.maps.LatLng(driver.position.nb, driver.position.ob )
-    wp[1] = new google.maps.LatLng(@position.nb, @position.ob)
+    wp[0] = new google.maps.LatLng(driver.position.b, driver.position.d )
+    wp[1] = new google.maps.LatLng(@position.b, @position.d)
     directionsService = new google.maps.DirectionsService()
     request =
       origin: wp[0]
@@ -82,6 +86,7 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
         driver.time = time
         driver.save()
         setTimeout((=> @showTaxies()) , 50) if lastDriver
+
 
   showTaxies: =>
     taxies = __Model.NearDriver.all().sort (a, b) ->

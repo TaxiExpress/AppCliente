@@ -24,7 +24,8 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
 
   constructor: ->
     super
-    @db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024)
+    @db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024)
+    
     
   loadDriverDetails: (driver) =>
     @driverDetails = driver
@@ -46,14 +47,14 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
       @image[0].src = "img/user.png"
     if __Model.FavoriteDriver.get(driver.email)[0] != undefined
       @favorite[0].checked = true
-    else  @favorite[0].checked = false
+    else @favorite[0].checked = false
 
 
   changeFavorite: (event) =>
     server = Lungo.Cache.get "server"
     @credentials = Lungo.Cache.get "credentials"
     @date = new Date().toISOString().substring 0, 19
-    @date = date.replace "T", " "
+    @date = @date.replace "T", " "
     data = 
       customerEmail: @credentials.email
       driverEmail: @driverDetails.email
@@ -81,10 +82,12 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
         error: (xhr, type) =>
           @
 
+
   updateLastUpdateFavorite: =>
     @db.transaction (tx) =>
       sql = "UPDATE profile SET lastUpdateFavorites = '"+@date+"' WHERE email ='"+@credentials.email+"';"
       tx.executeSql sql
+
 
   addFavoriteSQL: =>
     @db.transaction (tx) =>
@@ -94,7 +97,9 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
         '"+@driverDetails.capacity+"','"+@driverDetails.accessible+"','"+@driverDetails.animals+"','"+@driverDetails.appPayment+"');"
       tx.executeSql sql
 
+
   removeFavoriteSQL: =>
     @db.transaction (tx) =>
       sql = "DELETE FROM favorites WHERE email ='"+@driverDetails.email+"';"
       tx.executeSql sql
+

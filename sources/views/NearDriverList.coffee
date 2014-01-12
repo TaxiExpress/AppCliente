@@ -33,6 +33,7 @@ class __View.NearDriverList extends Monocle.View
     @model.valuationStars = val
     @append @model
 
+
   onView: (event) ->
     __Controller.chosenTaxi.loadDriverDetails(@model)
     Lungo.Router.section "chosenTaxi_s"

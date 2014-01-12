@@ -22,6 +22,7 @@ class __Controller.ProfileCtrl extends Monocle.Controller
     __Controller.password = new __Controller.PasswordCtrl "section#password_s"
     __Controller.menu = new __Controller.MenuCtrl "aside#menu_s"
 
+
   loadProfile: =>
     profile = Lungo.Cache.get "credentials"
     @email[0].textContent = profile.email if profile.email
@@ -29,6 +30,7 @@ class __Controller.ProfileCtrl extends Monocle.Controller
     @name[0].value = profile.name if profile.name
     @surname[0].value = profile.surname if profile.surname
     @avatar[0].src = profile.image if profile.image
+
 
   saveAvatar: (event) ->
     file = @image[0].files[0]
@@ -60,18 +62,23 @@ class __Controller.ProfileCtrl extends Monocle.Controller
         profile_avatar.src = dataURL
     setTimeout((=>@saveChanges()) , 500)
 
+
   clickAvatar: (event) =>
     @image[0].click()
+
 
   saveChanges: (event) =>
     server = Lungo.Cache.get "server"
     @date = new Date().toISOString().substring 0, 19
-    @date = date.replace "T", " "
+    @date = @date.replace "T", " "
+    console.log @date
+    avatar = @avatar[0].src
+    avatar = "" if @avatar[0].src.indexOf("user.png") != -1
     data =
       email: @email[0].innerText
       firstName: @name[0].value
       lastName: @surname[0].value
-      newImage: @avatar[0].src
+      newImage: avatar
       lastUpdate: @date
     $$.ajax
       type: "POST"
@@ -82,6 +89,7 @@ class __Controller.ProfileCtrl extends Monocle.Controller
       error: (xhr, type) =>
         @
 
+
   parseResponse: (result) =>
     credentials = Lungo.Cache.get "credentials"
     credentials.name = @name[0].value
@@ -89,7 +97,8 @@ class __Controller.ProfileCtrl extends Monocle.Controller
     credentials.image = @avatar[0].src
     Lungo.Cache.set "credentials", credentials
     __Controller.menu.updateProfile()
-    db = window.openDatabase("TaxiExpressNew", "1.0", "description", 2 * 1024 * 1024)
+    db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024)
     db.transaction (tx) =>
       sql = "UPDATE profile SET lastUpdate = '"+@date+"', name = '"+credentials.name+"', surname = '"+credentials.surname+"', image = '"+credentials.image+"' WHERE email ='"+credentials.email+"';"
       tx.executeSql sql
+
