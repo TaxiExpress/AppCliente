@@ -119,8 +119,8 @@ class __Controller.HomeCtrl extends Monocle.Controller
       url: server + "client/gettaxi"
       data:
         email: credentials.email
-        longitud: position.b
-        latitud: position.d
+        longitud: position.d
+        latitud: position.e
       error: (xhr, type) =>
         console.log type.response
       success: (result) =>

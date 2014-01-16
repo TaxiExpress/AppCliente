@@ -19,6 +19,7 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
 
   loadTravelDetails: (travel) =>
     @showMap(travel)
+    console.log travel
     @start[0].innerText = travel.origin
     @end[0].innerText = travel.destination
     @date[0].innerText = travel.date
@@ -50,8 +51,8 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     )
     directionsDisplay.setMap map
     bounds = new google.maps.LatLngBounds()
-    origin = new google.maps.LatLng(travel.startpoint.b, travel.startpoint.d)
-    destination = new google.maps.LatLng(travel.endpoint.b, travel.endpoint.d)
+    origin = new google.maps.LatLng(travel.startpoint.d, travel.startpoint.e)
+    destination = new google.maps.LatLng(travel.endpoint.d, travel.endpoint.e)
     bounds.extend(origin)
     bounds.extend(destination)
     map.fitBounds(bounds)

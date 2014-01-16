@@ -664,12 +664,14 @@
       "change #filters_seats": "saveFilters",
       "change #filters_payments": "saveFilters",
       "change #filters_animals": "saveFilters",
-      "change #filters_accessible": "saveFilters"
+      "change #filters_accessible": "saveFilters",
+      "tap #filters_b": "doSearch"
     };
 
     function FiltersCtrl() {
       this.parseResponse = __bind(this.parseResponse, this);
       this.saveFilters = __bind(this.saveFilters, this);
+      this.doSearch = __bind(this.doSearch, this);
       this.loadFilters = __bind(this.loadFilters, this);
       FiltersCtrl.__super__.constructor.apply(this, arguments);
     }
@@ -679,6 +681,11 @@
       this.payments[0].checked = payments.toString() === "true";
       this.animals[0].checked = animals.toString() === "true";
       return this.accessible[0].checked = accessible.toString() === "true";
+    };
+
+    FiltersCtrl.prototype.doSearch = function(event) {
+      __Controller.nearDriver.loadNearTaxis();
+      return Lungo.Router.back();
     };
 
     FiltersCtrl.prototype.saveFilters = function(event) {
@@ -901,8 +908,8 @@
         url: server + "client/gettaxi",
         data: {
           email: credentials.email,
-          longitud: position.b,
-          latitud: position.d
+          longitud: position.d,
+          latitud: position.e
         },
         error: function(xhr, type) {
           return console.log(type.response);
@@ -1389,14 +1396,9 @@
 
     position = void 0;
 
-    NearDriverCtrl.prototype.events = {
-      "singleTap #list_refresh_b": "doRefresh"
-    };
-
     function NearDriverCtrl() {
       this.showTaxies = __bind(this.showTaxies, this);
       this.getDistanceAndTime = __bind(this.getDistanceAndTime, this);
-      this.doRefresh = __bind(this.doRefresh, this);
       this.deleteNearTaxis = __bind(this.deleteNearTaxis, this);
       this.loadNearTaxis = __bind(this.loadNearTaxis, this);
       NearDriverCtrl.__super__.constructor.apply(this, arguments);
@@ -1415,8 +1417,8 @@
         url: server + "client/getneartaxies",
         data: {
           email: credentials.email,
-          longitud: position.b,
-          latitud: position.d
+          longitud: position.d,
+          latitud: position.e
         },
         error: function(xhr, type) {
           return console.log(type.response);
@@ -1492,16 +1494,12 @@
       return _results;
     };
 
-    NearDriverCtrl.prototype.doRefresh = function(event) {
-      return __Controller.nearDriver.loadNearTaxis();
-    };
-
     NearDriverCtrl.prototype.getDistanceAndTime = function(driver, lastDriver) {
       var directionsService, request, wp,
         _this = this;
       wp = new Array();
-      wp[0] = new google.maps.LatLng(driver.position.b, driver.position.d);
-      wp[1] = new google.maps.LatLng(this.position.b, this.position.d);
+      wp[0] = new google.maps.LatLng(driver.position.d, driver.position.e);
+      wp[1] = new google.maps.LatLng(this.position.d, this.position.e);
       directionsService = new google.maps.DirectionsService();
       request = {
         origin: wp[0],
@@ -2116,6 +2114,7 @@
 
     TravelDetailsCtrl.prototype.loadTravelDetails = function(travel) {
       this.showMap(travel);
+      console.log(travel);
       this.start[0].innerText = travel.origin;
       this.end[0].innerText = travel.destination;
       this.date[0].innerText = travel.date;
@@ -2155,8 +2154,8 @@
       });
       directionsDisplay.setMap(map);
       bounds = new google.maps.LatLngBounds();
-      origin = new google.maps.LatLng(travel.startpoint.b, travel.startpoint.d);
-      destination = new google.maps.LatLng(travel.endpoint.b, travel.endpoint.d);
+      origin = new google.maps.LatLng(travel.startpoint.d, travel.startpoint.e);
+      destination = new google.maps.LatLng(travel.endpoint.d, travel.endpoint.e);
       bounds.extend(origin);
       bounds.extend(destination);
       map.fitBounds(bounds);

@@ -3,9 +3,6 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
   _viewsList = []
   position = undefined
 
-  events:
-    "singleTap #list_refresh_b"                              : "doRefresh"
-
   constructor: ->
     super
 
@@ -21,8 +18,8 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
       url: server + "client/getneartaxies"
       data:
         email: credentials.email
-        longitud: position.b
-        latitud: position.d
+        longitud: position.d
+        latitud: position.e
       error: (xhr, type) =>
         console.log type.response
       success: (result) =>
@@ -58,6 +55,7 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
           @getDistanceAndTime(driver, lastDriver)
 
 
+
   deleteNearTaxis: =>
     for nearDriver in __Model.NearDriver.all()
       _viewsList[nearDriver.email].remove()
@@ -65,14 +63,10 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
       nearDriver.destroy()
 
 
-  doRefresh: (event) => 
-    __Controller.nearDriver.loadNearTaxis()
-
-
   getDistanceAndTime: (driver, lastDriver) =>
     wp = new Array()
-    wp[0] = new google.maps.LatLng(driver.position.b, driver.position.d )
-    wp[1] = new google.maps.LatLng(@position.b, @position.d)
+    wp[0] = new google.maps.LatLng(driver.position.d, driver.position.e )
+    wp[1] = new google.maps.LatLng(@position.d, @position.e)
     directionsService = new google.maps.DirectionsService()
     request =
       origin: wp[0]

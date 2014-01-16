@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="components/lungo/lungo.icon.css">
     <link rel="stylesheet" href="components/lungo/lungo.theme.css">
     <meta name="viewport" content="width=device-width, user-scalable=no, height=device-height, initial-scale=1.0, maximum-scale=1.0" />
+    <meta name="HandheldFriendly" content="True">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="cleartype" content="on">
 </head>
 <body>  
     <section id="init_s" data-transition="fade">
@@ -83,7 +87,6 @@
             </li>
             <li data-view-section="travelList_s">Trayectos realizados</li>
             <li data-view-section="favorites_s">Taxistas favoritos</li>
-            <li data-view-section="filters_s">Configuración</li>
             <li data-view-section="faq_s">F.A.Q.</li>
             <li data-view-section="legalAdvice_s">Aviso Legal</li>
         </article>
@@ -143,10 +146,10 @@
         </article>
     </section>
 
-    <section id="list_s" data-transition="slide">        
+    <section id="list_s" data-transition="slide" >        
         <header data-back="angle-left" data-title="Elegir taxi">
             <nav class="on-right">
-                <a href="#" id="list_refresh_b" data-icon="refresh"></a>
+                <a href="#" id="list_filters_b" data-icon="bookmark-empty" data-view-section="filters_s"></a>
             </nav>
         </header>
         <nav data-control="groupbar">
@@ -169,9 +172,9 @@
         </article>
     </section>    
 
-    <section id="filters_s" data-transition="slide">
-        <header data-title="Configuración" data-back="angle-left"></header>      
-        <article id="filters_a" class="scroll">
+    <section id="filters_s" data-transition="cover" >
+        <header data-title="Filtros de búsqueda" data-back="angle-down"></header>      
+        <article id="filters_a" class="scroll" >
             <div class="form list">
                 <li class="anchor contrast">CARACTERÍSTICAS DEL TAXI A BUSCAR</li>
                 <fieldset> 
@@ -190,6 +193,7 @@
                     <small>Habilitado para minusválidos</small>
                     <input id="filters_accessible" type="checkbox" />
                 </fieldset>
+                <button id="filters_b" class="anchor accept" data-label="Buscar taxis cercanos" />
             </div>           
         </article>
     </section>
