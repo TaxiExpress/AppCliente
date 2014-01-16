@@ -19,7 +19,6 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
 
   loadTravelDetails: (travel) =>
     @showMap(travel)
-    console.log travel
     @start[0].innerText = travel.origin
     @end[0].innerText = travel.destination
     @date[0].innerText = travel.date

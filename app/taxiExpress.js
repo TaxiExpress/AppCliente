@@ -2114,7 +2114,6 @@
 
     TravelDetailsCtrl.prototype.loadTravelDetails = function(travel) {
       this.showMap(travel);
-      console.log(travel);
       this.start[0].innerText = travel.origin;
       this.end[0].innerText = travel.destination;
       this.date[0].innerText = travel.date;
