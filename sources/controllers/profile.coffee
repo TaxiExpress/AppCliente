@@ -81,12 +81,14 @@ class __Controller.ProfileCtrl extends Monocle.Controller
     @date = @date.replace "T", " "
     avatar = @avatar[0].src
     avatar = "" if @avatar[0].src.indexOf("user.png") != -1
+    session = Lungo.Cache.get "session"
     data =
       email: @email[0].innerText
       firstName: @name[0].value
       lastName: @surname[0].value
       newImage: avatar
       lastUpdate: @date
+      sessionID: session
     $$.ajax
       type: "POST"
       url: server + "client/changedetails"

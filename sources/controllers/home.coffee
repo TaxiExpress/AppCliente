@@ -22,10 +22,11 @@ class __Controller.HomeCtrl extends Monocle.Controller
         timeout: 5000,
         maximumAge: 0
       navigator.geolocation.getCurrentPosition initialize, manageErrors
+    else
+      alert "HABILITALO!!"
 
 
   manageErrors = (err) ->
-    alert "Error de localización GPS"
     setTimeout((=> navigator.geolocation.getCurrentPosition initialize, manageErrors) , 5000)
 
 
@@ -114,6 +115,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
     credentials = Lungo.Cache.get "credentials"
     position = Lungo.Cache.get "geoPosition"
     server = Lungo.Cache.get "server"
+    session = Lungo.Cache.get "session"
     $$.ajax
       type: "GET"
       url: server + "client/gettaxi"
@@ -121,6 +123,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
         email: credentials.email
         longitud: position.d
         latitud: position.e
+        sessionID: session
       error: (xhr, type) =>
         console.log type.response
       success: (result) =>

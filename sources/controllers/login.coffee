@@ -50,10 +50,11 @@ class __Controller.LoginCtrl extends Monocle.Controller
       error: (xhr, type) =>
         setTimeout((=>Lungo.Router.section "login_s") , 500)
         @password[0].value = ""
-        console.log type.response        
+        alert type.response        
 
 
   parseResponse: (result) ->
+    Lungo.Cache.set "session", result.sessionID
     if result.email == undefined
       profile =
         name: credentials.name
@@ -177,7 +178,9 @@ class __Controller.LoginCtrl extends Monocle.Controller
       destination = travel.destination
       cost = travel.cost
       driver2 = travel.driver
-      image = "" if !driver2.image
+      if driver2.image == ""
+        image = "" 
+      else image = driver2.image
       model = driver2.car.company + " " + driver2.car.model
       driver = __Model.Driver.create email: driver2.email, name: driver2.first_name, surname: driver2.last_name, valuation: driver2.valuation, plate: driver2.car.plate, model: model, image: driver2.image, capacity: driver2.car.capacity, accessible: driver2.car.accessible, animals: driver2.car.animals, appPayment: driver2.car.appPayment
       sql = "INSERT INTO drivers (email, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('"+driver.email+"','"+driver.name+"','"+driver.surname+"','"+driver.valuation+"','"+driver.plate+"','"+model+"','"+image+"','"+driver.capacity+"','"+driver.accessible+"','"+driver.animals+"','"+driver.appPayment+"');"

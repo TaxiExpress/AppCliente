@@ -24,6 +24,7 @@ class __Controller.PasswordCtrl extends Monocle.Controller
     else
       server = Lungo.Cache.get "server"
       credentials = Lungo.Cache.get "credentials"
+      session = Lungo.Cache.get "session"
       if @new_pass1[0].value == @new_pass2[0].value
         $$.ajax
           type: "POST"
@@ -32,6 +33,7 @@ class __Controller.PasswordCtrl extends Monocle.Controller
             email: credentials.email
             oldPass: @old_pass[0].value
             newPass: @new_pass1[0].value
+            sessionID: session
           success: (result) =>
             @parseResponse result
           error: (xhr, type) =>

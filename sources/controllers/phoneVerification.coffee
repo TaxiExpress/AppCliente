@@ -24,9 +24,11 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
     else
       server = Lungo.Cache.get "server"
       phone = "+34" + @phone[0].value
+      session = Lungo.Cache.get "session"
       data =
         phone: phone
         validationCode: @code[0].value
+        sessionID: session
       $$.ajax
         type: "POST"
         url: server + "client/validateuser"

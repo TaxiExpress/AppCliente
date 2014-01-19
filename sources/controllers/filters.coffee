@@ -33,6 +33,7 @@ class __Controller.FiltersCtrl extends Monocle.Controller
     server = Lungo.Cache.get "server"
     date = new Date().toISOString().substring 0, 19
     date = date.replace "T", " "
+    session = Lungo.Cache.get "session"
     data =
       email: credentials.email
       capacity: @seats[0].value
@@ -40,6 +41,7 @@ class __Controller.FiltersCtrl extends Monocle.Controller
       animals: @animals[0].checked
       accesible: @accessible[0].checked
       lastUpdate: date
+      sessionID: session
     $$.ajax
       type: "POST"
       url: server + "client/changefilters"

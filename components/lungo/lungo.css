@@ -67,7 +67,7 @@ button.down > abbr{font-weight: 100!important}
 .list li.thumb > div{-webkit-box-flex:1;-moz-box-flex:1;-ms-box-flex:1;-o-box-flex:1;box-flex:1}
 .list li.thumb.big > img{width:65px;height:65px}
 .list li.thumb.big > div{padding:.25em .4em}
-.list li.thumb:not(.big) > img{margin-top:5px;width:45px;height:45px;border-radius:23px;}
+.list li.thumb:not(.big) > img{margin-top:3px;width:45px;height:45px;border-radius:23px;}
 .list li.thumb:not(.big) > div{padding-left:.8em; padding-top:3px;}
 .list li.arrow::after{position:absolute;right:1em;top:60%;width:.4em;height:.4em;content:'';opacity:.7; border-right:.15em solid;border-top:.15em solid;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);-o-transform:rotate(45deg);transform:rotate(45deg)}
 .list li a{display:block;text-decoration:none}

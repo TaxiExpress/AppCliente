@@ -55,10 +55,12 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
     @credentials = Lungo.Cache.get "credentials"
     @date = new Date().toISOString().substring 0, 19
     @date = @date.replace "T", " "
+    session = Lungo.Cache.get "session"
     data = 
       customerEmail: @credentials.email
       driverEmail: @driverDetails.email
       lastUpdateFavorites: @date
+      sessionID: session
     if @favorite[0].checked
       $$.ajax
         type: "POST"

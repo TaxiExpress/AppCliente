@@ -19,6 +19,7 @@ class __Controller.TravelListCtrl extends Monocle.Controller
     @credentials = Lungo.Cache.get "credentials"
     @date = new Date().toISOString().substring 0, 19
     @date = @date.replace "T", " "
+    session = Lungo.Cache.get "session"
     $$.ajax
       type: "POST"
       url: server + "client/removetravel"
@@ -26,6 +27,7 @@ class __Controller.TravelListCtrl extends Monocle.Controller
         email: @credentials.email
         travel_id: travel.id
         lastUpdateTravels: @date
+        sessionID: session
       success: (result) =>
         _views[travel.id].remove()
         _views[travel.id] = undefined

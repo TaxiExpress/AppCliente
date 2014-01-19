@@ -471,16 +471,18 @@
     };
 
     FavDriverCtrl.prototype.changeFavorite = function(event) {
-      var data, server,
+      var data, server, session,
         _this = this;
       server = Lungo.Cache.get("server");
       this.credentials = Lungo.Cache.get("credentials");
       this.date = new Date().toISOString().substring(0, 19);
       this.date = this.date.replace("T", " ");
+      session = Lungo.Cache.get("session");
       data = {
         customerEmail: this.credentials.email,
         driverEmail: this.driverDetails.email,
-        lastUpdateFavorites: this.date
+        lastUpdateFavorites: this.date,
+        sessionID: session
       };
       if (this.favorite[0].checked) {
         return $$.ajax({
@@ -689,19 +691,21 @@
     };
 
     FiltersCtrl.prototype.saveFilters = function(event) {
-      var credentials, data, date, server,
+      var credentials, data, date, server, session,
         _this = this;
       credentials = Lungo.Cache.get("credentials");
       server = Lungo.Cache.get("server");
       date = new Date().toISOString().substring(0, 19);
       date = date.replace("T", " ");
+      session = Lungo.Cache.get("session");
       data = {
         email: credentials.email,
         capacity: this.seats[0].value,
         appPayment: this.payments[0].checked,
         animals: this.animals[0].checked,
         accesible: this.accessible[0].checked,
-        lastUpdate: date
+        lastUpdate: date,
+        sessionID: session
       };
       return $$.ajax({
         type: "POST",
@@ -777,12 +781,13 @@
           maximumAge: 0
         };
         navigator.geolocation.getCurrentPosition(initialize, manageErrors);
+      } else {
+        alert("HABILITALO!!");
       }
     }
 
     manageErrors = function(err) {
       var _this = this;
-      alert("Error de localización GPS");
       return setTimeout((function() {
         return navigator.geolocation.getCurrentPosition(initialize, manageErrors);
       }), 5000);
@@ -898,18 +903,20 @@
     };
 
     HomeCtrl.prototype.getTaxi = function() {
-      var credentials, server,
+      var credentials, server, session,
         _this = this;
       credentials = Lungo.Cache.get("credentials");
       position = Lungo.Cache.get("geoPosition");
       server = Lungo.Cache.get("server");
+      session = Lungo.Cache.get("session");
       return $$.ajax({
         type: "GET",
         url: server + "client/gettaxi",
         data: {
           email: credentials.email,
           longitud: position.d,
-          latitud: position.e
+          latitud: position.e,
+          sessionID: session
         },
         error: function(xhr, type) {
           return console.log(type.response);
@@ -1012,7 +1019,7 @@
             return Lungo.Router.section("login_s");
           }), 500);
           _this.password[0].value = "";
-          return console.log(type.response);
+          return alert(type.response);
         }
       });
     };
@@ -1020,6 +1027,7 @@
     LoginCtrl.prototype.parseResponse = function(result) {
       var date, dateFav, dateTrav, profile,
         _this = this;
+      Lungo.Cache.set("session", result.sessionID);
       if (result.email === void 0) {
         profile = {
           name: credentials.name,
@@ -1181,8 +1189,10 @@
         destination = travel.destination;
         cost = travel.cost;
         driver2 = travel.driver;
-        if (!driver2.image) {
+        if (driver2.image === "") {
           image = "";
+        } else {
+          image = driver2.image;
         }
         model = driver2.car.company + " " + driver2.car.model;
         driver = __Model.Driver.create({
@@ -1366,7 +1376,7 @@
       var profile;
       profile = Lungo.Cache.get("credentials");
       this.phone[0].textContent = "Tel. " + profile.phone;
-      if (profile.name === "" | profile.name === void 0) {
+      if (profile.name === "" | profile.name === null) {
         this.name[0].textContent = profile.email;
       } else {
         this.name[0].textContent = profile.name + " " + profile.surname;
@@ -1405,20 +1415,22 @@
     }
 
     NearDriverCtrl.prototype.loadNearTaxis = function() {
-      var credentials, server,
+      var credentials, server, session,
         _this = this;
       this.deleteNearTaxis();
       Lungo.Router.section("list_s");
       credentials = Lungo.Cache.get("credentials");
       position = Lungo.Cache.get("geoPosition");
       server = Lungo.Cache.get("server");
+      session = Lungo.Cache.get("session");
       return $$.ajax({
         type: "GET",
         url: server + "client/getneartaxies",
         data: {
           email: credentials.email,
           longitud: position.d,
-          latitud: position.e
+          latitud: position.e,
+          sessionID: session
         },
         error: function(xhr, type) {
           return console.log(type.response);
@@ -1573,7 +1585,7 @@
     }
 
     PasswordCtrl.prototype.saveNewPassword = function(event) {
-      var server,
+      var server, session,
         _this = this;
       if (!(this.new_pass1[0].value || this.new_pass2[0].value || this.old_pass[0].value)) {
         return alert("Debes rellenar todos los campos");
@@ -1584,6 +1596,7 @@
       } else {
         server = Lungo.Cache.get("server");
         credentials = Lungo.Cache.get("credentials");
+        session = Lungo.Cache.get("session");
         if (this.new_pass1[0].value === this.new_pass2[0].value) {
           return $$.ajax({
             type: "POST",
@@ -1591,7 +1604,8 @@
             data: {
               email: credentials.email,
               oldPass: this.old_pass[0].value,
-              newPass: this.new_pass1[0].value
+              newPass: this.new_pass1[0].value,
+              sessionID: session
             },
             success: function(result) {
               return _this.parseResponse(result);
@@ -1730,7 +1744,7 @@
     };
 
     PhoneVerificationCtrl.prototype.doVerification = function(event) {
-      var data, phone, server,
+      var data, phone, server, session,
         _this = this;
       if (!(this.phone[0].value || this.code[0].value)) {
         return alert("Debes rellenar todos los campos");
@@ -1739,9 +1753,11 @@
       } else {
         server = Lungo.Cache.get("server");
         phone = "+34" + this.phone[0].value;
+        session = Lungo.Cache.get("session");
         data = {
           phone: phone,
-          validationCode: this.code[0].value
+          validationCode: this.code[0].value,
+          sessionID: session
         };
         return $$.ajax({
           type: "POST",
@@ -1886,7 +1902,7 @@
     };
 
     ProfileCtrl.prototype.saveChanges = function(event) {
-      var avatar, data, server,
+      var avatar, data, server, session,
         _this = this;
       server = Lungo.Cache.get("server");
       this.date = new Date().toISOString().substring(0, 19);
@@ -1895,12 +1911,14 @@
       if (this.avatar[0].src.indexOf("user.png") !== -1) {
         avatar = "";
       }
+      session = Lungo.Cache.get("session");
       data = {
         email: this.email[0].innerText,
         firstName: this.name[0].value,
         lastName: this.surname[0].value,
         newImage: avatar,
-        lastUpdate: this.date
+        lastUpdate: this.date,
+        sessionID: session
       };
       return $$.ajax({
         type: "POST",
@@ -2235,19 +2253,21 @@
     };
 
     TravelListCtrl.prototype.deleteTravel = function(travel) {
-      var server,
+      var server, session,
         _this = this;
       server = Lungo.Cache.get("server");
       this.credentials = Lungo.Cache.get("credentials");
       this.date = new Date().toISOString().substring(0, 19);
       this.date = this.date.replace("T", " ");
+      session = Lungo.Cache.get("session");
       return $$.ajax({
         type: "POST",
         url: server + "client/removetravel",
         data: {
           email: this.credentials.email,
           travel_id: travel.id,
-          lastUpdateTravels: this.date
+          lastUpdateTravels: this.date,
+          sessionID: session
         },
         success: function(result) {
           _views[travel.id].remove();

@@ -13,6 +13,7 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
     credentials = Lungo.Cache.get "credentials"
     position = Lungo.Cache.get "geoPosition"
     server = Lungo.Cache.get "server"
+    session = Lungo.Cache.get "session"
     $$.ajax
       type: "GET"
       url: server + "client/getneartaxies"
@@ -20,6 +21,7 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
         email: credentials.email
         longitud: position.d
         latitud: position.e
+        sessionID: session
       error: (xhr, type) =>
         console.log type.response
       success: (result) =>
