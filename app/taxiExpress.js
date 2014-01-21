@@ -405,7 +405,31 @@
           return alert(type.response);
         },
         success: function(result) {
-          return console.log(result);
+          var travelID;
+          console.log(result);
+          travelID = result.travelID;
+          Lungo.Cache.set("travelID", travelID);
+          Lungo.Cache.set("travelAccepted", false);
+          Lungo.Router.section("waiting_s");
+          return setTimeout((function() {
+            if (!Lungo.Cache.get("travelAccepted")) {
+              return $$.ajax({
+                type: "GET",
+                url: server + "client/cancelTravel",
+                data: {
+                  email: credentials.email,
+                  sessionID: session,
+                  travelID: travelID
+                },
+                error: function(xhr, type) {
+                  return alert(type.response);
+                },
+                success: function(result) {
+                  return console.log(result);
+                }
+              });
+            }
+          }), 30000);
         }
       });
     };
@@ -946,11 +970,34 @@
           sessionID: session
         },
         error: function(xhr, type) {
-          return alert(type.response);
+          return console.log(type.response);
         },
         success: function(result) {
+          var travelID;
           console.log(result);
-          return Lungo.Router.section("waiting_s");
+          travelID = result.travelID;
+          Lungo.Cache.set("travelID", travelID);
+          Lungo.Cache.set("travelAccepted", false);
+          Lungo.Router.section("waiting_s");
+          return setTimeout((function() {
+            if (!Lungo.Cache.get("travelAccepted")) {
+              return $$.ajax({
+                type: "GET",
+                url: server + "client/cancelTravel",
+                data: {
+                  email: credentials.email,
+                  sessionID: session,
+                  travelID: travelID
+                },
+                error: function(xhr, type) {
+                  return alert(type.response);
+                },
+                success: function(result) {
+                  return console.log(result);
+                }
+              });
+            }
+          }), 30000);
         }
       });
     };
@@ -2008,7 +2055,8 @@
 }).call(this);
 
 (function() {
-  var __hasProp = {}.hasOwnProperty,
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.PushCtrl = (function(_super) {
@@ -2019,6 +2067,7 @@
     pushNotification = void 0;
 
     function PushCtrl() {
+      this.handlePush = __bind(this.handlePush, this);
       PushCtrl.__super__.constructor.apply(this, arguments);
     }
 
@@ -2026,9 +2075,9 @@
 
     onDeviceReady = function() {
       var err, txt;
-      console.log("Deviceready event received");
+      alert("Deviceready event received");
       document.addEventListener("backbutton", (function(e) {
-        console.log("Backbutton event received");
+        alert("Backbutton event received");
         if ($("#home").length > 0) {
           e.preventDefault();
           return navigator.app.exitApp();
@@ -2039,13 +2088,13 @@
       try {
         pushNotification = window.plugins.pushNotification;
         if (device.platform === "android" || device.platform === "Android") {
-          console.log("Registering android");
+          alert("Registering android");
           return pushNotification.register(successHandler, errorHandler, {
             senderID: "661780372179",
             ecb: "onNotificationGCM"
           });
         } else {
-          console.log("Registering iOS");
+          alert("Registering iOS");
           return pushNotification.register(tokenHandler, errorHandler, {
             badge: "true",
             sound: "true",
@@ -2064,7 +2113,7 @@
     onNotificationAPN = function(e) {
       var snd;
       if (e.alert) {
-        console.log("Push-notification: " + e.alert);
+        alert("Push-notification: " + e.alert);
         navigator.notification.alert(e.alert);
       }
       if (e.sound) {
@@ -2078,45 +2127,66 @@
 
     onNotificationGCM = function(e) {
       var my_media;
-      console.log("EVENT -> RECEIVED:" + e.event);
+      alert("EVENT -> RECEIVED:" + e.event);
       switch (e.event) {
         case "registered":
           if (e.regid.length > 0) {
-            console.log("REGISTERED -> REGID:" + e.regid);
-            return console.log("regID = " + e.regid);
+            alert("REGISTERED -> REGID:" + e.regid);
+            return alert("regID = " + e.regid);
           }
           break;
         case "message":
           if (e.foreground) {
-            console.log("--INLINE NOTIFICATION--");
+            alert("--INLINE NOTIFICATION--");
+            handlePush(e.payload);
             my_media = new Media("/android_asset/www/" + e.soundname);
             my_media.play();
           } else {
             if (e.coldstart) {
-              console.log("--COLDSTART NOTIFICATION--");
+              handlePush(e.payload);
+              alert("--COLDSTART NOTIFICATION--");
             } else {
-              console.log("--BACKGROUND NOTIFICATION--");
+              handlePush(e.payload);
+              alert("--BACKGROUND NOTIFICATION--");
             }
           }
-          console.log("MESSAGE -> MSG: " + e.payload.message);
-          return console.log("MESSAGE -> MSGCNT: " + e.payload.msgcnt);
+          alert("MESSAGE -> MSG: " + e.payload.message);
+          return alert("MESSAGE -> MSGCNT: " + e.payload.msgcnt);
         case "error":
-          return console.log("ERROR -> MSG:" + e.msg);
+          return alert("ERROR -> MSG:" + e.msg);
         default:
-          return console.log("EVENT -> Unknown, an event was received and we do not know what it is");
+          return alert("EVENT -> Unknown, an event was received and we do not know what it is");
+      }
+    };
+
+    PushCtrl.prototype.handlePush = function(notification) {
+      switch (notification.code) {
+        case 701:
+          Lungo.Cache.set("travelAccepted", true);
+          return Lungo.Router.section("home_s");
+        case 702:
+          if (notification.appPayment === "true") {
+            __Controller.payment.loadPayment(notification.cost);
+            home_driver.style.visibility = "visible";
+            Lungo.Router.section("home_s");
+            return Lungo.Router.section("payment_s");
+          } else {
+            Lungo.Router.section("home_s");
+            return alert("Viaje pagado");
+          }
       }
     };
 
     tokenHandler = function(result) {
-      return console.log("Token: " + result);
+      return alert("Token: " + result);
     };
 
     successHandler = function(result) {
-      return console.log("PUSH recibido:" + result);
+      return alert("PUSH recibido:" + result);
     };
 
     errorHandler = function(error) {
-      return console.log("Error al recibir PUSH: " + error);
+      return alert("Error al recibir PUSH: " + error);
     };
 
     return PushCtrl;
@@ -2350,9 +2420,15 @@
         destination: destination,
         travelMode: google.maps.DirectionsTravelMode.DRIVING
       };
-      return directionsService.route(request, function(response, status) {
+      directionsService.route(request, function(response, status) {
         if (status === google.maps.DirectionsStatus.OK) {
           return directionsDisplay.setDirections(response);
+        }
+      });
+      return google.maps.event.addListener(directionsDisplay, "click", function() {
+        console.log("jjk");
+        if (infowindow) {
+          return infowindow.close();
         }
       });
     };
@@ -2500,9 +2576,27 @@
     }
 
     WaitingCtrl.prototype.cancel = function(event) {
-      home_driver.src = "img/payment.png";
-      home_driver.style.visibility = "visible";
-      return Lungo.Router.section("home_s");
+      var credentials, server, session, travelID,
+        _this = this;
+      credentials = Lungo.Cache.get("credentials");
+      server = Lungo.Cache.get("server");
+      session = Lungo.Cache.get("session");
+      travelID = Lungo.Cache.get("travelID");
+      return $$.ajax({
+        type: "GET",
+        url: server + "client/cancelTravel",
+        data: {
+          email: credentials.email,
+          sessionID: session,
+          travelID: travelID
+        },
+        error: function(xhr, type) {
+          return alert(type.response);
+        },
+        success: function(result) {
+          return console.log(result);
+        }
+      });
     };
 
     return WaitingCtrl;

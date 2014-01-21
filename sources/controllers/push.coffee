@@ -8,9 +8,9 @@ class __Controller.PushCtrl extends Monocle.Controller
   document.addEventListener "deviceready", onDeviceReady, true
 
   onDeviceReady = ->
-    console.log "Deviceready event received"
+    alert "Deviceready event received"
     document.addEventListener "backbutton", ((e) ->
-      console.log "Backbutton event received"
+      alert "Backbutton event received"
       if $("#home").length > 0
         
         # call this to get a new token each time. don't call it to reuse existing token.
@@ -23,13 +23,13 @@ class __Controller.PushCtrl extends Monocle.Controller
     try
       pushNotification = window.plugins.pushNotification
       if device.platform is "android" or device.platform is "Android"
-        console.log "Registering android"
+        alert "Registering android"
         pushNotification.register successHandler, errorHandler, # required!
           senderID: "661780372179"
           ecb: "onNotificationGCM"
 
       else
-        console.log "Registering iOS"
+        alert "Registering iOS"
         pushNotification.register tokenHandler, errorHandler, # required!
           badge: "true"
           sound: "true"
@@ -47,7 +47,7 @@ class __Controller.PushCtrl extends Monocle.Controller
   # handle APNS notifications for iOS
   onNotificationAPN = (e) ->
     if e.alert
-      console.log "Push-notification: " + e.alert
+      alert "Push-notification: " + e.alert
       navigator.notification.alert e.alert
     if e.sound
       snd = new Media(e.sound)
@@ -59,47 +59,61 @@ class __Controller.PushCtrl extends Monocle.Controller
 
   # handle GCM notifications for Android
   onNotificationGCM = (e) ->
-    console.log "EVENT -> RECEIVED:" + e.event
+    alert "EVENT -> RECEIVED:" + e.event
     switch e.event
       when "registered"
         if e.regid.length > 0
-          console.log "REGISTERED -> REGID:" + e.regid
+          alert "REGISTERED -> REGID:" + e.regid
           
           # Your GCM push server needs to know the regID before it can push to this device
           # here is where you might want to send it the regID for later use.
-          console.log "regID = " + e.regid
+          alert "regID = " + e.regid
       when "message"
         
         # if this flag is set, this notification happened while we were in the foreground.
         # you might want to play a sound to get the user's attention, throw up a dialog, etc.
         if e.foreground
-          console.log "--INLINE NOTIFICATION--"
-          
+          alert "--INLINE NOTIFICATION--"
+          handlePush(e.payload)
           # if the notification contains a soundname, play it.
           my_media = new Media("/android_asset/www/" + e.soundname)
           my_media.play()
         else # otherwise we were launched because the user touched a notification in the notification tray.
           if e.coldstart
-            console.log "--COLDSTART NOTIFICATION--"
+            handlePush(e.payload)
+            alert "--COLDSTART NOTIFICATION--"
           else
-            console.log "--BACKGROUND NOTIFICATION--"
-        console.log "MESSAGE -> MSG: " + e.payload.message
-        console.log "MESSAGE -> MSGCNT: " + e.payload.msgcnt
+            handlePush(e.payload)
+            alert "--BACKGROUND NOTIFICATION--"
+        alert "MESSAGE -> MSG: " + e.payload.message
+        alert "MESSAGE -> MSGCNT: " + e.payload.msgcnt
       when "error"
-        console.log "ERROR -> MSG:" + e.msg
+        alert "ERROR -> MSG:" + e.msg
       else
-        console.log "EVENT -> Unknown, an event was received and we do not know what it is"
+        alert "EVENT -> Unknown, an event was received and we do not know what it is"
 
-
+  handlePush: (notification) =>
+    switch notification.code
+      when 701 #Recibo push de trayecto aceptado
+        Lungo.Cache.set "travelAccepted", true
+        Lungo.Router.section "home_s"      
+      when 702 #Recibo la push de pago
+        if notification.appPayment == "true"
+          __Controller.payment.loadPayment(notification.cost)
+          home_driver.style.visibility = "visible"
+          Lungo.Router.section "home_s"      
+          Lungo.Router.section "payment_s"
+        else
+          Lungo.Router.section "home_s"      
+          alert "Viaje pagado"
+          #añadir viaje a la lista
 
   tokenHandler = (result) ->
-    console.log "Token: " + result
+    alert "Token: " + result
 
-  # Your iOS push server needs to know the token before it can push to this device
-  # here is where you might want to send it the token for later use.
   successHandler = (result) ->
-    console.log "PUSH recibido:" + result
+    alert "PUSH recibido:" + result
 
   errorHandler = (error) ->
-    console.log "Error al recibir PUSH: " + error
+    alert "Error al recibir PUSH: " + error
 

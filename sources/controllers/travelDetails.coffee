@@ -61,6 +61,9 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
       travelMode: google.maps.DirectionsTravelMode.DRIVING
     directionsService.route request, (response, status) ->
       directionsDisplay.setDirections response  if status is google.maps.DirectionsStatus.OK
+    google.maps.event.addListener directionsDisplay, "click", ->
+      console.log "jjk"
+      infowindow.close()  if infowindow
 
 
   changeValuation: =>
