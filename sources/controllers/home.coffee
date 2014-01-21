@@ -21,13 +21,13 @@ class __Controller.HomeCtrl extends Monocle.Controller
         enableHighAccuracy: true,
         timeout: 5000,
         maximumAge: 0
-      navigator.geolocation.getCurrentPosition initialize, manageErrors
-    else
-      alert "HABILITALO!!"
-
+      navigator.geolocation.getCurrentPosition initialize, manageErrors, options    
 
   manageErrors = (err) ->
-    setTimeout((=> navigator.geolocation.getCurrentPosition initialize, manageErrors) , 5000)
+    setTimeout((=> 
+      alert "error"
+      navigator.geolocation.getCurrentPosition initialize, manageErrors
+    ) , 5000)
 
 
   refresh: (event) =>
@@ -104,6 +104,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
         if results[1]
           if results[0].address_components[1].short_name == results[0].address_components[0].short_name
             home_streetField.value = results[0].address_components[1].short_name
+            Lungo.Cache.set "origin", home_streetField.value
           else home_streetField.value = results[0].address_components[1].short_name + ", " +results[0].address_components[0].short_name
         else
           home_streetField.value = 'Calle desconocida'
@@ -116,16 +117,18 @@ class __Controller.HomeCtrl extends Monocle.Controller
     position = Lungo.Cache.get "geoPosition"
     server = Lungo.Cache.get "server"
     session = Lungo.Cache.get "session"
+    origin = Lungo.Cache.get "origin"
     $$.ajax
       type: "GET"
       url: server + "client/gettaxi"
       data:
         email: credentials.email
-        longitud: position.d
-        latitud: position.e
+        longitude: position.d
+        latitude: position.e
+        origin: origin
         sessionID: session
       error: (xhr, type) =>
-        console.log type.response
+        alert type.response
       success: (result) =>
         console.log result
         Lungo.Router.section "waiting_s"

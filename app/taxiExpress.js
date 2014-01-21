@@ -382,7 +382,32 @@
     };
 
     ChosenTaxiCtrl.prototype.requestTaxi = function(event) {
-      return Lungo.Router.section("waiting_s");
+      var credentials, origin, position, server, session,
+        _this = this;
+      Lungo.Router.section("waiting_s");
+      credentials = Lungo.Cache.get("credentials");
+      position = Lungo.Cache.get("geoPosition");
+      server = Lungo.Cache.get("server");
+      session = Lungo.Cache.get("session");
+      origin = Lungo.Cache.get("origin");
+      return $$.ajax({
+        type: "GET",
+        url: server + "client/getselectedtaxi",
+        data: {
+          email: credentials.email,
+          longitude: position.d,
+          latitude: position.e,
+          origin: origin,
+          driver: this.driverDetails.email,
+          sessionID: session
+        },
+        error: function(xhr, type) {
+          return alert(type.response);
+        },
+        success: function(result) {
+          return console.log(result);
+        }
+      });
     };
 
     return ChosenTaxiCtrl;
@@ -780,15 +805,14 @@
           timeout: 5000,
           maximumAge: 0
         };
-        navigator.geolocation.getCurrentPosition(initialize, manageErrors);
-      } else {
-        alert("HABILITALO!!");
+        navigator.geolocation.getCurrentPosition(initialize, manageErrors, options);
       }
     }
 
     manageErrors = function(err) {
       var _this = this;
       return setTimeout((function() {
+        alert("error");
         return navigator.geolocation.getCurrentPosition(initialize, manageErrors);
       }), 5000);
     };
@@ -889,7 +913,8 @@
         if (status === google.maps.GeocoderStatus.OK) {
           if (results[1]) {
             if (results[0].address_components[1].short_name === results[0].address_components[0].short_name) {
-              return home_streetField.value = results[0].address_components[1].short_name;
+              home_streetField.value = results[0].address_components[1].short_name;
+              return Lungo.Cache.set("origin", home_streetField.value);
             } else {
               return home_streetField.value = results[0].address_components[1].short_name + ", " + results[0].address_components[0].short_name;
             }
@@ -903,23 +928,25 @@
     };
 
     HomeCtrl.prototype.getTaxi = function() {
-      var credentials, server, session,
+      var credentials, origin, server, session,
         _this = this;
       credentials = Lungo.Cache.get("credentials");
       position = Lungo.Cache.get("geoPosition");
       server = Lungo.Cache.get("server");
       session = Lungo.Cache.get("session");
+      origin = Lungo.Cache.get("origin");
       return $$.ajax({
         type: "GET",
         url: server + "client/gettaxi",
         data: {
           email: credentials.email,
-          longitud: position.d,
-          latitud: position.e,
+          longitude: position.d,
+          latitude: position.e,
+          origin: origin,
           sessionID: session
         },
         error: function(xhr, type) {
-          return console.log(type.response);
+          return alert(type.response);
         },
         success: function(result) {
           console.log(result);
@@ -1057,8 +1084,8 @@
           dateTrav = result.lastUpdateTravels.substring(0, 19);
           dateTrav = dateTrav.replace("T", " ");
         }
-        __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible);
         this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateFavorites, lastUpdateTravels, name, surname, phone, image, seats, payments, animals, accessible) VALUES ('" + profile.email + "','" + this.password[0].value + "','" + date + "','" + dateFav + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "');");
+        __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible);
       }
       Lungo.Cache.set("credentials", profile);
       if (result.favlist) {
@@ -1081,6 +1108,7 @@
         __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
         this.getDriversAndTravelsSQL();
       }
+      __Controller.push = new __Controller.PushCtrl;
       __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
       __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
       __Controller.favDriver = new __Controller.FavDriverCtrl("section#favDriver_s");
@@ -1099,6 +1127,8 @@
         return tx.executeSql("SELECT * FROM profile", [], (function(tx, results) {
           if (results.rows.length > 0) {
             credentials = results.rows.item(0);
+            _this.username[0].value = credentials.email;
+            _this.password[0].value = credentials.pass;
             return _this.valideCredentials(credentials.email, credentials.pass, credentials.lastUpdate, credentials.lastUpdateFavorites, credentials.lastUpdateTravels);
           } else {
             return Lungo.Router.section("login_s");
@@ -1699,13 +1729,34 @@
     };
 
     PaymentCtrl.prototype.stripeResponseHandler = function(status, response) {
+      var credentials, server, session, travelID,
+        _this = this;
       this.button[0].disabled = false;
       if (response.error) {
         return this.errors[0].innerText = "Los datos de la tarjeta no son válidos. Compruébelos.";
       } else {
-        alert("Trayecto pagado");
-        home_driver.style.visibility = "hidden";
-        return Lungo.Router.section("home_s");
+        credentials = Lungo.Cache.get("credentials");
+        server = Lungo.Cache.get("server");
+        session = Lungo.Cache.get("session");
+        travelID = Lungo.Cache.get("travelID");
+        return $$.ajax({
+          type: "GET",
+          url: server + "client/payTravel",
+          data: {
+            email: credentials.email,
+            travelID: travelID,
+            sessionID: session
+          },
+          error: function(xhr, type) {
+            return alert(type.response);
+          },
+          success: function(result) {
+            console.log(result);
+            alert("Trayecto pagado");
+            home_driver.style.visibility = "hidden";
+            return Lungo.Router.section("home_s");
+          }
+        });
       }
     };
 
@@ -1951,6 +2002,124 @@
     };
 
     return ProfileCtrl;
+
+  })(Monocle.Controller);
+
+}).call(this);
+
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  __Controller.PushCtrl = (function(_super) {
+    var errorHandler, onDeviceReady, onNotificationAPN, onNotificationGCM, pushNotification, successHandler, tokenHandler;
+
+    __extends(PushCtrl, _super);
+
+    pushNotification = void 0;
+
+    function PushCtrl() {
+      PushCtrl.__super__.constructor.apply(this, arguments);
+    }
+
+    document.addEventListener("deviceready", onDeviceReady, true);
+
+    onDeviceReady = function() {
+      var err, txt;
+      console.log("Deviceready event received");
+      document.addEventListener("backbutton", (function(e) {
+        console.log("Backbutton event received");
+        if ($("#home").length > 0) {
+          e.preventDefault();
+          return navigator.app.exitApp();
+        } else {
+          return navigator.app.backHistory();
+        }
+      }), false);
+      try {
+        pushNotification = window.plugins.pushNotification;
+        if (device.platform === "android" || device.platform === "Android") {
+          console.log("Registering android");
+          return pushNotification.register(successHandler, errorHandler, {
+            senderID: "661780372179",
+            ecb: "onNotificationGCM"
+          });
+        } else {
+          console.log("Registering iOS");
+          return pushNotification.register(tokenHandler, errorHandler, {
+            badge: "true",
+            sound: "true",
+            alert: "true",
+            ecb: "onNotificationAPN"
+          });
+        }
+      } catch (_error) {
+        err = _error;
+        txt = "There was an error on this page.\n\n";
+        txt += "Error description: " + err.message + "\n\n";
+        return alert(txt);
+      }
+    };
+
+    onNotificationAPN = function(e) {
+      var snd;
+      if (e.alert) {
+        console.log("Push-notification: " + e.alert);
+        navigator.notification.alert(e.alert);
+      }
+      if (e.sound) {
+        snd = new Media(e.sound);
+        snd.play();
+      }
+      if (e.badge) {
+        return pushNotification.setApplicationIconBadgeNumber(successHandler, e.badge);
+      }
+    };
+
+    onNotificationGCM = function(e) {
+      var my_media;
+      console.log("EVENT -> RECEIVED:" + e.event);
+      switch (e.event) {
+        case "registered":
+          if (e.regid.length > 0) {
+            console.log("REGISTERED -> REGID:" + e.regid);
+            return console.log("regID = " + e.regid);
+          }
+          break;
+        case "message":
+          if (e.foreground) {
+            console.log("--INLINE NOTIFICATION--");
+            my_media = new Media("/android_asset/www/" + e.soundname);
+            my_media.play();
+          } else {
+            if (e.coldstart) {
+              console.log("--COLDSTART NOTIFICATION--");
+            } else {
+              console.log("--BACKGROUND NOTIFICATION--");
+            }
+          }
+          console.log("MESSAGE -> MSG: " + e.payload.message);
+          return console.log("MESSAGE -> MSGCNT: " + e.payload.msgcnt);
+        case "error":
+          return console.log("ERROR -> MSG:" + e.msg);
+        default:
+          return console.log("EVENT -> Unknown, an event was received and we do not know what it is");
+      }
+    };
+
+    tokenHandler = function(result) {
+      return console.log("Token: " + result);
+    };
+
+    successHandler = function(result) {
+      return console.log("PUSH recibido:" + result);
+    };
+
+    errorHandler = function(error) {
+      return console.log("Error al recibir PUSH: " + error);
+    };
+
+    return PushCtrl;
 
   })(Monocle.Controller);
 

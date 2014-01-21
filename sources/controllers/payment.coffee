@@ -48,8 +48,23 @@ class __Controller.PaymentCtrl extends Monocle.Controller
     if response.error      
       @errors[0].innerText = "Los datos de la tarjeta no son válidos. Compruébelos."
     else
-      alert "Trayecto pagado"
-      home_driver.style.visibility = "hidden"
-      Lungo.Router.section "home_s"
+      credentials = Lungo.Cache.get "credentials"
+      server = Lungo.Cache.get "server"
+      session = Lungo.Cache.get "session"
+      travelID = Lungo.Cache.get "travelID"
+      $$.ajax
+        type: "GET"
+        url: server + "client/payTravel"
+        data:
+          email: credentials.email
+          travelID: travelID
+          sessionID: session
+        error: (xhr, type) =>
+          alert type.response
+        success: (result) =>
+          console.log result
+          alert "Trayecto pagado"
+          home_driver.style.visibility = "hidden"
+          Lungo.Router.section "home_s"
 
-      
+        

@@ -81,8 +81,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
         dateFav = dateFav.replace "T", " "
         dateTrav = result.lastUpdateTravels.substring 0, 19
         dateTrav = dateTrav.replace "T", " "
-      __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible)
       @doSQL "INSERT INTO profile (email, pass, lastUpdate, lastUpdateFavorites, lastUpdateTravels, name, surname, phone, image, seats, payments, animals, accessible) VALUES ('"+profile.email+"','"+@password[0].value+"','"+date+"','"+dateFav+"','"+dateTrav+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"','"+result.fCapacity+"','"+result.fAppPayment+"','"+result.fAnimals+"','"+result.fAccessible+"');"
+      __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible)
     Lungo.Cache.set "credentials", profile
     if result.favlist
       @loadFavoriteTaxis(result.favlist) 
@@ -102,6 +102,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     else
       __Controller.travelList = new __Controller.TravelListCtrl "section#travelList_s"
       @getDriversAndTravelsSQL()
+    __Controller.push = new __Controller.PushCtrl
     __Controller.profile = new __Controller.ProfileCtrl "section#profile_s"
     __Controller.payment = new __Controller.PaymentCtrl "section#payment_s"
     __Controller.favDriver = new __Controller.FavDriverCtrl "section#favDriver_s"
@@ -117,6 +118,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
       tx.executeSql "SELECT * FROM profile", [], ((tx, results) =>
         if results.rows.length > 0
           credentials = results.rows.item(0)
+          @username[0].value = credentials.email
+          @password[0].value = credentials.pass
           @valideCredentials(credentials.email, credentials.pass, credentials.lastUpdate, credentials.lastUpdateFavorites, credentials.lastUpdateTravels)
         else
           Lungo.Router.section "login_s"

@@ -38,3 +38,22 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
 
   requestTaxi: (event) =>
     Lungo.Router.section "waiting_s"
+    credentials = Lungo.Cache.get "credentials"
+    position = Lungo.Cache.get "geoPosition"
+    server = Lungo.Cache.get "server"
+    session = Lungo.Cache.get "session"
+    origin = Lungo.Cache.get "origin"
+    $$.ajax
+      type: "GET"
+      url: server + "client/getselectedtaxi"
+      data:
+        email: credentials.email
+        longitude: position.d
+        latitude: position.e
+        origin: origin
+        driver: @driverDetails.email
+        sessionID: session
+      error: (xhr, type) =>
+        alert type.response
+      success: (result) =>
+        console.log result
