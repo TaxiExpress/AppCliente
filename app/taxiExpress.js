@@ -1265,28 +1265,31 @@
         origin = travel.origin;
         destination = travel.destination;
         cost = travel.cost;
-        driver2 = travel.driver;
-        if (driver2.image === "") {
-          image = "";
-        } else {
-          image = driver2.image;
+        driver = __Model.Driver.get(travel.driver.email)[0];
+        if (driver === void 0) {
+          driver2 = travel.driver;
+          if (driver2.image === "") {
+            image = "";
+          } else {
+            image = driver2.image;
+          }
+          model = driver2.car.company + " " + driver2.car.model;
+          driver = __Model.Driver.create({
+            email: driver2.email,
+            name: driver2.first_name,
+            surname: driver2.last_name,
+            valuation: driver2.valuation,
+            plate: driver2.car.plate,
+            model: model,
+            image: driver2.image,
+            capacity: driver2.car.capacity,
+            accessible: driver2.car.accessible,
+            animals: driver2.car.animals,
+            appPayment: driver2.car.appPayment
+          });
+          sql = "INSERT INTO drivers (email, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('" + driver.email + "','" + driver.name + "','" + driver.surname + "','" + driver.valuation + "','" + driver.plate + "','" + model + "','" + image + "','" + driver.capacity + "','" + driver.accessible + "','" + driver.animals + "','" + driver.appPayment + "');";
+          this.doSQL(sql);
         }
-        model = driver2.car.company + " " + driver2.car.model;
-        driver = __Model.Driver.create({
-          email: driver2.email,
-          name: driver2.first_name,
-          surname: driver2.last_name,
-          valuation: driver2.valuation,
-          plate: driver2.car.plate,
-          model: model,
-          image: driver2.image,
-          capacity: driver2.car.capacity,
-          accessible: driver2.car.accessible,
-          animals: driver2.car.animals,
-          appPayment: driver2.car.appPayment
-        });
-        sql = "INSERT INTO drivers (email, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('" + driver.email + "','" + driver.name + "','" + driver.surname + "','" + driver.valuation + "','" + driver.plate + "','" + model + "','" + image + "','" + driver.capacity + "','" + driver.accessible + "','" + driver.animals + "','" + driver.appPayment + "');";
-        this.doSQL(sql);
         travel2 = __Model.Travel.create({
           id: id,
           starttime: starttime,
@@ -2067,6 +2070,7 @@
     pushNotification = void 0;
 
     function PushCtrl() {
+      this.doSQL = __bind(this.doSQL, this);
       this.handlePush = __bind(this.handlePush, this);
       PushCtrl.__super__.constructor.apply(this, arguments);
     }
@@ -2160,6 +2164,8 @@
     };
 
     PushCtrl.prototype.handlePush = function(notification) {
+      var credentials, data, server, session,
+        _this = this;
       switch (notification.code) {
         case 701:
           Lungo.Cache.set("travelAccepted", true);
@@ -2172,9 +2178,94 @@
             return Lungo.Router.section("payment_s");
           } else {
             Lungo.Router.section("home_s");
-            return alert("Viaje pagado");
+            alert("Viaje pagado");
+            credentials = Lungo.Cache.get("credentials");
+            server = Lungo.Cache.get("server");
+            session = Lungo.Cache.get("session");
+            data = {
+              email: credentials.email,
+              sessionID: session
+            };
+            return $$.ajax({
+              type: "GET",
+              url: server + "client/getlasttravel",
+              data: data,
+              success: function(result) {
+                return addLastTravel(result);
+              },
+              error: function(xhr, type) {
+                return console.log(type.response);
+              }
+            });
           }
       }
+    };
+
+    PushCtrl.prototype.addLastTravel = function(travel) {
+      var coords, cost, destination, driver, driver2, endpoint, endtime, id, image, lat, long, model, origin, pos, sql, startpoint, starttime, travel2;
+      id = travel.id;
+      starttime = new Date(travel.starttime);
+      endtime = new Date(travel.endtime);
+      coords = travel.startpoint.substring(7);
+      pos = coords.indexOf(" ");
+      long = coords.substring(0, pos);
+      lat = coords.substring(pos + 1, coords.indexOf(")"));
+      startpoint = new google.maps.LatLng(long, lat);
+      coords = travel.endpoint.substring(7);
+      pos = coords.indexOf(" ");
+      long = coords.substring(0, pos);
+      lat = coords.substring(pos + 1, coords.indexOf(")"));
+      endpoint = new google.maps.LatLng(long, lat);
+      origin = travel.origin;
+      destination = travel.destination;
+      cost = travel.cost;
+      driver = __Model.Driver.get(travel.driver.email)[0];
+      if (driver === void 0) {
+        driver2 = travel.driver;
+        if (driver2.image === "") {
+          image = "";
+        } else {
+          image = driver2.image;
+        }
+        model = driver2.car.company + " " + driver2.car.model;
+        driver = __Model.Driver.create({
+          email: driver2.email,
+          name: driver2.first_name,
+          surname: driver2.last_name,
+          valuation: driver2.valuation,
+          plate: driver2.car.plate,
+          model: model,
+          image: driver2.image,
+          capacity: driver2.car.capacity,
+          accessible: driver2.car.accessible,
+          animals: driver2.car.animals,
+          appPayment: driver2.car.appPayment
+        });
+        sql = "INSERT INTO drivers (email, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('" + driver.email + "','" + driver.name + "','" + driver.surname + "','" + driver.valuation + "','" + driver.plate + "','" + model + "','" + image + "','" + driver.capacity + "','" + driver.accessible + "','" + driver.animals + "','" + driver.appPayment + "');";
+        this.doSQL(sql);
+      }
+      travel2 = __Model.Travel.create({
+        id: id,
+        starttime: starttime,
+        endtime: endtime,
+        startpoint: startpoint,
+        endpoint: endpoint,
+        cost: cost,
+        driver: driver,
+        origin: origin,
+        destination: destination
+      });
+      sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "');";
+      return this.doSQL(sql);
+    };
+
+    PushCtrl.prototype.doSQL = function(sql) {
+      var db,
+        _this = this;
+      db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
+      return db.transaction(function(tx) {
+        return tx.executeSql(sql);
+      });
     };
 
     tokenHandler = function(result) {
