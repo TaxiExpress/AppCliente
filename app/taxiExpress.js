@@ -253,8 +253,7 @@
     Travel.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"travelDetails_s\">                \n    <div>\n        <strong>{{ origin }} - {{ destination }}</strong>\n        <small>{{ date }}</small>\n    </div>\n</li>";
 
     Travel.prototype.events = {
-      "singleTap li": "onView",
-      "swipeLeft li": "deleteTravel"
+      "singleTap li": "onView"
     };
 
     function Travel() {
@@ -320,6 +319,7 @@
 
   $$(function() {
     Lungo.init({});
+    __Controller.push = new __Controller.PushCtrl;
     return __Controller.App = new __Controller.AppCtrl("section#init_s");
   });
 
@@ -1155,7 +1155,6 @@
         __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
         this.getDriversAndTravelsSQL();
       }
-      __Controller.push = new __Controller.PushCtrl;
       __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
       __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
       __Controller.favDriver = new __Controller.FavDriverCtrl("section#favDriver_s");
@@ -2063,7 +2062,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.PushCtrl = (function(_super) {
-    var errorHandler, onDeviceReady, onNotificationAPN, onNotificationGCM, pushNotification, successHandler, tokenHandler;
+    var pushNotification;
 
     __extends(PushCtrl, _super);
 
@@ -2074,94 +2073,6 @@
       this.handlePush = __bind(this.handlePush, this);
       PushCtrl.__super__.constructor.apply(this, arguments);
     }
-
-    document.addEventListener("deviceready", onDeviceReady, true);
-
-    onDeviceReady = function() {
-      var err, txt;
-      alert("Deviceready event received");
-      document.addEventListener("backbutton", (function(e) {
-        alert("Backbutton event received");
-        if ($("#home").length > 0) {
-          e.preventDefault();
-          return navigator.app.exitApp();
-        } else {
-          return navigator.app.backHistory();
-        }
-      }), false);
-      try {
-        pushNotification = window.plugins.pushNotification;
-        if (device.platform === "android" || device.platform === "Android") {
-          alert("Registering android");
-          return pushNotification.register(successHandler, errorHandler, {
-            senderID: "661780372179",
-            ecb: "onNotificationGCM"
-          });
-        } else {
-          alert("Registering iOS");
-          return pushNotification.register(tokenHandler, errorHandler, {
-            badge: "true",
-            sound: "true",
-            alert: "true",
-            ecb: "onNotificationAPN"
-          });
-        }
-      } catch (_error) {
-        err = _error;
-        txt = "There was an error on this page.\n\n";
-        txt += "Error description: " + err.message + "\n\n";
-        return alert(txt);
-      }
-    };
-
-    onNotificationAPN = function(e) {
-      var snd;
-      if (e.alert) {
-        alert("Push-notification: " + e.alert);
-        navigator.notification.alert(e.alert);
-      }
-      if (e.sound) {
-        snd = new Media(e.sound);
-        snd.play();
-      }
-      if (e.badge) {
-        return pushNotification.setApplicationIconBadgeNumber(successHandler, e.badge);
-      }
-    };
-
-    onNotificationGCM = function(e) {
-      var my_media;
-      alert("EVENT -> RECEIVED:" + e.event);
-      switch (e.event) {
-        case "registered":
-          if (e.regid.length > 0) {
-            alert("REGISTERED -> REGID:" + e.regid);
-            return alert("regID = " + e.regid);
-          }
-          break;
-        case "message":
-          if (e.foreground) {
-            alert("--INLINE NOTIFICATION--");
-            handlePush(e.payload);
-            my_media = new Media("/android_asset/www/" + e.soundname);
-            my_media.play();
-          } else {
-            if (e.coldstart) {
-              handlePush(e.payload);
-              alert("--COLDSTART NOTIFICATION--");
-            } else {
-              handlePush(e.payload);
-              alert("--BACKGROUND NOTIFICATION--");
-            }
-          }
-          alert("MESSAGE -> MSG: " + e.payload.message);
-          return alert("MESSAGE -> MSGCNT: " + e.payload.msgcnt);
-        case "error":
-          return alert("ERROR -> MSG:" + e.msg);
-        default:
-          return alert("EVENT -> Unknown, an event was received and we do not know what it is");
-      }
-    };
 
     PushCtrl.prototype.handlePush = function(notification) {
       var credentials, data, server, session,
@@ -2266,18 +2177,6 @@
       return db.transaction(function(tx) {
         return tx.executeSql(sql);
       });
-    };
-
-    tokenHandler = function(result) {
-      return alert("Token: " + result);
-    };
-
-    successHandler = function(result) {
-      return alert("PUSH recibido:" + result);
-    };
-
-    errorHandler = function(error) {
-      return alert("Error al recibir PUSH: " + error);
     };
 
     return PushCtrl;

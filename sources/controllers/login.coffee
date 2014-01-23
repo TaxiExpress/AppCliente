@@ -102,7 +102,6 @@ class __Controller.LoginCtrl extends Monocle.Controller
     else
       __Controller.travelList = new __Controller.TravelListCtrl "section#travelList_s"
       @getDriversAndTravelsSQL()
-    __Controller.push = new __Controller.PushCtrl
     __Controller.profile = new __Controller.ProfileCtrl "section#profile_s"
     __Controller.payment = new __Controller.PaymentCtrl "section#payment_s"
     __Controller.favDriver = new __Controller.FavDriverCtrl "section#favDriver_s"

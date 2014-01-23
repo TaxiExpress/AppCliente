@@ -15,7 +15,7 @@ class __View.Travel extends Monocle.View
 
   events:
     "singleTap li"              :  "onView"
-    "swipeLeft li"              :  "deleteTravel"
+#    "swipeLeft li"              :  "deleteTravel"
    
   constructor: ->
     super

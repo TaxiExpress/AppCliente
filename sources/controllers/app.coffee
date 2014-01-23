@@ -11,4 +11,5 @@ class __Controller.AppCtrl extends Monocle.Controller
     
 $$ ->
   Lungo.init({})
+  __Controller.push = new __Controller.PushCtrl
   __Controller.App = new __Controller.AppCtrl "section#init_s"
