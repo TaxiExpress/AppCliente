@@ -35,12 +35,14 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
   valideCredentials: (email, pass, date, dateFavorites, dateTravels) =>
     server = Lungo.Cache.get "server"
+    pushID = Lungo.Cache.get "pushID"
     data = 
       email: email
       password: pass
       lastUpdate: date
       lastUpdateFavorites: dateFavorites
       lastUpdateTravels: dateTravels
+      pushID: pushID
     $$.ajax
       type: "POST"
       url: server + "client/login"

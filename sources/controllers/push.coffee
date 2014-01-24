@@ -5,6 +5,8 @@ class __Controller.PushCtrl extends Monocle.Controller
   constructor: ->
     super
 
+  savePushID: (id) =>
+    Lungo.Cache.set "pushID", id
 
   handlePush: (notification) =>
     switch notification.code

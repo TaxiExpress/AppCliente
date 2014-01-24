@@ -960,7 +960,7 @@
       session = Lungo.Cache.get("session");
       origin = Lungo.Cache.get("origin");
       return $$.ajax({
-        type: "GET",
+        type: "POST",
         url: server + "client/gettaxi",
         data: {
           email: credentials.email,
@@ -1071,15 +1071,17 @@
     };
 
     LoginCtrl.prototype.valideCredentials = function(email, pass, date, dateFavorites, dateTravels) {
-      var data, server,
+      var data, pushID, server,
         _this = this;
       server = Lungo.Cache.get("server");
+      pushID = Lungo.Cache.get("pushID");
       data = {
         email: email,
         password: pass,
         lastUpdate: date,
         lastUpdateFavorites: dateFavorites,
-        lastUpdateTravels: dateTravels
+        lastUpdateTravels: dateTravels,
+        pushID: pushID
       };
       return $$.ajax({
         type: "POST",
@@ -2071,8 +2073,13 @@
     function PushCtrl() {
       this.doSQL = __bind(this.doSQL, this);
       this.handlePush = __bind(this.handlePush, this);
+      this.savePushID = __bind(this.savePushID, this);
       PushCtrl.__super__.constructor.apply(this, arguments);
     }
+
+    PushCtrl.prototype.savePushID = function(id) {
+      return Lungo.Cache.set("pushID", id);
+    };
 
     PushCtrl.prototype.handlePush = function(notification) {
       var credentials, data, server, session,

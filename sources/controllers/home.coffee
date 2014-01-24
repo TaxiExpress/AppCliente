@@ -119,7 +119,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
     session = Lungo.Cache.get "session"
     origin = Lungo.Cache.get "origin"
     $$.ajax
-      type: "GET"
+      type: "POST"
       url: server + "client/gettaxi"
       data:
         email: credentials.email
