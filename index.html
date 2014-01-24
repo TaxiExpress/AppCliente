@@ -368,9 +368,8 @@
         function onDeviceReady() {
             try 
             { 
-                alert('Registering android</li>');
+                pushNotification = window.plugins.pushNotification;
                 pushNotification.register(successHandler, errorHandler, {"senderID":"513061017666","ecb":"onNotificationGCM"});
-                
             }
             catch(err) 
             { 
@@ -379,59 +378,68 @@
                 alert(txt); 
             } 
         }
-
-        function onNotificationGCM(e) {            
+        
+        // handle APNS notifications for iOS
+        function onNotificationAPN(e) {
+            if (e.alert) {
+                 alert('<li>push-notification: ' + e.alert + '</li>');
+                 navigator.notification.alert(e.alert);
+            }
+                
+            if (e.sound) {
+                var snd = new Media(e.sound);
+                snd.play();
+            }
+            
+            if (e.badge) {
+                pushNotification.setApplicationIconBadgeNumber(successHandler, e.badge);
+            }
+        }
+        
+        // handle GCM notifications for Android
+        function onNotificationGCM(e) {
+            
             switch( e.event )
             {
-                case 'registered':
-                if ( e.regid.length > 0 )
-                {
-                    alert('<li>REGISTERED -> REGID:' + e.regid + "</li>");
-                }
-                break;
-                
                 case 'message':
                     if (e.foreground)
                     {
-                        alert('<li>--INLINE NOTIFICATION--');
                         __Controller.push.handlePush(e.payload);
                         var my_media = new Media("/android_asset/www/"+e.soundname);
                         my_media.play();
                     }
                     else
-                    {   
+                    {   // otherwise we were launched because the user touched a notification in the notification tray.
                         if (e.coldstart)
-                            alert('<li>--COLDSTART NOTIFICATION--');
-                        else{
+                            alert('<li>--COLDSTART NOTIFICATION--' + '</li>');
+                        else
                             __Controller.push.handlePush(e.payload);
-                            alert('<li>--BACKGROUND NOTIFICATION--');
-                        }
                     }
                 break;
                 
                 case 'error':
-                    alert('ERROR -> MSG:' + e.msg);
+                    alert('<li>ERROR -> MSG:' + e.msg + '</li>');
                 break;
                 
                 default:
-                    alert('EVENT -> Unknown, an event was received and we do not know what it is');
+                    alert('<li>EVENT -> Unknown, an event was received and we do not know what it is</li>');
                 break;
             }
         }
         
         function tokenHandler (result) {
-            alert('Token: '+ result);
+            console.log('<li>token: '+ result +'</li>');
         }
         
         function successHandler (result) {
-            alert('Success:'+ result);
+            console.log('<li>success:'+ result +'</li>');
         }
         
         function errorHandler (error) {
-            alert('Error:'+ error);
+            console.log('<li>error:'+ error +'</li>');
         }
         
         document.addEventListener('deviceready', onDeviceReady, true);
 
-     </script>
+    </script>
 </html>

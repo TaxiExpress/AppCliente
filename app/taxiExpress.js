@@ -2078,10 +2078,11 @@
       var credentials, data, server, session,
         _this = this;
       switch (notification.code) {
-        case 701:
+        case "701":
           Lungo.Cache.set("travelAccepted", true);
-          return Lungo.Router.section("home_s");
-        case 702:
+          Lungo.Router.section("filters_s");
+          return alert("El taxista ha aceptado tu solicitud");
+        case "702":
           if (notification.appPayment === "true") {
             __Controller.payment.loadPayment(notification.cost);
             home_driver.style.visibility = "visible";
