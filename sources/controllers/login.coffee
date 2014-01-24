@@ -85,6 +85,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
         dateTrav = dateTrav.replace "T", " "
       @doSQL "INSERT INTO profile (email, pass, lastUpdate, lastUpdateFavorites, lastUpdateTravels, name, surname, phone, image, seats, payments, animals, accessible) VALUES ('"+profile.email+"','"+@password[0].value+"','"+date+"','"+dateFav+"','"+dateTrav+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"','"+result.fCapacity+"','"+result.fAppPayment+"','"+result.fAnimals+"','"+result.fAccessible+"');"
       __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible)
+    Lungo.Cache.set "travelAccepted", false
+    Lungo.Cache.set "travelID", 0
     Lungo.Cache.set "credentials", profile
     if result.favlist
       @loadFavoriteTaxis(result.favlist) 

@@ -406,7 +406,6 @@
         },
         success: function(result) {
           var travelID;
-          console.log(result);
           travelID = result.travelID;
           Lungo.Cache.set("travelID", travelID);
           Lungo.Cache.set("travelAccepted", false);
@@ -414,8 +413,8 @@
           return setTimeout((function() {
             if (!Lungo.Cache.get("travelAccepted")) {
               return $$.ajax({
-                type: "GET",
-                url: server + "client/cancelTravel",
+                type: "POST",
+                url: server + "client/canceltravel",
                 data: {
                   email: credentials.email,
                   sessionID: session,
@@ -425,7 +424,10 @@
                   return alert(type.response);
                 },
                 success: function(result) {
-                  return console.log(result);
+                  Lungo.Cache.set("travelID", 0);
+                  Lungo.Cache.set("travelAccepted", null);
+                  alert("Peticion cancelada");
+                  return Lungo.Router.back();
                 }
               });
             }
@@ -974,7 +976,6 @@
         },
         success: function(result) {
           var travelID;
-          console.log(result);
           travelID = result.travelID;
           Lungo.Cache.set("travelID", travelID);
           Lungo.Cache.set("travelAccepted", false);
@@ -982,8 +983,8 @@
           return setTimeout((function() {
             if (!Lungo.Cache.get("travelAccepted")) {
               return $$.ajax({
-                type: "GET",
-                url: server + "client/cancelTravel",
+                type: "POST",
+                url: server + "client/canceltravel",
                 data: {
                   email: credentials.email,
                   sessionID: session,
@@ -993,7 +994,10 @@
                   return alert(type.response);
                 },
                 success: function(result) {
-                  return console.log(result);
+                  Lungo.Cache.set("travelID", 0);
+                  Lungo.Cache.set("travelAccepted", null);
+                  alert("Peticion cancelada");
+                  return Lungo.Router.back();
                 }
               });
             }
@@ -1136,6 +1140,8 @@
         this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateFavorites, lastUpdateTravels, name, surname, phone, image, seats, payments, animals, accessible) VALUES ('" + profile.email + "','" + this.password[0].value + "','" + date + "','" + dateFav + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "');");
         __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible);
       }
+      Lungo.Cache.set("travelAccepted", null);
+      Lungo.Cache.set("travelID", 0);
       Lungo.Cache.set("credentials", profile);
       if (result.favlist) {
         this.loadFavoriteTaxis(result.favlist);
@@ -2592,7 +2598,32 @@
           return alert(type.response);
         },
         success: function(result) {
-          return console.log(result);
+          console.log(result);
+          travelID = Lungo.Cache.get("travelID");
+          Lungo.Cache.set("travelAccepted", false);
+          Lungo.Router.section("waiting_s");
+          return setTimeout((function() {
+            if (!Lungo.Cache.get("travelAccepted")) {
+              return $$.ajax({
+                type: "POST",
+                url: server + "client/canceltravel",
+                data: {
+                  email: credentials.email,
+                  sessionID: session,
+                  travelID: travelID
+                },
+                error: function(xhr, type) {
+                  return alert(type.response);
+                },
+                success: function(result) {
+                  Lungo.Cache.set("travelID", 0);
+                  Lungo.Cache.set("travelAccepted", null);
+                  alert("Peticion cancelada");
+                  return Lungo.Router.back();
+                }
+              });
+            }
+          }), 30000);
         }
       });
     };

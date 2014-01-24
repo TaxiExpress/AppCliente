@@ -130,7 +130,6 @@ class __Controller.HomeCtrl extends Monocle.Controller
       error: (xhr, type) =>
         console.log type.response
       success: (result) =>
-        console.log result
         travelID = result.travelID
         Lungo.Cache.set "travelID", travelID
         Lungo.Cache.set "travelAccepted", false
@@ -138,8 +137,8 @@ class __Controller.HomeCtrl extends Monocle.Controller
         setTimeout((=> 
           if !Lungo.Cache.get "travelAccepted"
             $$.ajax
-              type: "GET"
-              url: server + "client/cancelTravel"
+              type: "POST"
+              url: server + "client/canceltravel"
               data:
                 email: credentials.email
                 sessionID: session
@@ -147,7 +146,10 @@ class __Controller.HomeCtrl extends Monocle.Controller
               error: (xhr, type) =>
                 alert type.response
               success: (result) =>
-                console.log result
+                Lungo.Cache.set "travelID", 0
+                Lungo.Cache.set "travelAccepted", false
+                alert "Peticion cancelada"
+                Lungo.Router.back()
         ) , 30000)
 
 
