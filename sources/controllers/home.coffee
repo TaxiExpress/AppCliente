@@ -23,6 +23,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
         maximumAge: 0
       navigator.geolocation.getCurrentPosition initialize, manageErrors, options    
 
+
   manageErrors = (err) ->
     setTimeout((=> 
       navigator.notification.alert "Error al obtener la posicion GPS", null, "TaxiExpress", "Aceptar"

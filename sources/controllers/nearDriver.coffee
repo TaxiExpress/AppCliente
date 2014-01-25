@@ -57,7 +57,6 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
           @getDistanceAndTime(driver, lastDriver)
 
 
-
   deleteNearTaxis: =>
     for nearDriver in __Model.NearDriver.all()
       _viewsList[nearDriver.email].remove()
@@ -89,5 +88,3 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
       parseFloat(a.distance) - parseFloat(b.distance)
     for driver in taxies
       _viewsList[driver.email] = new __View.NearDriverList model: driver
-
-

@@ -21,6 +21,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     #@drop()
     @read()  
 
+
   doLogin: (event) =>
     if @username[0].value && @password[0].value
       @drop()
@@ -30,6 +31,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       @valideCredentials(@username[0].value, @password[0].value, date, date, date)
     else
       navigator.notification.alert "Debes rellenar el email y la contraseña", null, "TaxiExpress", "Aceptar"
+
 
   valideCredentials: (email, pass, date, dateFavorites, dateTravels) =>
     server = Lungo.Cache.get "server"

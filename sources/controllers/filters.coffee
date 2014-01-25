@@ -28,6 +28,7 @@ class __Controller.FiltersCtrl extends Monocle.Controller
     __Controller.nearDriver.loadNearTaxis()
     Lungo.Router.back()
 
+
   saveFilters: (event) =>
     credentials = Lungo.Cache.get "credentials"
     server = Lungo.Cache.get "server"

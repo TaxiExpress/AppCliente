@@ -44,17 +44,17 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
     session = Lungo.Cache.get "session"
     origin = Lungo.Cache.get "origin"
     $$.ajax
-      type: "GET"
+      type: "POST"
       url: server + "client/getselectedtaxi"
       data:
         email: credentials.email
         longitude: position.d
         latitude: position.e
         origin: origin
-        driver: @driverDetails.email
+        driverEmail: @driverDetails.email
         sessionID: session
       error: (xhr, type) =>
-        alert type.response
+        console.log type.response
       success: (result) =>
         travelID = result.travelID
         Lungo.Cache.set "travelID", travelID

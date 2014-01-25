@@ -391,18 +391,18 @@
       session = Lungo.Cache.get("session");
       origin = Lungo.Cache.get("origin");
       return $$.ajax({
-        type: "GET",
+        type: "POST",
         url: server + "client/getselectedtaxi",
         data: {
           email: credentials.email,
           longitude: position.d,
           latitude: position.e,
           origin: origin,
-          driver: this.driverDetails.email,
+          driverEmail: this.driverDetails.email,
           sessionID: session
         },
         error: function(xhr, type) {
-          return alert(type.response);
+          return console.log(type.response);
         },
         success: function(result) {
           var travelID;
@@ -2594,7 +2594,7 @@
           success: function(result) {
             Lungo.Cache.set("travelID", 0);
             Lungo.Cache.set("travelAccepted", false);
-            navigator.notification.alert("Petición cancelada", null, "TaxiExpress", "Aceptar");
+            alert("Peticion cancelada");
             return Lungo.Router.back();
           }
         });
