@@ -18,9 +18,9 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
 
   doVerification: (event) => 
     if !(@phone[0].value || @code[0].value)
-      navigator.notification.alert "Debes rellenar todos los campos", null, "TaxiExpress", "Aceptar"
+      navigator.notification.alert "Debes rellenar todos los campos", null, "Taxi Express", "Aceptar"
     else if @code[0].value.length < 4
-      navigator.notification.alert "El código debe tener al menos 4 dígitos", null, "TaxiExpress", "Aceptar"
+      navigator.notification.alert "El código debe tener al menos 4 dígitos", null, "Taxi Express", "Aceptar"
     else
       server = Lungo.Cache.get "server"
       phone = "+34" + @phone[0].value

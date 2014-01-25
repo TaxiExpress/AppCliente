@@ -12,7 +12,7 @@ class __Controller.SendSMSCtrl extends Monocle.Controller
 
   sendSMS: (event) => 
     if !@phone[0].value
-      navigator.notification.alert "Debes introducir un teléfono válido", null, "TaxiExpress", "Aceptar"
+      navigator.notification.alert "Debes introducir un teléfono válido", null, "Taxi Express", "Aceptar"
     else
       server = Lungo.Cache.get "server"
       phone = "+34" + @phone[0].value

@@ -795,7 +795,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.HomeCtrl = (function(_super) {
-    var getStreet, initialize, manageErrors, map, position, updatePosition,
+    var getStreet, initialize, manageErrors, map, position, reconnect, updatePosition,
       _this = this;
 
     __extends(HomeCtrl, _super);
@@ -838,9 +838,12 @@
     manageErrors = function(err) {
       var _this = this;
       return setTimeout((function() {
-        navigator.notification.alert("Error al obtener la posicion GPS", null, "TaxiExpress", "Aceptar");
-        return navigator.geolocation.getCurrentPosition(initialize, manageErrors);
+        return navigator.notification.alert("Error al obtener la posicion GPS", reconnect, "Taxi Express", "Reintentar");
       }), 5000);
+    };
+
+    reconnect = function() {
+      return navigator.geolocation.getCurrentPosition(initialize, manageErrors);
     };
 
     HomeCtrl.prototype.refresh = function(event) {
@@ -1070,7 +1073,7 @@
         date = date.replace("T", " ");
         return this.valideCredentials(this.username[0].value, this.password[0].value, date, date, date);
       } else {
-        return navigator.notification.alert("Debes rellenar el email y la contraseña", null, "TaxiExpress", "Aceptar");
+        return navigator.notification.alert("Debes rellenar el email y la contraseña", null, "Taxi Express", "Aceptar");
       }
     };
 
@@ -1675,11 +1678,11 @@
       var server, session,
         _this = this;
       if (!(this.new_pass1[0].value || this.new_pass2[0].value || this.old_pass[0].value)) {
-        return navigator.notification.alert("Debes rellenar todos los campos", null, "TaxiExpress", "Aceptar");
+        return navigator.notification.alert("Debes rellenar todos los campos", null, "Taxi Express", "Aceptar");
       } else if (this.new_pass1[0].value.length < 8 || this.new_pass1[0].value.length > 20) {
-        return navigator.notification.alert("La contraseña debe tener entre 8 y 20 caracteres", null, "TaxiExpress", "Aceptar");
+        return navigator.notification.alert("La contraseña debe tener entre 8 y 20 caracteres", null, "Taxi Express", "Aceptar");
       } else if (this.new_pass1[0].value !== this.new_pass2[0].value) {
-        return navigator.notification.alert("Los valores de la nueva contraseña deben ser iguales", null, "TaxiExpress", "Aceptar");
+        return navigator.notification.alert("Los valores de la nueva contraseña deben ser iguales", null, "Taxi Express", "Aceptar");
       } else {
         server = Lungo.Cache.get("server");
         credentials = Lungo.Cache.get("credentials");
@@ -1714,7 +1717,7 @@
         sql = "UPDATE profile SET pass = '" + _this.new_pass1[0].value + "' WHERE email ='" + credentials.email + "';";
         return tx.executeSql(sql);
       });
-      navigator.notification.alert("Contraseña modificada", null, "TaxiExpress", "Aceptar");
+      navigator.notification.alert("Contraseña modificada", null, "Taxi Express", "Aceptar");
       Lungo.Router.back();
       this.new_pass1[0].value = "";
       this.new_pass2[0].value = "";
@@ -1769,7 +1772,7 @@
 
     PaymentCtrl.prototype.doPayment = function(event) {
       if (!(this.creditCard.val() && this.cvc.val() && this.expires.val())) {
-        return navigator.notification.alert("Debes completar todos los detalles de la tarjeta", null, "TaxiExpress", "Aceptar");
+        return navigator.notification.alert("Debes completar todos los detalles de la tarjeta", null, "Taxi Express", "Aceptar");
       } else {
         this.button[0].disabled = true;
         Stripe.setPublishableKey("pk_test_VdRyFEwU3Ap84cUaLp5S8yBC");
@@ -1790,7 +1793,7 @@
         _this = this;
       this.button[0].disabled = false;
       if (response.error) {
-        return navigator.notification.alert("Los datos de la tarjeta no son válidos. Compruébelos.", null, "TaxiExpress", "Aceptar");
+        return navigator.notification.alert("Los datos de la tarjeta no son válidos. Compruébelos.", null, "Taxi Express", "Aceptar");
       } else {
         credentials = Lungo.Cache.get("credentials");
         server = Lungo.Cache.get("server");
@@ -1808,7 +1811,7 @@
             return alert(type.response);
           },
           success: function(result) {
-            navigator.notification.alert("Trayecto pagado", null, "TaxiExpress", "Aceptar");
+            navigator.notification.alert("Trayecto pagado", null, "Taxi Express", "Aceptar");
             home_driver.style.visibility = "hidden";
             return Lungo.Router.section("home_s");
           }
@@ -1854,9 +1857,9 @@
       var data, phone, server, session,
         _this = this;
       if (!(this.phone[0].value || this.code[0].value)) {
-        return navigator.notification.alert("Debes rellenar todos los campos", null, "TaxiExpress", "Aceptar");
+        return navigator.notification.alert("Debes rellenar todos los campos", null, "Taxi Express", "Aceptar");
       } else if (this.code[0].value.length < 4) {
-        return navigator.notification.alert("El código debe tener al menos 4 dígitos", null, "TaxiExpress", "Aceptar");
+        return navigator.notification.alert("El código debe tener al menos 4 dígitos", null, "Taxi Express", "Aceptar");
       } else {
         server = Lungo.Cache.get("server");
         phone = "+34" + this.phone[0].value;
@@ -2093,7 +2096,7 @@
         case "701":
           Lungo.Cache.set("travelAccepted", true);
           Lungo.Router.section("home_s");
-          return navigator.notification.alert("El taxista ha aceptado su solicitud", null, "TaxiExpress", "Aceptar");
+          return navigator.notification.alert("El taxista ha aceptado su solicitud", null, "Taxi Express", "Aceptar");
         case "702":
           if (notification.appPayment === "true") {
             __Controller.payment.loadPayment(notification.cost);
@@ -2102,7 +2105,7 @@
             return Lungo.Router.section("payment_s");
           } else {
             Lungo.Router.section("home_s");
-            navigator.notification.alert("Viaje pagado", null, "TaxiExpress", "Aceptar");
+            navigator.notification.alert("Viaje pagado", null, "Taxi Express", "Aceptar");
             credentials = Lungo.Cache.get("credentials");
             server = Lungo.Cache.get("server");
             session = Lungo.Cache.get("session");
@@ -2232,11 +2235,11 @@
       var date, phone, server,
         _this = this;
       if (!(this.pass1[0].value || this.pass2[0].value || this.email[0].value || this.phone[0].value)) {
-        return navigator.notification.alert("Debes rellenar todos los campos", null, "TaxiExpress", "Aceptar");
+        return navigator.notification.alert("Debes rellenar todos los campos", null, "Taxi Express", "Aceptar");
       } else if (this.pass1[0].value.length < 8 || this.pass1[0].value.length > 20) {
-        return navigator.notification.alert("La contraseña debe tener entre 8 y 20 caracteres", null, "TaxiExpress", "Aceptar");
+        return navigator.notification.alert("La contraseña debe tener entre 8 y 20 caracteres", null, "Taxi Express", "Aceptar");
       } else if (this.pass1[0].value !== this.pass2[0].value) {
-        return navigator.notification.alert("Los valores de la contraseña deben ser iguales", null, "TaxiExpress", "Aceptar");
+        return navigator.notification.alert("Los valores de la contraseña deben ser iguales", null, "Taxi Express", "Aceptar");
       } else {
         date = new Date().toISOString().substring(0, 19);
         date = date.replace("T", " ");
@@ -2307,7 +2310,7 @@
       var data, phone, server,
         _this = this;
       if (!this.phone[0].value) {
-        return navigator.notification.alert("Debes introducir un teléfono válido", null, "TaxiExpress", "Aceptar");
+        return navigator.notification.alert("Debes introducir un teléfono válido", null, "Taxi Express", "Aceptar");
       } else {
         server = Lungo.Cache.get("server");
         phone = "+34" + this.phone[0].value;

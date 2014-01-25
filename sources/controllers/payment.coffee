@@ -28,7 +28,7 @@ class __Controller.PaymentCtrl extends Monocle.Controller
 
   doPayment: (event) =>
     if !(@creditCard.val() && @cvc.val() && @expires.val())
-      navigator.notification.alert "Debes completar todos los detalles de la tarjeta", null, "TaxiExpress", "Aceptar"
+      navigator.notification.alert "Debes completar todos los detalles de la tarjeta", null, "Taxi Express", "Aceptar"
     else
       @button[0].disabled = true
       Stripe.setPublishableKey "pk_test_VdRyFEwU3Ap84cUaLp5S8yBC"
@@ -46,7 +46,7 @@ class __Controller.PaymentCtrl extends Monocle.Controller
   stripeResponseHandler: (status, response) =>
     @button[0].disabled = false
     if response.error      
-      navigator.notification.alert "Los datos de la tarjeta no son válidos. Compruébelos.", null, "TaxiExpress", "Aceptar"
+      navigator.notification.alert "Los datos de la tarjeta no son válidos. Compruébelos.", null, "Taxi Express", "Aceptar"
     else
       credentials = Lungo.Cache.get "credentials"
       server = Lungo.Cache.get "server"
@@ -62,7 +62,7 @@ class __Controller.PaymentCtrl extends Monocle.Controller
         error: (xhr, type) =>
           alert type.response
         success: (result) =>
-          navigator.notification.alert "Trayecto pagado", null, "TaxiExpress", "Aceptar"
+          navigator.notification.alert "Trayecto pagado", null, "Taxi Express", "Aceptar"
           home_driver.style.visibility = "hidden"
           Lungo.Router.section "home_s"
 

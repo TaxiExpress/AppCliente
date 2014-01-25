@@ -30,7 +30,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       date = date.replace "T", " "
       @valideCredentials(@username[0].value, @password[0].value, date, date, date)
     else
-      navigator.notification.alert "Debes rellenar el email y la contraseña", null, "TaxiExpress", "Aceptar"
+      navigator.notification.alert "Debes rellenar el email y la contraseña", null, "Taxi Express", "Aceptar"
 
 
   valideCredentials: (email, pass, date, dateFavorites, dateTravels) =>
