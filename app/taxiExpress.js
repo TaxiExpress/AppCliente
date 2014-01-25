@@ -940,10 +940,10 @@
           if (results[1]) {
             if (results[0].address_components[1].short_name === results[0].address_components[0].short_name) {
               home_streetField.value = results[0].address_components[1].short_name;
-              return Lungo.Cache.set("origin", home_streetField.value);
             } else {
-              return home_streetField.value = results[0].address_components[1].short_name + ", " + results[0].address_components[0].short_name;
+              home_streetField.value = results[0].address_components[1].short_name + ", " + results[0].address_components[0].short_name;
             }
+            return Lungo.Cache.set("origin", home_streetField.value);
           } else {
             return home_streetField.value = 'Calle desconocida';
           }
@@ -2092,7 +2092,7 @@
       switch (notification.code) {
         case "701":
           Lungo.Cache.set("travelAccepted", true);
-          Lungo.Router.section("filters_s");
+          Lungo.Router.section("home_s");
           return navigator.notification.alert("El taxista ha aceptado su solicitud", null, "TaxiExpress", "Aceptar");
         case "702":
           if (notification.appPayment === "true") {

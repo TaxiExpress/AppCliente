@@ -12,7 +12,7 @@ class __Controller.PushCtrl extends Monocle.Controller
     switch notification.code
       when "701" #Recibo push de trayecto aceptado
         Lungo.Cache.set "travelAccepted", true
-        Lungo.Router.section "filters_s"      
+        Lungo.Router.section "home_s"      
         navigator.notification.alert "El taxista ha aceptado su solicitud", null, "TaxiExpress", "Aceptar"
       when "702" #Recibo la push de pago
         if notification.appPayment == "true"

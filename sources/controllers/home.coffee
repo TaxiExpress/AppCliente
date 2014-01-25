@@ -104,8 +104,8 @@ class __Controller.HomeCtrl extends Monocle.Controller
         if results[1]
           if results[0].address_components[1].short_name == results[0].address_components[0].short_name
             home_streetField.value = results[0].address_components[1].short_name
-            Lungo.Cache.set "origin", home_streetField.value
           else home_streetField.value = results[0].address_components[1].short_name + ", " +results[0].address_components[0].short_name
+          Lungo.Cache.set "origin", home_streetField.value
         else
           home_streetField.value = 'Calle desconocida'
       else
