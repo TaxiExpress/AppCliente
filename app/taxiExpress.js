@@ -2111,7 +2111,7 @@
     };
 
     PushCtrl.prototype.addLastTravel = function(travel) {
-      var coords, cost, destination, driver, driver2, endpoint, endtime, id, image, lat, long, model, origin, pos, sql, startpoint, starttime, travel2;
+      var coords, cost, credentials, date, destination, driver, driver2, endpoint, endtime, id, image, lat, long, model, origin, pos, sql, startpoint, starttime, travel2, vote;
       id = travel.id;
       starttime = new Date(travel.starttime);
       endtime = new Date(travel.endtime);
@@ -2128,6 +2128,7 @@
       origin = travel.origin;
       destination = travel.destination;
       cost = travel.cost;
+      vote = travel.vote;
       driver = __Model.Driver.get(travel.driver.email)[0];
       if (driver === void 0) {
         driver2 = travel.driver;
@@ -2162,10 +2163,15 @@
         cost: cost,
         driver: driver,
         origin: origin,
-        destination: destination
+        destination: destination,
+        vote: vote
       });
-      sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "');";
-      return this.doSQL(sql);
+      sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver,vote) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "','" + travel2.vote + "');";
+      this.doSQL(sql);
+      credentials = Lungo.Cache.get("credentials");
+      date = travel.lastUpdateTravels.substring(0, 19);
+      date = date.replace("T", " ");
+      return this.doSQL("UPDATE profile SET lastUpdateTravels = '" + date + "' WHERE email ='" + credentials.email + "';");
     };
 
     PushCtrl.prototype.doSQL = function(sql) {
