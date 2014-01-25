@@ -28,6 +28,5 @@ class __Controller.WaitingCtrl extends Monocle.Controller
         success: (result) =>
           Lungo.Cache.set "travelID", 0
           Lungo.Cache.set "travelAccepted", false
-          alert "Peticion cancelada"
+          navigator.notification.alert "Petición cancelada", null, "TaxiExpress", "Aceptar"
           Lungo.Router.back()
-      ) , 30000)

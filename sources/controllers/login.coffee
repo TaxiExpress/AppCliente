@@ -19,8 +19,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       tx.executeSql "CREATE TABLE IF NOT EXISTS favorites (email STRING NOT NULL PRIMARY KEY, phone STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)"
       tx.executeSql "CREATE TABLE IF NOT EXISTS drivers (email STRING NOT NULL PRIMARY KEY, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)"
     #@drop()
-    @read()
-
+    @read()  
 
   doLogin: (event) =>
     if @username[0].value && @password[0].value
@@ -30,8 +29,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       date = date.replace "T", " "
       @valideCredentials(@username[0].value, @password[0].value, date, date, date)
     else
-      alert "Debe rellenar el email y la contraseña"
-
+      navigator.notification.alert "Debes rellenar el email y la contraseña", null, "TaxiExpress", "Aceptar"
 
   valideCredentials: (email, pass, date, dateFavorites, dateTravels) =>
     server = Lungo.Cache.get "server"

@@ -17,11 +17,11 @@ class __Controller.RegisterCtrl extends Monocle.Controller
 
   register: (event) =>
     if !(@pass1[0].value || @pass2[0].value || @email[0].value || @phone[0].value)
-      alert "Debes rellenar todos los campos"
+      navigator.notification.alert "Debes rellenar todos los campos", null, "TaxiExpress", "Aceptar"
     else if @pass1[0].value.length < 8 || @pass1[0].value.length > 20
-      alert "La contraseña debe tener entre 8 y 20 caracteres"
+      navigator.notification.alert "La contraseña debe tener entre 8 y 20 caracteres", null, "TaxiExpress", "Aceptar"
     else if @pass1[0].value != @pass2[0].value
-      alert "Los valores de la contraseña deben ser iguales"
+      navigator.notification.alert "Los valores de la contraseña deben ser iguales", null, "TaxiExpress", "Aceptar"
     else
       date = new Date().toISOString().substring 0, 19
       date = date.replace "T", " "

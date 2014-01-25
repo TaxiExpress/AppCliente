@@ -16,11 +16,11 @@ class __Controller.PasswordCtrl extends Monocle.Controller
 
   saveNewPassword: (event) =>
     if !(@new_pass1[0].value || @new_pass2[0].value || @old_pass[0].value )
-      alert "Debes rellenar todos los campos"
+      navigator.notification.alert "Debes rellenar todos los campos", null, "TaxiExpress", "Aceptar"
     else if @new_pass1[0].value.length < 8 || @new_pass1[0].value.length > 20
-      alert "La contraseña debe tener entre 8 y 20 caracteres"
+      navigator.notification.alert "La contraseña debe tener entre 8 y 20 caracteres", null, "TaxiExpress", "Aceptar"
     else if @new_pass1[0].value != @new_pass2[0].value
-      alert "Los valores de la nueva contraseña deben ser iguales"
+      navigator.notification.alert "Los valores de la nueva contraseña deben ser iguales", null, "TaxiExpress", "Aceptar"
     else
       server = Lungo.Cache.get "server"
       credentials = Lungo.Cache.get "credentials"
@@ -45,7 +45,7 @@ class __Controller.PasswordCtrl extends Monocle.Controller
     db.transaction (tx) =>
       sql = "UPDATE profile SET pass = '"+@new_pass1[0].value+"' WHERE email ='"+credentials.email+"';"
       tx.executeSql sql
-    alert "Contraseña cambiada"
+    navigator.notification.alert "Contraseña modificada", null, "TaxiExpress", "Aceptar"
     Lungo.Router.back()
     @new_pass1[0].value = ""
     @new_pass2[0].value = ""

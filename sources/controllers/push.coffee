@@ -13,7 +13,7 @@ class __Controller.PushCtrl extends Monocle.Controller
       when "701" #Recibo push de trayecto aceptado
         Lungo.Cache.set "travelAccepted", true
         Lungo.Router.section "filters_s"      
-        alert "El taxista ha aceptado tu solicitud"
+        navigator.notification.alert "El taxista ha aceptado su solicitud", null, "TaxiExpress", "Aceptar"
       when "702" #Recibo la push de pago
         if notification.appPayment == "true"
           __Controller.payment.loadPayment(notification.cost)
@@ -22,7 +22,7 @@ class __Controller.PushCtrl extends Monocle.Controller
           Lungo.Router.section "payment_s"
         else
           Lungo.Router.section "home_s"      
-          alert "Viaje pagado"
+          navigator.notification.alert "Viaje pagado", null, "TaxiExpress", "Aceptar"
           credentials = Lungo.Cache.get "credentials"
           server = Lungo.Cache.get "server"
           session = Lungo.Cache.get "session"

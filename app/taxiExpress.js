@@ -425,7 +425,7 @@
                 },
                 success: function(result) {
                   Lungo.Cache.set("travelID", 0);
-                  Lungo.Cache.set("travelAccepted", null);
+                  Lungo.Cache.set("travelAccepted", false);
                   alert("Peticion cancelada");
                   return Lungo.Router.back();
                 }
@@ -838,7 +838,7 @@
     manageErrors = function(err) {
       var _this = this;
       return setTimeout((function() {
-        alert("error");
+        navigator.notification.alert("Error al obtener la posicion GPS", null, "TaxiExpress", "Aceptar");
         return navigator.geolocation.getCurrentPosition(initialize, manageErrors);
       }), 5000);
     };
@@ -995,7 +995,7 @@
                 },
                 success: function(result) {
                   Lungo.Cache.set("travelID", 0);
-                  Lungo.Cache.set("travelAccepted", null);
+                  Lungo.Cache.set("travelAccepted", false);
                   alert("Peticion cancelada");
                   return Lungo.Router.back();
                 }
@@ -1070,7 +1070,7 @@
         date = date.replace("T", " ");
         return this.valideCredentials(this.username[0].value, this.password[0].value, date, date, date);
       } else {
-        return alert("Debe rellenar el email y la contraseña");
+        return navigator.notification.alert("Debes rellenar el email y la contraseña", null, "TaxiExpress", "Aceptar");
       }
     };
 
@@ -1140,7 +1140,7 @@
         this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateFavorites, lastUpdateTravels, name, surname, phone, image, seats, payments, animals, accessible) VALUES ('" + profile.email + "','" + this.password[0].value + "','" + date + "','" + dateFav + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "');");
         __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible);
       }
-      Lungo.Cache.set("travelAccepted", null);
+      Lungo.Cache.set("travelAccepted", false);
       Lungo.Cache.set("travelID", 0);
       Lungo.Cache.set("credentials", profile);
       if (result.favlist) {
@@ -1675,11 +1675,11 @@
       var server, session,
         _this = this;
       if (!(this.new_pass1[0].value || this.new_pass2[0].value || this.old_pass[0].value)) {
-        return alert("Debes rellenar todos los campos");
+        return navigator.notification.alert("Debes rellenar todos los campos", null, "TaxiExpress", "Aceptar");
       } else if (this.new_pass1[0].value.length < 8 || this.new_pass1[0].value.length > 20) {
-        return alert("La contraseña debe tener entre 8 y 20 caracteres");
+        return navigator.notification.alert("La contraseña debe tener entre 8 y 20 caracteres", null, "TaxiExpress", "Aceptar");
       } else if (this.new_pass1[0].value !== this.new_pass2[0].value) {
-        return alert("Los valores de la nueva contraseña deben ser iguales");
+        return navigator.notification.alert("Los valores de la nueva contraseña deben ser iguales", null, "TaxiExpress", "Aceptar");
       } else {
         server = Lungo.Cache.get("server");
         credentials = Lungo.Cache.get("credentials");
@@ -1714,7 +1714,7 @@
         sql = "UPDATE profile SET pass = '" + _this.new_pass1[0].value + "' WHERE email ='" + credentials.email + "';";
         return tx.executeSql(sql);
       });
-      alert("Contraseña cambiada");
+      navigator.notification.alert("Contraseña modificada", null, "TaxiExpress", "Aceptar");
       Lungo.Router.back();
       this.new_pass1[0].value = "";
       this.new_pass2[0].value = "";
@@ -1769,7 +1769,7 @@
 
     PaymentCtrl.prototype.doPayment = function(event) {
       if (!(this.creditCard.val() && this.cvc.val() && this.expires.val())) {
-        return alert("Debes completar todos los detalles de la tarjeta");
+        return navigator.notification.alert("Debes completar todos los detalles de la tarjeta", null, "TaxiExpress", "Aceptar");
       } else {
         this.button[0].disabled = true;
         Stripe.setPublishableKey("pk_test_VdRyFEwU3Ap84cUaLp5S8yBC");
@@ -1790,7 +1790,7 @@
         _this = this;
       this.button[0].disabled = false;
       if (response.error) {
-        return this.errors[0].innerText = "Los datos de la tarjeta no son válidos. Compruébelos.";
+        return navigator.notification.alert("Los datos de la tarjeta no son válidos. Compruébelos.", null, "TaxiExpress", "Aceptar");
       } else {
         credentials = Lungo.Cache.get("credentials");
         server = Lungo.Cache.get("server");
@@ -1808,8 +1808,7 @@
             return alert(type.response);
           },
           success: function(result) {
-            console.log(result);
-            alert("Trayecto pagado");
+            navigator.notification.alert("Trayecto pagado", null, "TaxiExpress", "Aceptar");
             home_driver.style.visibility = "hidden";
             return Lungo.Router.section("home_s");
           }
@@ -1855,9 +1854,9 @@
       var data, phone, server, session,
         _this = this;
       if (!(this.phone[0].value || this.code[0].value)) {
-        return alert("Debes rellenar todos los campos");
+        return navigator.notification.alert("Debes rellenar todos los campos", null, "TaxiExpress", "Aceptar");
       } else if (this.code[0].value.length < 4) {
-        return alert("El código debe tener al menos 4 dígitos");
+        return navigator.notification.alert("El código debe tener al menos 4 dígitos", null, "TaxiExpress", "Aceptar");
       } else {
         server = Lungo.Cache.get("server");
         phone = "+34" + this.phone[0].value;
@@ -2094,7 +2093,7 @@
         case "701":
           Lungo.Cache.set("travelAccepted", true);
           Lungo.Router.section("filters_s");
-          return alert("El taxista ha aceptado tu solicitud");
+          return navigator.notification.alert("El taxista ha aceptado su solicitud", null, "TaxiExpress", "Aceptar");
         case "702":
           if (notification.appPayment === "true") {
             __Controller.payment.loadPayment(notification.cost);
@@ -2103,7 +2102,7 @@
             return Lungo.Router.section("payment_s");
           } else {
             Lungo.Router.section("home_s");
-            alert("Viaje pagado");
+            navigator.notification.alert("Viaje pagado", null, "TaxiExpress", "Aceptar");
             credentials = Lungo.Cache.get("credentials");
             server = Lungo.Cache.get("server");
             session = Lungo.Cache.get("session");
@@ -2233,11 +2232,11 @@
       var date, phone, server,
         _this = this;
       if (!(this.pass1[0].value || this.pass2[0].value || this.email[0].value || this.phone[0].value)) {
-        return alert("Debes rellenar todos los campos");
+        return navigator.notification.alert("Debes rellenar todos los campos", null, "TaxiExpress", "Aceptar");
       } else if (this.pass1[0].value.length < 8 || this.pass1[0].value.length > 20) {
-        return alert("La contraseña debe tener entre 8 y 20 caracteres");
+        return navigator.notification.alert("La contraseña debe tener entre 8 y 20 caracteres", null, "TaxiExpress", "Aceptar");
       } else if (this.pass1[0].value !== this.pass2[0].value) {
-        return alert("Los valores de la contraseña deben ser iguales");
+        return navigator.notification.alert("Los valores de la contraseña deben ser iguales", null, "TaxiExpress", "Aceptar");
       } else {
         date = new Date().toISOString().substring(0, 19);
         date = date.replace("T", " ");
@@ -2308,7 +2307,7 @@
       var data, phone, server,
         _this = this;
       if (!this.phone[0].value) {
-        return alert("Debes introducir un teléfono válido");
+        return navigator.notification.alert("Debes introducir un teléfono válido", null, "TaxiExpress", "Aceptar");
       } else {
         server = Lungo.Cache.get("server");
         phone = "+34" + this.phone[0].value;
@@ -2424,15 +2423,9 @@
         destination: destination,
         travelMode: google.maps.DirectionsTravelMode.DRIVING
       };
-      directionsService.route(request, function(response, status) {
+      return directionsService.route(request, function(response, status) {
         if (status === google.maps.DirectionsStatus.OK) {
           return directionsDisplay.setDirections(response);
-        }
-      });
-      return google.maps.event.addListener(directionsDisplay, "click", function() {
-        console.log("jjk");
-        if (infowindow) {
-          return infowindow.close();
         }
       });
     };
@@ -2586,46 +2579,26 @@
       server = Lungo.Cache.get("server");
       session = Lungo.Cache.get("session");
       travelID = Lungo.Cache.get("travelID");
-      return $$.ajax({
-        type: "GET",
-        url: server + "client/cancelTravel",
-        data: {
-          email: credentials.email,
-          sessionID: session,
-          travelID: travelID
-        },
-        error: function(xhr, type) {
-          return alert(type.response);
-        },
-        success: function(result) {
-          console.log(result);
-          travelID = Lungo.Cache.get("travelID");
-          Lungo.Cache.set("travelAccepted", false);
-          Lungo.Router.section("waiting_s");
-          return setTimeout((function() {
-            if (!Lungo.Cache.get("travelAccepted")) {
-              return $$.ajax({
-                type: "POST",
-                url: server + "client/canceltravel",
-                data: {
-                  email: credentials.email,
-                  sessionID: session,
-                  travelID: travelID
-                },
-                error: function(xhr, type) {
-                  return alert(type.response);
-                },
-                success: function(result) {
-                  Lungo.Cache.set("travelID", 0);
-                  Lungo.Cache.set("travelAccepted", null);
-                  alert("Peticion cancelada");
-                  return Lungo.Router.back();
-                }
-              });
-            }
-          }), 30000);
-        }
-      });
+      if (!Lungo.Cache.get("travelAccepted")) {
+        return $$.ajax({
+          type: "POST",
+          url: server + "client/canceltravel",
+          data: {
+            email: credentials.email,
+            sessionID: session,
+            travelID: travelID
+          },
+          error: function(xhr, type) {
+            return alert(type.response);
+          },
+          success: function(result) {
+            Lungo.Cache.set("travelID", 0);
+            Lungo.Cache.set("travelAccepted", false);
+            navigator.notification.alert("Petición cancelada", null, "TaxiExpress", "Aceptar");
+            return Lungo.Router.back();
+          }
+        });
+      }
     };
 
     return WaitingCtrl;
