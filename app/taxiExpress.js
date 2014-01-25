@@ -92,7 +92,7 @@
       return _ref;
     }
 
-    Travel.fields("id", "starttime", "endtime", "startpoint", "endpoint", "cost", "driver", "origin", "destination");
+    Travel.fields("id", "starttime", "endtime", "startpoint", "endpoint", "cost", "driver", "origin", "destination", "vote");
 
     Travel.get = function(iden) {
       return this.select(function(travel) {
@@ -1057,7 +1057,7 @@
       this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
       this.db.transaction(function(tx) {
         tx.executeSql("CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateFavorites STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )");
-        tx.executeSql("CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL)");
+        tx.executeSql("CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL, vote STRING NOT NULL)");
         tx.executeSql("CREATE TABLE IF NOT EXISTS favorites (email STRING NOT NULL PRIMARY KEY, phone STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)");
         return tx.executeSql("CREATE TABLE IF NOT EXISTS drivers (email STRING NOT NULL PRIMARY KEY, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)");
       });
@@ -1250,7 +1250,7 @@
     };
 
     LoginCtrl.prototype.loadTravels = function(travels) {
-      var coords, cost, destination, driver, driver2, endpoint, endtime, id, image, lat, long, model, origin, pos, sql, startpoint, starttime, travel, travel2, _i, _len, _results;
+      var coords, cost, destination, driver, driver2, endpoint, endtime, id, image, lat, long, model, origin, pos, sql, startpoint, starttime, travel, travel2, vote, _i, _len, _results;
       this.doSQL("DELETE FROM travels");
       this.doSQL("DELETE FROM drivers");
       if (travels.length > 0) {
@@ -1274,6 +1274,7 @@
         endpoint = new google.maps.LatLng(long, lat);
         origin = travel.origin;
         destination = travel.destination;
+        vote = 0;
         cost = travel.cost;
         driver = __Model.Driver.get(travel.driver.email)[0];
         if (driver === void 0) {
@@ -1309,9 +1310,10 @@
           cost: cost,
           driver: driver,
           origin: origin,
-          destination: destination
+          destination: destination,
+          vote: vote
         });
-        sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "');";
+        sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "','" + travel2.vote + "');";
         _results.push(this.doSQL(sql));
       }
       return _results;
@@ -1420,7 +1422,8 @@
               cost: travel.cost,
               driver: driver,
               origin: travel.origin,
-              destination: travel.destination
+              destination: travel.destination,
+              vote: travel.vote
             });
             i++;
             if (i === results.rows.length) {
@@ -2348,11 +2351,13 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.TravelDetailsCtrl = (function(_super) {
-    var driverDetails;
+    var driverDetails, travel;
 
     __extends(TravelDetailsCtrl, _super);
 
     driverDetails = void 0;
+
+    travel = void 0;
 
     TravelDetailsCtrl.prototype.elements = {
       "#travelDetails_start": "start",
@@ -2360,14 +2365,17 @@
       "#travelDetails_date": "date",
       "#travelDetails_time": "time",
       "#travelDetails_cost": "cost",
-      "#travelDetails_driver": "driver"
+      "#travelDetails_driver": "driver",
+      "#travelDetails_valoration": "valoration"
     };
 
     TravelDetailsCtrl.prototype.events = {
-      "singleTap #travelDetails_driver": "viewDriver"
+      "singleTap #travelDetails_driver": "viewDriver",
+      "change #travelDetails_valoration": "vote"
     };
 
     function TravelDetailsCtrl() {
+      this.vote = __bind(this.vote, this);
       this.viewDriver = __bind(this.viewDriver, this);
       this.changeValuation = __bind(this.changeValuation, this);
       this.showMap = __bind(this.showMap, this);
@@ -2376,6 +2384,7 @@
     }
 
     TravelDetailsCtrl.prototype.loadTravelDetails = function(travel) {
+      this.travel = travel;
       this.showMap(travel);
       this.start[0].innerText = travel.origin;
       this.end[0].innerText = travel.destination;
@@ -2385,9 +2394,15 @@
       this.driverDetails = travel.driver;
       this.changeValuation();
       if (travel.driver.image) {
-        return this.driver[0].src = travel.driver.image;
+        this.driver[0].src = travel.driver.image;
       } else {
-        return this.driver[0].src = "img/user.png";
+        this.driver[0].src = "img/user.png";
+      }
+      if (travel.vote > 0) {
+        this.valoration[0].disabled = true;
+        return this.valoration[0].selectedIndex = travel.vote;
+      } else {
+        return this.valoration[0].disabled = false;
       }
     };
 
@@ -2451,6 +2466,34 @@
     TravelDetailsCtrl.prototype.viewDriver = function(event) {
       __Controller.favDriver.loadDriverDetails(this.driverDetails);
       return Lungo.Router.section("favDriver_s");
+    };
+
+    TravelDetailsCtrl.prototype.vote = function(event) {
+      var credentials, data, server, session,
+        _this = this;
+      if (this.valoration[0].selectedIndex > 0) {
+        credentials = Lungo.Cache.get("credentials");
+        server = Lungo.Cache.get("server");
+        session = Lungo.Cache.get("session");
+        data = {
+          email: credentials.email,
+          sessionID: session,
+          vote: this.valoration[0].selectedIndex,
+          travelID: this.travel.id
+        };
+        return $$.ajax({
+          type: "GET",
+          url: server + "client/voteDriver",
+          data: data,
+          success: function(result) {
+            _this.valoration[0].disabled = true;
+            return navigator.notification.alert("Taxista valorado", null, "Taxi Express", "Aceptar");
+          },
+          error: function(xhr, type) {
+            return navigator.notification.alert("Error al valorar al taxista", null, "Taxi Express", "Aceptar");
+          }
+        });
+      }
     };
 
     return TravelDetailsCtrl;
