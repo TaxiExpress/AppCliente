@@ -15,7 +15,6 @@ class __View.Travel extends Monocle.View
 
   events:
     "singleTap li"              :  "onView"
-#    "swipeLeft li"              :  "deleteTravel"
    
   constructor: ->
     super
@@ -27,18 +26,3 @@ class __View.Travel extends Monocle.View
 
   onView: (event) ->
     __Controller.travelDetails.loadTravelDetails(@model)
-
-
-  deleteTravel: (event) ->
-    Lungo.Notification.confirm
-      icon: "road"
-      title: "Eliminar viaje"
-      description: "¿Desea eliminar este viaje?"
-      accept:
-        label: "Sí"
-        callback: =>
-          __Controller.travelList.deleteTravel(@model)
-      cancel:
-        label: "No"
-        callback: ->
-          @

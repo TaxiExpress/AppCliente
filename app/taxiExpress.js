@@ -269,27 +269,6 @@
       return __Controller.travelDetails.loadTravelDetails(this.model);
     };
 
-    Travel.prototype.deleteTravel = function(event) {
-      var _this = this;
-      return Lungo.Notification.confirm({
-        icon: "road",
-        title: "Eliminar viaje",
-        description: "¿Desea eliminar este viaje?",
-        accept: {
-          label: "Sí",
-          callback: function() {
-            return __Controller.travelList.deleteTravel(_this.model);
-          }
-        },
-        cancel: {
-          label: "No",
-          callback: function() {
-            return this;
-          }
-        }
-      });
-    };
-
     return Travel;
 
   })(Monocle.View);
