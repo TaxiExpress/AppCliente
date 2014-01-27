@@ -34,25 +34,32 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
 
   valideCredentials: (email, pass, date, dateFavorites, dateTravels) =>
-    server = Lungo.Cache.get "server"
     pushID = Lungo.Cache.get "pushID"
-    data = 
-      email: email
-      password: pass
-      lastUpdate: date
-      lastUpdateFavorites: dateFavorites
-      lastUpdateTravels: dateTravels
-      pushID: pushID
-    $$.ajax
-      type: "POST"
-      url: server + "client/login"
-      data: data
-      success: (result) =>
-        @parseResponse result
-      error: (xhr, type) =>
-        setTimeout((=>Lungo.Router.section "login_s") , 500)
-        @password[0].value = ""
-        alert type.response        
+    #pushID = "prueba"
+    if pushID == undefined
+      setTimeout((=> 
+        pushID = Lungo.Cache.get "pushID"
+        @valideCredentials email, pass, date, dateFavorites, dateTravels 
+      ) , 500)
+    else
+      server = Lungo.Cache.get "server"
+      data = 
+        email: email
+        password: pass
+        lastUpdate: date
+        lastUpdateFavorites: dateFavorites
+        lastUpdateTravels: dateTravels
+        pushID: pushID
+      $$.ajax
+        type: "POST"
+        url: server + "client/login"
+        data: data
+        success: (result) =>
+          @parseResponse result
+        error: (xhr, type) =>
+          setTimeout((=>Lungo.Router.section "login_s") , 500)
+          @password[0].value = ""
+          alert type.response        
 
 
   parseResponse: (result) ->
