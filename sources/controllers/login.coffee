@@ -35,13 +35,14 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
   valideCredentials: (email, pass, date, dateFavorites, dateTravels) =>
     pushID = Lungo.Cache.get "pushID"
-    #pushID = "prueba"
+    pushID = "prueba"
     if pushID == undefined
       setTimeout((=> 
         pushID = Lungo.Cache.get "pushID"
         @valideCredentials email, pass, date, dateFavorites, dateTravels 
       ) , 500)
     else
+      device = Lungo.Cache.get "pushDevice"
       server = Lungo.Cache.get "server"
       data = 
         email: email
@@ -50,6 +51,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
         lastUpdateFavorites: dateFavorites
         lastUpdateTravels: dateTravels
         pushID: pushID
+        pushDevice: device
       $$.ajax
         type: "POST"
         url: server + "client/login"

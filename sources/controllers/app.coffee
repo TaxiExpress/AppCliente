@@ -8,7 +8,7 @@ class __Controller.AppCtrl extends Monocle.Controller
     __Controller.phoneVerification = new __Controller.PhoneVerificationCtrl "section#phoneVerification_s"
     __Controller.sendSMS = new __Controller.SendSMSCtrl "section#sendSMS_s"
     __Controller.filters = new __Controller.FiltersCtrl "section#filters_s"
-
+    console.log navigator
 
 $$ ->
   Lungo.init({})

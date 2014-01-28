@@ -290,6 +290,7 @@
       __Controller.phoneVerification = new __Controller.PhoneVerificationCtrl("section#phoneVerification_s");
       __Controller.sendSMS = new __Controller.SendSMSCtrl("section#sendSMS_s");
       __Controller.filters = new __Controller.FiltersCtrl("section#filters_s");
+      console.log(navigator);
     }
 
     return AppCtrl;
@@ -1057,15 +1058,17 @@
     };
 
     LoginCtrl.prototype.valideCredentials = function(email, pass, date, dateFavorites, dateTravels) {
-      var data, pushID, server,
+      var data, device, pushID, server,
         _this = this;
       pushID = Lungo.Cache.get("pushID");
+      pushID = "prueba";
       if (pushID === void 0) {
         return setTimeout((function() {
           pushID = Lungo.Cache.get("pushID");
           return _this.valideCredentials(email, pass, date, dateFavorites, dateTravels);
         }), 500);
       } else {
+        device = Lungo.Cache.get("pushDevice");
         server = Lungo.Cache.get("server");
         data = {
           email: email,
@@ -1073,7 +1076,8 @@
           lastUpdate: date,
           lastUpdateFavorites: dateFavorites,
           lastUpdateTravels: dateTravels,
-          pushID: pushID
+          pushID: pushID,
+          pushDevice: device
         };
         return $$.ajax({
           type: "POST",
@@ -2074,8 +2078,9 @@
       PushCtrl.__super__.constructor.apply(this, arguments);
     }
 
-    PushCtrl.prototype.savePushID = function(id) {
-      return Lungo.Cache.set("pushID", id);
+    PushCtrl.prototype.savePushID = function(id, device) {
+      Lungo.Cache.set("pushID", id);
+      return Lungo.Cache.set("pushDevice", device);
     };
 
     PushCtrl.prototype.handlePush = function(notification) {
