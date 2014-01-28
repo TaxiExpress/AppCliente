@@ -78,7 +78,7 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
         distance = (response.routes[0].legs[0].distance.value/1000).toFixed(2)
         time = Math.round(response.routes[0].legs[0].duration.value/60)
         driver.distance = distance
-        driver.time = time
+        driver.time = time+1
         driver.save()
         setTimeout((=> @showTaxies()) , 50) if lastDriver
 
