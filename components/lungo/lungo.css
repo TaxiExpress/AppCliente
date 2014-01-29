@@ -60,6 +60,9 @@ img.driver {visibility: visible!important;  border-radius: 24px; margin-top:46px
 .white {background: white}
 button.down {bottom:25px;position:absolute!important;background: none!important;color:#888;} 
 button.down > abbr{font-weight: 100!important} 
+.green{background:#04B404!important;margin-top: 5px; margin-right: 4px;margin-bottom: 5px; width: 49%; color:#333}
+.red{background:#FE2E2E!important;margin-top: 5px; margin-bottom: 5px; width: 49%; color:#333}
+
 
 .list li{list-style-type:none;position:relative;text-align:-webkit-match-parent;line-height:inherit;}
 .list li:not(.big){padding-top:17px;padding-bottom:17px;padding-left:10px;margin-bottom: 1px;}

@@ -1,10 +1,10 @@
-class __Controller.PushCtrl extends Monocle.Controller
+ class __Controller.PushCtrl extends Monocle.Controller
 
   pushNotification = undefined
 
   constructor: ->
     super
-    @savePushID "pushIDdeprueba", "IOS"
+    #@savePushID "pushIDdeprueba", "IOS"
 
   savePushID: (id, device) =>
     Lungo.Cache.set "pushID", id
@@ -16,16 +16,17 @@ class __Controller.PushCtrl extends Monocle.Controller
       when "701" #Recibo push de trayecto aceptado
         Lungo.Cache.set "travelAccepted", true
         Lungo.Router.section "home_s"      
-        navigator.notification.alert "El taxista ha aceptado su solicitud", null, "Taxi Express", "Aceptar"
+        navigator.notification.alert "El taxista ha aceptado su solicitud y está en camino", null, "Taxi Express", "Aceptar"
       when "702" #Recibo la push de pago
         if notification.appPayment == "true"
           __Controller.payment.loadPayment(notification.cost)
+          navigator.notification.alert "Ya puedes pagar tu trayecto en taxi", null, "Taxi Express", "Aceptar"
           home_driver.style.visibility = "visible"
           Lungo.Router.section "home_s"      
           Lungo.Router.section "payment_s"
         else
           Lungo.Router.section "home_s"      
-          navigator.notification.alert "Viaje pagado", null, "Taxi Express", "Aceptar"
+          navigator.notification.alert "Viaje pagado. Gracias por usar TaxiExpress", null, "Taxi Express", "Aceptar"
           credentials = Lungo.Cache.get "credentials"
           server = Lungo.Cache.get "server"
           session = Lungo.Cache.get "session"

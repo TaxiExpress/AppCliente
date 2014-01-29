@@ -1263,7 +1263,7 @@
           endpoint = new google.maps.LatLng(long, lat);
           origin = travel.origin;
           destination = travel.destination;
-          vote = 0;
+          vote = (travel.vote === "true").toString();
           cost = travel.cost;
           driver = __Model.Driver.get(travel.driver.email)[0];
           if (driver === void 0) {
@@ -1866,7 +1866,7 @@
         };
         return $$.ajax({
           type: "POST",
-          url: server + "client/validateuser",
+          url: server + "client/validate",
           data: data,
           success: function(result) {
             return _this.parseResponse(result);
@@ -2078,7 +2078,6 @@
       this.handlePush = __bind(this.handlePush, this);
       this.savePushID = __bind(this.savePushID, this);
       PushCtrl.__super__.constructor.apply(this, arguments);
-      this.savePushID("pushIDdeprueba", "IOS");
     }
 
     PushCtrl.prototype.savePushID = function(id, device) {
@@ -2093,16 +2092,17 @@
         case "701":
           Lungo.Cache.set("travelAccepted", true);
           Lungo.Router.section("home_s");
-          return navigator.notification.alert("El taxista ha aceptado su solicitud", null, "Taxi Express", "Aceptar");
+          return navigator.notification.alert("El taxista ha aceptado su solicitud y está en camino", null, "Taxi Express", "Aceptar");
         case "702":
           if (notification.appPayment === "true") {
             __Controller.payment.loadPayment(notification.cost);
+            navigator.notification.alert("Ya puedes pagar tu trayecto en taxi", null, "Taxi Express", "Aceptar");
             home_driver.style.visibility = "visible";
             Lungo.Router.section("home_s");
             return Lungo.Router.section("payment_s");
           } else {
             Lungo.Router.section("home_s");
-            navigator.notification.alert("Viaje pagado", null, "Taxi Express", "Aceptar");
+            navigator.notification.alert("Viaje pagado. Gracias por usar TaxiExpress", null, "Taxi Express", "Aceptar");
             credentials = Lungo.Cache.get("credentials");
             server = Lungo.Cache.get("server");
             session = Lungo.Cache.get("session");
@@ -2366,17 +2366,21 @@
       "#travelDetails_time": "time",
       "#travelDetails_cost": "cost",
       "#travelDetails_driver": "driver",
-      "#travelDetails_valoration": "valoration"
+      "#travelDetails_positiveVote": "votePos",
+      "#travelDetails_negativeVote": "voteNeg"
     };
 
     TravelDetailsCtrl.prototype.events = {
       "singleTap #travelDetails_driver": "viewDriver",
-      "change #travelDetails_valoration": "vote"
+      "singleTap #travelDetails_positiveVote": "votePositive",
+      "singleTap #travelDetails_negativeVote": "voteNegative"
     };
 
     function TravelDetailsCtrl() {
       this.vote = __bind(this.vote, this);
       this.viewDriver = __bind(this.viewDriver, this);
+      this.voteNegative = __bind(this.voteNegative, this);
+      this.votePositive = __bind(this.votePositive, this);
       this.changeValuation = __bind(this.changeValuation, this);
       this.showMap = __bind(this.showMap, this);
       this.loadTravelDetails = __bind(this.loadTravelDetails, this);
@@ -2398,11 +2402,13 @@
       } else {
         this.driver[0].src = "img/user.png";
       }
-      if (travel.vote > 0) {
-        this.valoration[0].disabled = true;
-        return this.valoration[0].selectedIndex = travel.vote;
+      console.log(travel.vote);
+      if (travel.vote !== "false") {
+        this.votePos[0].disabled = true;
+        return this.voteNeg[0].disabled = true;
       } else {
-        return this.valoration[0].disabled = false;
+        this.votePos[0].disabled = false;
+        return this.voteNeg[0].disabled = false;
       }
     };
 
@@ -2463,37 +2469,44 @@
       return this.driverDetails.valuationStars = val;
     };
 
+    TravelDetailsCtrl.prototype.votePositive = function(event) {
+      return this.vote("positive");
+    };
+
+    TravelDetailsCtrl.prototype.voteNegative = function(event) {
+      return this.vote("negative");
+    };
+
     TravelDetailsCtrl.prototype.viewDriver = function(event) {
       __Controller.favDriver.loadDriverDetails(this.driverDetails);
       return Lungo.Router.section("favDriver_s");
     };
 
-    TravelDetailsCtrl.prototype.vote = function(event) {
+    TravelDetailsCtrl.prototype.vote = function(vote) {
       var credentials, data, server, session,
         _this = this;
-      if (this.valoration[0].selectedIndex > 0) {
-        credentials = Lungo.Cache.get("credentials");
-        server = Lungo.Cache.get("server");
-        session = Lungo.Cache.get("session");
-        data = {
-          email: credentials.email,
-          sessionID: session,
-          vote: this.valoration[0].selectedIndex,
-          travelID: this.travel.id
-        };
-        return $$.ajax({
-          type: "GET",
-          url: server + "client/voteDriver",
-          data: data,
-          success: function(result) {
-            _this.valoration[0].disabled = true;
-            return navigator.notification.alert("Taxista valorado", null, "Taxi Express", "Aceptar");
-          },
-          error: function(xhr, type) {
-            return navigator.notification.alert("Error al valorar al taxista", null, "Taxi Express", "Aceptar");
-          }
-        });
-      }
+      credentials = Lungo.Cache.get("credentials");
+      server = Lungo.Cache.get("server");
+      session = Lungo.Cache.get("session");
+      data = {
+        email: credentials.email,
+        sessionID: session,
+        vote: vote,
+        travelID: this.travel.id
+      };
+      console.log(data);
+      return $$.ajax({
+        type: "GET",
+        url: server + "client/voteDriver",
+        data: data,
+        success: function(result) {
+          _this.valoration[0].disabled = true;
+          return navigator.notification.alert("Taxista valorado", null, "Taxi Express", "Aceptar");
+        },
+        error: function(xhr, type) {
+          return navigator.notification.alert("Error al valorar al taxista", null, "Taxi Express", "Aceptar");
+        }
+      });
     };
 
     return TravelDetailsCtrl;
@@ -2519,9 +2532,6 @@
     credentials = void 0;
 
     function TravelListCtrl() {
-      this.updateLastUpdateTravel = __bind(this.updateLastUpdateTravel, this);
-      this.tryEmpty = __bind(this.tryEmpty, this);
-      this.deleteTravel = __bind(this.deleteTravel, this);
       this.loadTravelList = __bind(this.loadTravelList, this);
       TravelListCtrl.__super__.constructor.apply(this, arguments);
       this.loadTravelList();
@@ -2538,57 +2548,6 @@
         }));
       }
       return _results;
-    };
-
-    TravelListCtrl.prototype.deleteTravel = function(travel) {
-      var server, session,
-        _this = this;
-      server = Lungo.Cache.get("server");
-      this.credentials = Lungo.Cache.get("credentials");
-      this.date = new Date().toISOString().substring(0, 19);
-      this.date = this.date.replace("T", " ");
-      session = Lungo.Cache.get("session");
-      return $$.ajax({
-        type: "POST",
-        url: server + "client/removetravel",
-        data: {
-          email: this.credentials.email,
-          travel_id: travel.id,
-          lastUpdateTravels: this.date,
-          sessionID: session
-        },
-        success: function(result) {
-          _views[travel.id].remove();
-          _views[travel.id] = void 0;
-          travel.destroy();
-          _this.tryEmpty();
-          return _this.updateLastUpdateTravel(travel.id);
-        },
-        error: function(xhr, type) {
-          return _this;
-        }
-      });
-    };
-
-    TravelListCtrl.prototype.tryEmpty = function() {
-      if (__Model.Travel.all().length === 0) {
-        return empty_travels.style.display = "block";
-      } else {
-        return empty_travels.style.display = "none";
-      }
-    };
-
-    TravelListCtrl.prototype.updateLastUpdateTravel = function(id) {
-      var db,
-        _this = this;
-      db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
-      return db.transaction(function(tx) {
-        var sql;
-        sql = "UPDATE profile SET lastUpdateTravels = '" + _this.date + "' WHERE email ='" + _this.credentials.email + "';";
-        tx.executeSql(sql);
-        sql = "DELETE FROM travels WHERE id ='" + id + "';";
-        return tx.executeSql(sql);
-      });
     };
 
     return TravelListCtrl;

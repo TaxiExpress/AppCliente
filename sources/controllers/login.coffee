@@ -191,7 +191,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
         endpoint = new google.maps.LatLng(long,lat)
         origin = travel.origin
         destination = travel.destination
-        vote = 0#parseInt(travel.vote)
+        vote = (travel.vote == "true").toString()
         cost = travel.cost
         driver = __Model.Driver.get(travel.driver.email)[0]
         if driver == undefined

@@ -10,11 +10,13 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     "#travelDetails_time"                              : "time"
     "#travelDetails_cost"                              : "cost"
     "#travelDetails_driver"                            : "driver"
-    "#travelDetails_valoration"                        : "valoration"
+    "#travelDetails_positiveVote"                      : "votePos"
+    "#travelDetails_negativeVote"                      : "voteNeg"
 
   events:
     "singleTap #travelDetails_driver"                  : "viewDriver"
-    "change #travelDetails_valoration"                 : "vote"
+    "singleTap #travelDetails_positiveVote"            : "votePositive"
+    "singleTap #travelDetails_negativeVote"            : "voteNegative"
 
   constructor: ->
     super
@@ -22,7 +24,7 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
 
   loadTravelDetails: (travel) =>
     @travel = travel
-    @showMap(travel)
+    @showMap travel
     @start[0].innerText = travel.origin
     @end[0].innerText = travel.destination
     @date[0].innerText = travel.date
@@ -34,11 +36,13 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
       @driver[0].src = travel.driver.image
     else
       @driver[0].src = "img/user.png"
-    if travel.vote > 0
-      @valoration[0].disabled = true
-      @valoration[0].selectedIndex = travel.vote
+    console.log travel.vote
+    if travel.vote != "false"
+      @votePos[0].disabled = true
+      @voteNeg[0].disabled = true
     else
-      @valoration[0].disabled = false      
+      @votePos[0].disabled = false
+      @voteNeg[0].disabled = false
 
 
   showMap: (travel) =>
@@ -84,28 +88,36 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     @driverDetails.valuationStars = val
 
 
+  votePositive: (event) =>
+    @vote "positive"
+
+
+  voteNegative: (event) =>
+    @vote "negative"
+
+
   viewDriver: (event) =>
     __Controller.favDriver.loadDriverDetails(@driverDetails)
     Lungo.Router.section "favDriver_s"
 
 
-  vote: (event) =>
-    if @valoration[0].selectedIndex > 0
-      credentials = Lungo.Cache.get "credentials"
-      server = Lungo.Cache.get "server"
-      session = Lungo.Cache.get "session"
-      data =
-        email: credentials.email
-        sessionID: session
-        vote: @valoration[0].selectedIndex
-        travelID: @travel.id
-      $$.ajax
-        type: "GET"
-        url: server + "client/voteDriver"
-        data: data
-        success: (result) =>
-          @valoration[0].disabled = true
-          navigator.notification.alert "Taxista valorado", null, "Taxi Express", "Aceptar"
-        error: (xhr, type) =>
-          navigator.notification.alert "Error al valorar al taxista", null, "Taxi Express", "Aceptar"
+  vote: (vote) =>
+    credentials = Lungo.Cache.get "credentials"
+    server = Lungo.Cache.get "server"
+    session = Lungo.Cache.get "session"
+    data =
+      email: credentials.email
+      sessionID: session
+      vote: vote
+      travelID: @travel.id
+    console.log data
+    $$.ajax
+      type: "GET"
+      url: server + "client/voteDriver"
+      data: data
+      success: (result) =>
+        @valoration[0].disabled = true
+        navigator.notification.alert "Taxista valorado", null, "Taxi Express", "Aceptar"
+      error: (xhr, type) =>
+        navigator.notification.alert "Error al valorar al taxista", null, "Taxi Express", "Aceptar"
 

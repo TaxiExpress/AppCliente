@@ -31,7 +31,7 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
         sessionID: session
       $$.ajax
         type: "POST"
-        url: server + "client/validateuser"
+        url: server + "client/validate"
         data: data
         success: (result) =>
           @parseResponse result
