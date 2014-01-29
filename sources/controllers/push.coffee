@@ -4,7 +4,7 @@ class __Controller.PushCtrl extends Monocle.Controller
 
   constructor: ->
     super
-
+    @savePushID "pushIDdeprueba", "IOS"
 
   savePushID: (id, device) =>
     Lungo.Cache.set "pushID", id

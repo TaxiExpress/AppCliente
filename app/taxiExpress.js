@@ -1060,7 +1060,6 @@
       var data, device, pushID, server,
         _this = this;
       pushID = Lungo.Cache.get("pushID");
-      pushID = "prueba";
       if (pushID === void 0) {
         return setTimeout((function() {
           pushID = Lungo.Cache.get("pushID");
@@ -1090,7 +1089,7 @@
               return Lungo.Router.section("login_s");
             }), 500);
             _this.password[0].value = "";
-            return alert(type.response);
+            return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
           }
         });
       }
@@ -1248,62 +1247,66 @@
       _results = [];
       for (_i = 0, _len = travels.length; _i < _len; _i++) {
         travel = travels[_i];
-        id = travel.id;
-        starttime = new Date(travel.starttime);
-        endtime = new Date(travel.endtime);
-        coords = travel.startpoint.substring(7);
-        pos = coords.indexOf(" ");
-        long = coords.substring(0, pos);
-        lat = coords.substring(pos + 1, coords.indexOf(")"));
-        startpoint = new google.maps.LatLng(long, lat);
-        coords = travel.endpoint.substring(7);
-        pos = coords.indexOf(" ");
-        long = coords.substring(0, pos);
-        lat = coords.substring(pos + 1, coords.indexOf(")"));
-        endpoint = new google.maps.LatLng(long, lat);
-        origin = travel.origin;
-        destination = travel.destination;
-        vote = 0;
-        cost = travel.cost;
-        driver = __Model.Driver.get(travel.driver.email)[0];
-        if (driver === void 0) {
-          driver2 = travel.driver;
-          if (driver2.image === "") {
-            image = "";
-          } else {
-            image = driver2.image;
+        if (travel.endtime) {
+          id = travel.id;
+          starttime = new Date(travel.starttime);
+          endtime = new Date(travel.endtime);
+          coords = travel.startpoint.substring(7);
+          pos = coords.indexOf(" ");
+          long = coords.substring(0, pos);
+          lat = coords.substring(pos + 1, coords.indexOf(")"));
+          startpoint = new google.maps.LatLng(long, lat);
+          coords = travel.endpoint.substring(7);
+          pos = coords.indexOf(" ");
+          long = coords.substring(0, pos);
+          lat = coords.substring(pos + 1, coords.indexOf(")"));
+          endpoint = new google.maps.LatLng(long, lat);
+          origin = travel.origin;
+          destination = travel.destination;
+          vote = 0;
+          cost = travel.cost;
+          driver = __Model.Driver.get(travel.driver.email)[0];
+          if (driver === void 0) {
+            driver2 = travel.driver;
+            if (driver2.image === "") {
+              image = "";
+            } else {
+              image = driver2.image;
+            }
+            model = driver2.car.company + " " + driver2.car.model;
+            driver = __Model.Driver.create({
+              email: driver2.email,
+              name: driver2.first_name,
+              surname: driver2.last_name,
+              valuation: driver2.valuation,
+              plate: driver2.car.plate,
+              model: model,
+              image: driver2.image,
+              capacity: driver2.car.capacity,
+              accessible: driver2.car.accessible,
+              animals: driver2.car.animals,
+              appPayment: driver2.car.appPayment
+            });
+            sql = "INSERT INTO drivers (email, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('" + driver.email + "','" + driver.name + "','" + driver.surname + "','" + driver.valuation + "','" + driver.plate + "','" + model + "','" + image + "','" + driver.capacity + "','" + driver.accessible + "','" + driver.animals + "','" + driver.appPayment + "');";
+            this.doSQL(sql);
           }
-          model = driver2.car.company + " " + driver2.car.model;
-          driver = __Model.Driver.create({
-            email: driver2.email,
-            name: driver2.first_name,
-            surname: driver2.last_name,
-            valuation: driver2.valuation,
-            plate: driver2.car.plate,
-            model: model,
-            image: driver2.image,
-            capacity: driver2.car.capacity,
-            accessible: driver2.car.accessible,
-            animals: driver2.car.animals,
-            appPayment: driver2.car.appPayment
+          travel2 = __Model.Travel.create({
+            id: id,
+            starttime: starttime,
+            endtime: endtime,
+            startpoint: startpoint,
+            endpoint: endpoint,
+            cost: cost,
+            driver: driver,
+            origin: origin,
+            destination: destination,
+            vote: vote
           });
-          sql = "INSERT INTO drivers (email, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('" + driver.email + "','" + driver.name + "','" + driver.surname + "','" + driver.valuation + "','" + driver.plate + "','" + model + "','" + image + "','" + driver.capacity + "','" + driver.accessible + "','" + driver.animals + "','" + driver.appPayment + "');";
-          this.doSQL(sql);
+          sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "','" + travel2.vote + "');";
+          _results.push(this.doSQL(sql));
+        } else {
+          _results.push(void 0);
         }
-        travel2 = __Model.Travel.create({
-          id: id,
-          starttime: starttime,
-          endtime: endtime,
-          startpoint: startpoint,
-          endpoint: endpoint,
-          cost: cost,
-          driver: driver,
-          origin: origin,
-          destination: destination,
-          vote: vote
-        });
-        sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "','" + travel2.vote + "');";
-        _results.push(this.doSQL(sql));
       }
       return _results;
     };
@@ -2075,6 +2078,7 @@
       this.handlePush = __bind(this.handlePush, this);
       this.savePushID = __bind(this.savePushID, this);
       PushCtrl.__super__.constructor.apply(this, arguments);
+      this.savePushID("pushIDdeprueba", "IOS");
     }
 
     PushCtrl.prototype.savePushID = function(id, device) {

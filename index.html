@@ -382,8 +382,11 @@
         function onDeviceReady() {
             try { 
                 pushNotification = window.plugins.pushNotification;
-              //pushNotification.register(tokenHandler, errorHandler, {"badge":"true","sound":"true","alert":"true","ecb":"onNotificationAPN"});
-                pushNotification.register(successHandler, errorHandler, {"senderID":"513061017666","ecb":"onNotificationGCM"});
+                if (device.platform == 'android' || device.platform == 'Android') {
+                    pushNotification.register(successHandler, errorHandler, {"senderID":"513061017666","ecb":"onNotificationGCM"});
+                } else {
+                    pushNotification.register(tokenHandler, errorHandler, {"badge":"true","sound":"true","alert":"true","ecb":"onNotificationAPN"});
+                }
             } catch(err) { 
                 txt="There was an error on this page.\n\n"; 
                 txt+="Error description: " + err.message + "\n\n"; 

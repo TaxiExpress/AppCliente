@@ -35,7 +35,6 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
   valideCredentials: (email, pass, date, dateFavorites, dateTravels) =>
     pushID = Lungo.Cache.get "pushID"
-    pushID = "prueba"
     if pushID == undefined
       setTimeout((=> 
         pushID = Lungo.Cache.get "pushID"
@@ -61,7 +60,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
         error: (xhr, type) =>
           setTimeout((=>Lungo.Router.section "login_s") , 500)
           @password[0].value = ""
-          alert type.response        
+          navigator.notification.alert type.response , null, "Taxi Express", "Aceptar"
 
 
   parseResponse: (result) ->
@@ -176,36 +175,37 @@ class __Controller.LoginCtrl extends Monocle.Controller
     if travels.length > 0
       empty_travels.style.display = "none"
     for travel in travels
-      id = travel.id
-      starttime = new Date(travel.starttime)
-      endtime = new Date(travel.endtime)
-      coords = travel.startpoint.substring 7
-      pos = coords.indexOf " "
-      long = coords.substring 0, pos
-      lat = coords.substring pos+1, coords.indexOf ")"
-      startpoint = new google.maps.LatLng(long,lat)
-      coords = travel.endpoint.substring 7
-      pos = coords.indexOf " "
-      long = coords.substring 0, pos
-      lat = coords.substring pos+1, coords.indexOf ")"
-      endpoint = new google.maps.LatLng(long,lat)
-      origin = travel.origin
-      destination = travel.destination
-      vote = 0#parseInt(travel.vote)
-      cost = travel.cost
-      driver = __Model.Driver.get(travel.driver.email)[0]
-      if driver == undefined
-        driver2 = travel.driver
-        if driver2.image == ""
-          image = "" 
-        else image = driver2.image
-        model = driver2.car.company + " " + driver2.car.model
-        driver = __Model.Driver.create email: driver2.email, name: driver2.first_name, surname: driver2.last_name, valuation: driver2.valuation, plate: driver2.car.plate, model: model, image: driver2.image, capacity: driver2.car.capacity, accessible: driver2.car.accessible, animals: driver2.car.animals, appPayment: driver2.car.appPayment
-        sql = "INSERT INTO drivers (email, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('"+driver.email+"','"+driver.name+"','"+driver.surname+"','"+driver.valuation+"','"+driver.plate+"','"+model+"','"+image+"','"+driver.capacity+"','"+driver.accessible+"','"+driver.animals+"','"+driver.appPayment+"');"
+      if travel.endtime
+        id = travel.id
+        starttime = new Date(travel.starttime)
+        endtime = new Date(travel.endtime)
+        coords = travel.startpoint.substring 7
+        pos = coords.indexOf " "
+        long = coords.substring 0, pos
+        lat = coords.substring pos+1, coords.indexOf ")"
+        startpoint = new google.maps.LatLng(long,lat)
+        coords = travel.endpoint.substring 7
+        pos = coords.indexOf " "
+        long = coords.substring 0, pos
+        lat = coords.substring pos+1, coords.indexOf ")"
+        endpoint = new google.maps.LatLng(long,lat)
+        origin = travel.origin
+        destination = travel.destination
+        vote = 0#parseInt(travel.vote)
+        cost = travel.cost
+        driver = __Model.Driver.get(travel.driver.email)[0]
+        if driver == undefined
+          driver2 = travel.driver
+          if driver2.image == ""
+            image = "" 
+          else image = driver2.image
+          model = driver2.car.company + " " + driver2.car.model
+          driver = __Model.Driver.create email: driver2.email, name: driver2.first_name, surname: driver2.last_name, valuation: driver2.valuation, plate: driver2.car.plate, model: model, image: driver2.image, capacity: driver2.car.capacity, accessible: driver2.car.accessible, animals: driver2.car.animals, appPayment: driver2.car.appPayment
+          sql = "INSERT INTO drivers (email, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('"+driver.email+"','"+driver.name+"','"+driver.surname+"','"+driver.valuation+"','"+driver.plate+"','"+model+"','"+image+"','"+driver.capacity+"','"+driver.accessible+"','"+driver.animals+"','"+driver.appPayment+"');"
+          @doSQL sql
+        travel2 = __Model.Travel.create id: id, starttime: starttime, endtime: endtime, startpoint: startpoint, endpoint: endpoint, cost: cost, driver: driver, origin: origin, destination: destination, vote: vote
+        sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote) VALUES ('"+travel2.id+"','"+travel2.starttime+"','"+travel2.endtime+"','"+travel.startpoint+"','"+travel.endpoint+"','"+travel2.origin+"','"+travel2.destination+"','"+travel2.cost+"','"+travel2.driver.email+"','"+travel2.vote+"');"
         @doSQL sql
-      travel2 = __Model.Travel.create id: id, starttime: starttime, endtime: endtime, startpoint: startpoint, endpoint: endpoint, cost: cost, driver: driver, origin: origin, destination: destination, vote: vote
-      sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote) VALUES ('"+travel2.id+"','"+travel2.starttime+"','"+travel2.endtime+"','"+travel.startpoint+"','"+travel.endpoint+"','"+travel2.origin+"','"+travel2.destination+"','"+travel2.cost+"','"+travel2.driver.email+"','"+travel2.vote+"');"
-      @doSQL sql
 
 
   doSQL: (sql) =>
