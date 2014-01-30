@@ -17,6 +17,7 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     "singleTap #travelDetails_driver"                  : "viewDriver"
     "singleTap #travelDetails_positiveVote"            : "votePositive"
     "singleTap #travelDetails_negativeVote"            : "voteNegative"
+    "singleTap #map-canvas2"                           : "clickMap"
 
   constructor: ->
     super
@@ -36,7 +37,6 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
       @driver[0].src = travel.driver.image
     else
       @driver[0].src = "img/user.png"
-    console.log travel.vote
     if travel.vote != "false"
       @votePos[0].disabled = true
       @voteNeg[0].disabled = true
@@ -88,6 +88,9 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     @driverDetails.valuationStars = val
 
 
+  clickMap: (event) =>
+    console.log "llego"
+    
   votePositive: (event) =>
     @vote "positive"
 
@@ -110,14 +113,14 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
       sessionID: session
       vote: vote
       travelID: @travel.id
-    console.log data
     $$.ajax
-      type: "GET"
+      type: "POST"
       url: server + "client/voteDriver"
       data: data
       success: (result) =>
         @valoration[0].disabled = true
         navigator.notification.alert "Taxista valorado", null, "Taxi Express", "Aceptar"
       error: (xhr, type) =>
+        console.log type.response
         navigator.notification.alert "Error al valorar al taxista", null, "Taxi Express", "Aceptar"
 

@@ -2078,6 +2078,7 @@
       this.handlePush = __bind(this.handlePush, this);
       this.savePushID = __bind(this.savePushID, this);
       PushCtrl.__super__.constructor.apply(this, arguments);
+      this.savePushID("pushIDdeprueba", "IOS");
     }
 
     PushCtrl.prototype.savePushID = function(id, device) {
@@ -2373,7 +2374,8 @@
     TravelDetailsCtrl.prototype.events = {
       "singleTap #travelDetails_driver": "viewDriver",
       "singleTap #travelDetails_positiveVote": "votePositive",
-      "singleTap #travelDetails_negativeVote": "voteNegative"
+      "singleTap #travelDetails_negativeVote": "voteNegative",
+      "singleTap #map-canvas2": "clickMap"
     };
 
     function TravelDetailsCtrl() {
@@ -2381,6 +2383,7 @@
       this.viewDriver = __bind(this.viewDriver, this);
       this.voteNegative = __bind(this.voteNegative, this);
       this.votePositive = __bind(this.votePositive, this);
+      this.clickMap = __bind(this.clickMap, this);
       this.changeValuation = __bind(this.changeValuation, this);
       this.showMap = __bind(this.showMap, this);
       this.loadTravelDetails = __bind(this.loadTravelDetails, this);
@@ -2402,7 +2405,6 @@
       } else {
         this.driver[0].src = "img/user.png";
       }
-      console.log(travel.vote);
       if (travel.vote !== "false") {
         this.votePos[0].disabled = true;
         return this.voteNeg[0].disabled = true;
@@ -2469,6 +2471,10 @@
       return this.driverDetails.valuationStars = val;
     };
 
+    TravelDetailsCtrl.prototype.clickMap = function(event) {
+      return console.log("llego");
+    };
+
     TravelDetailsCtrl.prototype.votePositive = function(event) {
       return this.vote("positive");
     };
@@ -2494,9 +2500,8 @@
         vote: vote,
         travelID: this.travel.id
       };
-      console.log(data);
       return $$.ajax({
-        type: "GET",
+        type: "POST",
         url: server + "client/voteDriver",
         data: data,
         success: function(result) {
@@ -2504,6 +2509,7 @@
           return navigator.notification.alert("Taxista valorado", null, "Taxi Express", "Aceptar");
         },
         error: function(xhr, type) {
+          console.log(type.response);
           return navigator.notification.alert("Error al valorar al taxista", null, "Taxi Express", "Aceptar");
         }
       });

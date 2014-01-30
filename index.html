@@ -271,6 +271,7 @@
         <article id="travelDetails_a" class="scroll">
             <img id="travelDetails_driver" class="topRight driver" src="" />
             <div id="map-canvas2"></div> 
+            <div class="overMap"></div>
             <div class="form list little_list">
                 <fieldset><small><label>De:</label><span id="travelDetails_start" /></small></fieldset>
                 <fieldset><small><label>A:</label><span id="travelDetails_end" /></small></fieldset>
@@ -311,11 +312,31 @@
     <section id="faq_s" data-transition="cover">
         <header data-title="F.A.Q." data-back="angle-left"></header>      
         <article id="faq_a" class="scroll" >
-            <div class="list indented">            
-                <p>1- ¿Es segura TaxiExpress?</p>
-                <p>Claaaro</p><br/>
-                <p>2- ¿Qué hago si no viene el taxi?</p>
-                <p>Pedir otro</p>
+            <div class="list faq indented"> 
+                <li>
+                    <div>
+                        <strong>¿Es segura TaxiExpress?</strong>
+                        <small>Vestibulum rutrum eleifend sapien, sit amet vulputate purus venenatis nec. Quisque in commodo nisl. Mauris sagittis sed justo in auctor. Praesent auctor laoreet orci, at pellentesque mi dapibus vitae. Phasellus dolor libero, eleifend at commodo a, rutrum in purus. Nulla rhoncus enim vitae feugiat hendrerit. Nullam adipiscing risus ac nulla vulputate egestas. In tempor turpis in nulla tincidunt dapibus.</small>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong>¿Qué hago si no viene el taxi?</strong>
+                        <small>Nulla ac congue est, non luctus lectus. Vestibulum quis ornare ante. Nam elementum nec est et sodales. Pellentesque accumsan odio non ipsum pretium, at volutpat tortor sodales. Nam laoreet, mi ullamcorper lacinia venenatis, metus nisl sagittis arcu, id gravida orci ante gravida orci. Suspendisse eu massa quis massa pulvinar eleifend lacinia non velit. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aenean commodo nibh arcu, vel aliquet turpis blandit id.</small>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong>¿Cómo puedo registrarme?</strong>
+                        <small>n lobortis, neque non hendrerit tincidunt, augue eros imperdiet sem, ut placerat ipsum magna quis velit. Donec quis elit congue, semper libero eget, aliquam ligula. Praesent sed metus vitae augue pulvinar consectetur. Phasellus quis dapibus sem. Donec ornare cursus est vel dictum. Etiam eget tellus nec orci ultricies elementum pellentesque aliquam felis. Maecenas id dui vel dolor suscipit pulvinar. Nulla luctus, purus sed tempor euismod, orci lacus eleifend urna, at iaculis erat metus eget ipsum. Integer interdum libero sed elit tristique, quis mattis mauris placerat.</small>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong>¿Cómo puedo registrarme?</strong>
+                        <small>Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Praesent dapibus lacus in leo mattis adipiscing. Donec ullamcorper, dolor ut pharetra euismod, velit urna cursus mi, vel aliquam erat eros ac elit. Vestibulum interdum, sem eu fringilla varius, dui nibh hendrerit lacus, et pretium enim sem sit amet lectus. Etiam sed velit commodo, suscipit quam eget, varius mi. Sed a adipiscing lacus. Cras auctor tellus a pellentesque pulvinar. Donec ac semper sem. Morbi fringilla placerat venenatis. Quisque congue ante lacus, quis ultrices nunc consequat eget.</small>
+                    </div>
+                </li>
             </div>          
         </article>
     </section>
@@ -373,6 +394,7 @@
         }, false);
         var pushNotification;        
         function onDeviceReady() {
+            navigator.splashscreen.hide();
             try { 
                 pushNotification = window.plugins.pushNotification;
                 if (device.platform == 'android' || device.platform == 'Android') {
