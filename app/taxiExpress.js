@@ -325,7 +325,8 @@
       "#chosenTaxi_capacity": "capacity",
       "#chosenTaxi_accessible": "accessible",
       "#chosenTaxi_animals": "animals",
-      "#chosenTaxi_appPayment": "appPayment"
+      "#chosenTaxi_appPayment": "appPayment",
+      "#chosenTaxi_request": "button"
     };
 
     ChosenTaxiCtrl.prototype.events = {
@@ -363,7 +364,7 @@
     ChosenTaxiCtrl.prototype.requestTaxi = function(event) {
       var credentials, origin, position, server, session,
         _this = this;
-      Lungo.Router.section("waiting_s");
+      this.button[0].disabled = true;
       credentials = Lungo.Cache.get("credentials");
       position = Lungo.Cache.get("geoPosition");
       server = Lungo.Cache.get("server");
@@ -381,12 +382,16 @@
           sessionID: session
         },
         error: function(xhr, type) {
-          return console.log(type.response);
+          navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
+          return _this.button[0].disabled = false;
         },
         success: function(result) {
           var travelID;
+          _this.button[0].disabled = false;
+          Lungo.Router.section("waiting_s");
           travelID = result.travelID;
-          Lungo.Cache.set("travelID", travelID);
+          Lungo.Cache.set("travelID", travelID.toString());
+          Lungo.Cache.remove("travelAccepted");
           Lungo.Cache.set("travelAccepted", false);
           Lungo.Router.section("waiting_s");
           return setTimeout((function() {
@@ -397,16 +402,17 @@
                 data: {
                   email: credentials.email,
                   sessionID: session,
-                  travelID: travelID
+                  travelID: travelID.toString()
                 },
                 error: function(xhr, type) {
-                  return alert(type.response);
+                  Lungo.Router.back();
+                  return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
                 },
                 success: function(result) {
-                  Lungo.Cache.set("travelID", 0);
+                  Lungo.Cache.remove("travelID");
                   Lungo.Cache.set("travelAccepted", false);
-                  alert("Peticion cancelada");
-                  return Lungo.Router.back();
+                  Lungo.Router.back();
+                  return navigator.notification.alert("Ningún taxista cercano ha aceptado la solicitud", null, "Taxi Express", "Aceptar");
                 }
               });
             }
@@ -954,12 +960,13 @@
           sessionID: session
         },
         error: function(xhr, type) {
-          return console.log(type.response);
+          return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
         },
         success: function(result) {
           var travelID;
           travelID = result.travelID;
           Lungo.Cache.set("travelID", travelID);
+          Lungo.Cache.remove("travelAccepted");
           Lungo.Cache.set("travelAccepted", false);
           Lungo.Router.section("waiting_s");
           return setTimeout((function() {
@@ -970,20 +977,21 @@
                 data: {
                   email: credentials.email,
                   sessionID: session,
-                  travelID: travelID
+                  travelID: travelID.toString()
                 },
                 error: function(xhr, type) {
-                  return alert(type.response);
+                  Lungo.Router.back();
+                  return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
                 },
                 success: function(result) {
-                  Lungo.Cache.set("travelID", 0);
+                  Lungo.Cache.remove("travelID");
                   Lungo.Cache.set("travelAccepted", false);
-                  alert("Peticion cancelada");
-                  return Lungo.Router.back();
+                  Lungo.Router.back();
+                  return navigator.notification.alert("Ningún taxista cercano ha aceptado la solicitud", null, "Taxi Express", "Aceptar");
                 }
               });
             }
-          }), 30000);
+          }), 5000);
         }
       });
     };
@@ -2374,8 +2382,7 @@
     TravelDetailsCtrl.prototype.events = {
       "singleTap #travelDetails_driver": "viewDriver",
       "singleTap #travelDetails_positiveVote": "votePositive",
-      "singleTap #travelDetails_negativeVote": "voteNegative",
-      "singleTap #map-canvas2": "clickMap"
+      "singleTap #travelDetails_negativeVote": "voteNegative"
     };
 
     function TravelDetailsCtrl() {
@@ -2383,7 +2390,6 @@
       this.viewDriver = __bind(this.viewDriver, this);
       this.voteNegative = __bind(this.voteNegative, this);
       this.votePositive = __bind(this.votePositive, this);
-      this.clickMap = __bind(this.clickMap, this);
       this.changeValuation = __bind(this.changeValuation, this);
       this.showMap = __bind(this.showMap, this);
       this.loadTravelDetails = __bind(this.loadTravelDetails, this);
@@ -2469,10 +2475,6 @@
         i++;
       }
       return this.driverDetails.valuationStars = val;
-    };
-
-    TravelDetailsCtrl.prototype.clickMap = function(event) {
-      return console.log("llego");
     };
 
     TravelDetailsCtrl.prototype.votePositive = function(event) {
@@ -2600,13 +2602,14 @@
             travelID: travelID
           },
           error: function(xhr, type) {
-            return alert(type.response);
+            return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
           },
           success: function(result) {
-            Lungo.Cache.set("travelID", 0);
-            Lungo.Cache.set("travelAccepted", false);
-            alert("Peticion cancelada");
-            return Lungo.Router.back();
+            Lungo.Cache.remove("travelID");
+            Lungo.Cache.remove("travelAccepted");
+            Lungo.Cache.set("travelAccepted", true);
+            Lungo.Router.back();
+            return navigator.notification.alert("Peticion cancelada", null, "Taxi Express", "Aceptar");
           }
         });
       }

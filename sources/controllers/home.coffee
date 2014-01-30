@@ -130,10 +130,11 @@ class __Controller.HomeCtrl extends Monocle.Controller
         origin: origin
         sessionID: session
       error: (xhr, type) =>
-        console.log type.response
+        navigator.notification.alert type.response, null, "Taxi Express", "Aceptar"
       success: (result) =>
         travelID = result.travelID
         Lungo.Cache.set "travelID", travelID
+        Lungo.Cache.remove "travelAccepted"
         Lungo.Cache.set "travelAccepted", false
         Lungo.Router.section "waiting_s"
         setTimeout((=> 
@@ -144,15 +145,16 @@ class __Controller.HomeCtrl extends Monocle.Controller
               data:
                 email: credentials.email
                 sessionID: session
-                travelID: travelID
+                travelID: travelID.toString()
               error: (xhr, type) =>
-                alert type.response
-              success: (result) =>
-                Lungo.Cache.set "travelID", 0
-                Lungo.Cache.set "travelAccepted", false
-                alert "Peticion cancelada"
                 Lungo.Router.back()
-        ) , 30000)
+                navigator.notification.alert type.response, null, "Taxi Express", "Aceptar"
+              success: (result) =>
+                Lungo.Cache.remove "travelID"
+                Lungo.Cache.set "travelAccepted", false
+                Lungo.Router.back()
+                navigator.notification.alert "Ningún taxista cercano ha aceptado la solicitud", null, "Taxi Express", "Aceptar"
+        ) , 5000)
 
 
   payTaxi: (event) =>

@@ -24,9 +24,10 @@ class __Controller.WaitingCtrl extends Monocle.Controller
           sessionID: session
           travelID: travelID
         error: (xhr, type) =>
-          alert type.response
+          navigator.notification.alert type.response, null, "Taxi Express", "Aceptar"
         success: (result) =>
-          Lungo.Cache.set "travelID", 0
-          Lungo.Cache.set "travelAccepted", false
-          alert "Peticion cancelada"
+          Lungo.Cache.remove "travelID"
+          Lungo.Cache.remove "travelAccepted"
+          Lungo.Cache.set "travelAccepted", true
           Lungo.Router.back()
+          navigator.notification.alert "Peticion cancelada", null, "Taxi Express", "Aceptar"

@@ -60,7 +60,7 @@ img.driver {visibility: visible!important;  border-radius: 24px; margin-top:46px
 .white {background: white}
 button.down {bottom:25px;position:absolute!important;background: none!important;color:#888;} 
 button.down > abbr{font-weight: 100!important} 
-.green{background:#ffcc00!important;margin-top: 5px; margin-right: 4px;margin-bottom: 5px; width: 49%; color:#333}
+.green{background:#ffcc00!important;margin-top: 5px; margin-right: 3px;margin-bottom: 5px; width: 49%; color:#333}
 .red{background:#333!important;margin-top: 5px; margin-bottom: 5px; width: 49%; color:#fff}
 .overMap{position: relative;margin-top: -247px;height: 220px;z-index: 1;}
 .faq li{height:auto!important;}

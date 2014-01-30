@@ -12,6 +12,7 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
     "#chosenTaxi_accessible"                        : "accessible"
     "#chosenTaxi_animals"                           : "animals"
     "#chosenTaxi_appPayment"                        : "appPayment"
+    "#chosenTaxi_request"                           : "button"
 
   events:
     "singleTap #chosenTaxi_request"                 : "requestTaxi"
@@ -37,7 +38,7 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
 
 
   requestTaxi: (event) =>
-    Lungo.Router.section "waiting_s"
+    @button[0].disabled = true
     credentials = Lungo.Cache.get "credentials"
     position = Lungo.Cache.get "geoPosition"
     server = Lungo.Cache.get "server"
@@ -54,10 +55,14 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
         driverEmail: @driverDetails.email
         sessionID: session
       error: (xhr, type) =>
-        console.log type.response
+        navigator.notification.alert type.response, null, "Taxi Express", "Aceptar"
+        @button[0].disabled = false
       success: (result) =>
+        @button[0].disabled = false
+        Lungo.Router.section "waiting_s"
         travelID = result.travelID
-        Lungo.Cache.set "travelID", travelID
+        Lungo.Cache.set "travelID", travelID.toString()
+        Lungo.Cache.remove "travelAccepted"
         Lungo.Cache.set "travelAccepted", false
         Lungo.Router.section "waiting_s"
         setTimeout((=> 
@@ -68,13 +73,15 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
               data:
                 email: credentials.email
                 sessionID: session
-                travelID: travelID
+                travelID: travelID.toString()
               error: (xhr, type) =>
-                alert type.response
-              success: (result) =>
-                Lungo.Cache.set "travelID", 0
-                Lungo.Cache.set "travelAccepted", false
-                alert "Peticion cancelada"
                 Lungo.Router.back()
-            ) , 30000)
+                navigator.notification.alert type.response, null, "Taxi Express", "Aceptar"
+              success: (result) =>
+                Lungo.Cache.remove "travelID"
+                Lungo.Cache.set "travelAccepted", false
+                Lungo.Router.back()
+                navigator.notification.alert "Ningún taxista cercano ha aceptado la solicitud", null, "Taxi Express", "Aceptar"
+        ) , 30000)
+
 

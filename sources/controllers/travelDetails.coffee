@@ -17,7 +17,6 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     "singleTap #travelDetails_driver"                  : "viewDriver"
     "singleTap #travelDetails_positiveVote"            : "votePositive"
     "singleTap #travelDetails_negativeVote"            : "voteNegative"
-    "singleTap #map-canvas2"                           : "clickMap"
 
   constructor: ->
     super
@@ -88,9 +87,6 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     @driverDetails.valuationStars = val
 
 
-  clickMap: (event) =>
-    console.log "llego"
-    
   votePositive: (event) =>
     @vote "positive"
 
