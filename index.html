@@ -174,14 +174,23 @@
         </article>
     </section>    
 
-    <section id="filters_s" data-transition="cover" >
-        <header data-title="Filtros de búsqueda" data-back="angle-down"></header>      
+    <section id="filters_s" data-transition="slide" >
+        <header data-title="Filtros de búsqueda" data-back="angle-left"></header>      
         <article id="filters_a" class="scroll" >
             <div class="form list">
                 <li class="anchor contrast">CARACTERÍSTICAS DEL TAXI A BUSCAR</li>
                 <fieldset> 
                     <small>Número de plazas necesarias</small>
-                    <input id="filters_seats" type="number" min="1" max="9"/>
+                    <label class="select">
+                        <select id="filters_seats" class="custom">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select>
+                    </label>
                 </fieldset> 
                 <fieldset> 
                     <small>Permitido pago a través de la App</small>
@@ -194,6 +203,16 @@
                 <fieldset> 
                     <small>Habilitado para minusválidos</small>
                     <input id="filters_accessible" type="checkbox" />
+                </fieldset>
+                <fieldset> 
+                    <small>Taxis a un radio de </small>
+                    <label class="select">
+                        <select id="filters_distance" class="custom">
+                            <option value="1">1 km</option>
+                            <option value="2">2 km</option>
+                            <option value="3">3 km</option>
+                        </select>
+                    </label>
                 </fieldset>
             </div>           
         </article>

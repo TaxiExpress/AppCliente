@@ -14,7 +14,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     super
     @db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024)
     @db.transaction (tx) =>
-      tx.executeSql "CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )"
+      tx.executeSql "CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, distance STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )"
       tx.executeSql "CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL, vote STRING NOT NULL)"
       tx.executeSql "CREATE TABLE IF NOT EXISTS drivers (email STRING NOT NULL PRIMARY KEY, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)"
     #@drop()
@@ -71,7 +71,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
         phone: credentials.phone
         email: credentials.email
         image: credentials.image
-      __Controller.filters.loadFilters(credentials.seats, credentials.payments, credentials.animals, credentials.accessible)
+      __Controller.filters.loadFilters(credentials.seats, credentials.payments, credentials.animals, credentials.accessible, credentials.distance)
     else 
       @doSQL "DELETE FROM profile"
       profile =
@@ -87,8 +87,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
       else
         dateTrav = result.lastUpdateTravels.substring 0, 19
         dateTrav = dateTrav.replace "T", " "
-      @doSQL "INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, payments, animals, accessible) VALUES ('"+profile.email+"','"+@password[0].value+"','"+date+"','"+dateTrav+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"','"+result.fCapacity+"','"+result.fAppPayment+"','"+result.fAnimals+"','"+result.fAccessible+"');"
-      __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible)
+      @doSQL "INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible) VALUES ('"+profile.email+"','"+@password[0].value+"','"+date+"','"+dateTrav+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"','"+result.fCapacity+"','"+result.fDistance+"','"+result.fAppPayment+"','"+result.fAnimals+"','"+result.fAccessible+"');"
+      __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible, result.fDistance)
     Lungo.Cache.set "travelAccepted", false
     Lungo.Cache.set "travelID", 0
     Lungo.Cache.set "credentials", profile

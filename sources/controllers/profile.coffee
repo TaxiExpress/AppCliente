@@ -65,7 +65,7 @@ class __Controller.ProfileCtrl extends Monocle.Controller
 
 
   clickAvatar: (event) =>
-    @image[0].click()
+    #@image[0].click()
 
 
   clickHeader: (event) =>

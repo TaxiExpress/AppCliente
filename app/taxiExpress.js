@@ -412,7 +412,7 @@
                   Lungo.Cache.remove("travelID");
                   Lungo.Cache.set("travelAccepted", false);
                   Lungo.Router.back();
-                  return navigator.notification.alert("Ningún taxista cercano ha aceptado la solicitud", null, "Taxi Express", "Aceptar");
+                  return navigator.notification.alert("El taxista no ha aceptado tu solicitud", null, "Taxi Express", "Aceptar");
                 }
               });
             }
@@ -668,14 +668,16 @@
       "#filters_seats": "seats",
       "#filters_payments": "payments",
       "#filters_animals": "animals",
-      "#filters_accessible": "accessible"
+      "#filters_accessible": "accessible",
+      "#filters_distance": "distance"
     };
 
     FiltersCtrl.prototype.events = {
       "change #filters_seats": "saveFilters",
       "change #filters_payments": "saveFilters",
       "change #filters_animals": "saveFilters",
-      "change #filters_accessible": "saveFilters"
+      "change #filters_accessible": "saveFilters",
+      "change #filters_distance": "saveFilters"
     };
 
     function FiltersCtrl() {
@@ -685,11 +687,12 @@
       FiltersCtrl.__super__.constructor.apply(this, arguments);
     }
 
-    FiltersCtrl.prototype.loadFilters = function(seats, payments, animals, accessible) {
+    FiltersCtrl.prototype.loadFilters = function(seats, payments, animals, accessible, distance) {
       this.seats[0].value = seats;
       this.payments[0].checked = payments.toString() === "true";
       this.animals[0].checked = animals.toString() === "true";
-      return this.accessible[0].checked = accessible.toString() === "true";
+      this.accessible[0].checked = accessible.toString() === "true";
+      return this.distance[0].value = distance;
     };
 
     FiltersCtrl.prototype.saveFilters = function(event) {
@@ -706,6 +709,7 @@
         appPayment: this.payments[0].checked,
         animals: this.animals[0].checked,
         accesible: this.accessible[0].checked,
+        distance: this.distance[0].value,
         lastUpdate: date,
         sessionID: session
       };
@@ -729,7 +733,7 @@
       db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
       return db.transaction(function(tx) {
         var sql;
-        sql = "UPDATE profile SET lastUpdate = '" + date + "', seats = '" + _this.seats[0].value + "', animals = '" + _this.animals[0].checked + "', payments = '" + _this.payments[0].checked + "', accessible = '" + _this.accessible[0].checked + "' WHERE email ='" + credentials.email + "';";
+        sql = "UPDATE profile SET lastUpdate = '" + date + "', seats = '" + _this.seats[0].value + "', distance = '" + _this.distance[0].value + "', animals = '" + _this.animals[0].checked + "', payments = '" + _this.payments[0].checked + "', accessible = '" + _this.accessible[0].checked + "' WHERE email ='" + credentials.email + "';";
         return tx.executeSql(sql);
       });
     };
@@ -958,7 +962,7 @@
                 }
               });
             }
-          }), 5000);
+          }), 30000);
         }
       });
     };
@@ -1009,7 +1013,7 @@
       LoginCtrl.__super__.constructor.apply(this, arguments);
       this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
       this.db.transaction(function(tx) {
-        tx.executeSql("CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )");
+        tx.executeSql("CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, distance STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )");
         tx.executeSql("CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL, vote STRING NOT NULL)");
         return tx.executeSql("CREATE TABLE IF NOT EXISTS drivers (email STRING NOT NULL PRIMARY KEY, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)");
       });
@@ -1080,7 +1084,7 @@
           email: credentials.email,
           image: credentials.image
         };
-        __Controller.filters.loadFilters(credentials.seats, credentials.payments, credentials.animals, credentials.accessible);
+        __Controller.filters.loadFilters(credentials.seats, credentials.payments, credentials.animals, credentials.accessible, credentials.distance);
       } else {
         this.doSQL("DELETE FROM profile");
         profile = {
@@ -1098,8 +1102,8 @@
           dateTrav = result.lastUpdateTravels.substring(0, 19);
           dateTrav = dateTrav.replace("T", " ");
         }
-        this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, payments, animals, accessible) VALUES ('" + profile.email + "','" + this.password[0].value + "','" + date + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "');");
-        __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible);
+        this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible) VALUES ('" + profile.email + "','" + this.password[0].value + "','" + date + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fDistance + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "');");
+        __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible, result.fDistance);
       }
       Lungo.Cache.set("travelAccepted", false);
       Lungo.Cache.set("travelID", 0);
@@ -1438,7 +1442,6 @@
     NearDriverCtrl.prototype.loadNearTaxis = function() {
       var credentials, server, session,
         _this = this;
-      console.log("llego");
       this.deleteNearTaxis();
       Lungo.Router.section("list_s");
       credentials = Lungo.Cache.get("credentials");
@@ -1931,9 +1934,7 @@
       }), 500);
     };
 
-    ProfileCtrl.prototype.clickAvatar = function(event) {
-      return this.image[0].click();
-    };
+    ProfileCtrl.prototype.clickAvatar = function(event) {};
 
     ProfileCtrl.prototype.clickHeader = function(event) {
       var input;
@@ -2021,7 +2022,6 @@
       this.handlePush = __bind(this.handlePush, this);
       this.savePushID = __bind(this.savePushID, this);
       PushCtrl.__super__.constructor.apply(this, arguments);
-      this.savePushID("pushIDdeprueba", "IOS");
     }
 
     PushCtrl.prototype.savePushID = function(id, device) {

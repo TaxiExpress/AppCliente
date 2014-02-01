@@ -81,7 +81,7 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
                 Lungo.Cache.remove "travelID"
                 Lungo.Cache.set "travelAccepted", false
                 Lungo.Router.back()
-                navigator.notification.alert "Ningún taxista cercano ha aceptado la solicitud", null, "Taxi Express", "Aceptar"
+                navigator.notification.alert "El taxista no ha aceptado tu solicitud", null, "Taxi Express", "Aceptar"
         ) , 30000)
 
 

@@ -155,7 +155,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
                 Lungo.Cache.set "travelAccepted", false
                 Lungo.Router.back()
                 navigator.notification.alert "Ningún taxista cercano ha aceptado la solicitud", null, "Taxi Express", "Aceptar"
-        ) , 5000)
+        ) , 30000)
 
 
   payTaxi: (event) =>

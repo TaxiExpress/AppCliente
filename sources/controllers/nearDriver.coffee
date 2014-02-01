@@ -11,7 +11,6 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
 
 
   loadNearTaxis: =>
-    console.log "llego"
     @deleteNearTaxis()
     Lungo.Router.section "list_s"
     credentials = Lungo.Cache.get "credentials"
