@@ -49,8 +49,8 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
       url: server + "client/getselectedtaxi"
       data:
         email: credentials.email
-        longitude: position.d
-        latitude: position.e
+        longitude: position.e
+        latitude: position.d
         origin: origin
         driverEmail: @driverDetails.email
         sessionID: session

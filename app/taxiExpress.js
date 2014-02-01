@@ -375,8 +375,8 @@
         url: server + "client/getselectedtaxi",
         data: {
           email: credentials.email,
-          longitude: position.d,
-          latitude: position.e,
+          longitude: position.e,
+          latitude: position.d,
           origin: origin,
           driverEmail: this.driverDetails.email,
           sessionID: session
@@ -925,8 +925,8 @@
         url: server + "client/gettaxi",
         data: {
           email: credentials.email,
-          longitude: position.d,
-          latitude: position.e,
+          longitude: position.e,
+          latitude: position.d,
           origin: origin,
           sessionID: session
         },

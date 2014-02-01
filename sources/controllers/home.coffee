@@ -126,8 +126,8 @@ class __Controller.HomeCtrl extends Monocle.Controller
       url: server + "client/gettaxi"
       data:
         email: credentials.email
-        longitude: position.d
-        latitude: position.e
+        longitude: position.e
+        latitude: position.d
         origin: origin
         sessionID: session
       error: (xhr, type) =>
