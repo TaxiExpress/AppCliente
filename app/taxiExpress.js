@@ -2022,6 +2022,7 @@
       this.handlePush = __bind(this.handlePush, this);
       this.savePushID = __bind(this.savePushID, this);
       PushCtrl.__super__.constructor.apply(this, arguments);
+      this.savePushID("pushIDdeprueba", "IOS");
     }
 
     PushCtrl.prototype.savePushID = function(id, device) {

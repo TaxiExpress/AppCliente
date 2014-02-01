@@ -4,7 +4,7 @@
 
   constructor: ->
     super
-    #@savePushID "pushIDdeprueba", "IOS"
+    @savePushID "pushIDdeprueba", "IOS"
 
   savePushID: (id, device) =>
     Lungo.Cache.set "pushID", id
