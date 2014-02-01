@@ -111,3 +111,7 @@ class __Controller.ProfileCtrl extends Monocle.Controller
       sql = "UPDATE profile SET lastUpdate = '"+@date+"', name = '"+credentials.name+"', surname = '"+credentials.surname+"', image = '"+credentials.image+"' WHERE email ='"+credentials.email+"';"
       tx.executeSql sql
 
+  resetProfile: ->
+    profile_avatar.src = "img/user.png"
+    @name[0].value = ""
+    @surname[0].value = ""

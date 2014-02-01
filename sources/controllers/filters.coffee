@@ -11,7 +11,6 @@ class __Controller.FiltersCtrl extends Monocle.Controller
     "change #filters_payments"                      : "saveFilters"
     "change #filters_animals"                       : "saveFilters"
     "change #filters_accessible"                    : "saveFilters"
-    "tap #filters_b"                                : "doSearch"
 
   constructor: ->
     super
@@ -22,12 +21,6 @@ class __Controller.FiltersCtrl extends Monocle.Controller
     @payments[0].checked = (payments.toString() == "true")
     @animals[0].checked = (animals.toString() == "true")    
     @accessible[0].checked = (accessible.toString() == "true")
-
-
-  doSearch: (event) =>
-    __Controller.nearDriver.loadNearTaxis()
-    Lungo.Router.back()
-
 
   saveFilters: (event) =>
     credentials = Lungo.Cache.get "credentials"

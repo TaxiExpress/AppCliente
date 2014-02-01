@@ -55,7 +55,7 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
         driverEmail: @driverDetails.email
         sessionID: session
       error: (xhr, type) =>
-        navigator.notification.alert type.response, null, "Taxi Express", "Aceptar"
+        navigator.notification.alert "Servicio no disponible", null, "Taxi Express", "Aceptar"
         @button[0].disabled = false
       success: (result) =>
         @button[0].disabled = false

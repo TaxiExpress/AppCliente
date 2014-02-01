@@ -3,11 +3,15 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
   _viewsList = []
   position = undefined
 
+  events:
+     "singleTap #list_refresh_b"              : "loadNearTaxis"
+
   constructor: ->
     super
 
 
   loadNearTaxis: =>
+    console.log "llego"
     @deleteNearTaxis()
     Lungo.Router.section "list_s"
     credentials = Lungo.Cache.get "credentials"

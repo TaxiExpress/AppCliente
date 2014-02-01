@@ -6,7 +6,7 @@ class __Controller.MenuCtrl extends Monocle.Controller
     "#menu_profile_name"                       : "name"
 
   events:
-    "tap #menu_logout"                         : "doLogOut"
+    "tap #menu_logout_b"                         : "doLogOut"
 
   constructor: ->
     super
@@ -21,3 +21,13 @@ class __Controller.MenuCtrl extends Monocle.Controller
     else
       @name[0].textContent = profile.name + " " + profile.surname
     @avatar[0].src = profile.image if profile.image
+
+  doLogOut: ->
+    Lungo.Router.section "login_s"
+    Lungo.Cache.remove "travelID"
+    Lungo.Cache.remove "travelAccepted"
+    Lungo.Cache.remove "credentials"
+    @avatar[0].src = "img/user.png"
+    __Controller.profile.resetProfile()
+    __Controller.favorites.cleanFavorites()
+    __Controller.travelList.cleanTravels()

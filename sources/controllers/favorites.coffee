@@ -45,3 +45,13 @@ class __Controller.FavoritesCtrl extends Monocle.Controller
     else
       empty_favorites.style.display = "none"
       empty_favorites2.style.display = "none"
+
+  cleanFavorites: ->
+    for driver in __Model.FavoriteDriver.all()
+      __Model.FavoriteDriver.get(driver.email)[0].destroy()
+      _views[driver.email].remove()
+      _views[driver.email]= undefined
+      _viewsList[driver.email].remove()
+      _viewsList[driver.email]= undefined 
+    empty_favorites.style.display = "block"
+    empty_favorites2.style.display = "block" 

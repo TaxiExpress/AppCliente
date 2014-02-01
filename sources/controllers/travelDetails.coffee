@@ -114,7 +114,8 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
       url: server + "client/voteDriver"
       data: data
       success: (result) =>
-        @valoration[0].disabled = true
+        @votePos[0].disabled = true
+        @voteNeg[0].disabled = true
         navigator.notification.alert "Taxista valorado", null, "Taxi Express", "Aceptar"
       error: (xhr, type) =>
         console.log type.response

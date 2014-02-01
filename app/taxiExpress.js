@@ -382,7 +382,7 @@
           sessionID: session
         },
         error: function(xhr, type) {
-          navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
+          navigator.notification.alert("Servicio no disponible", null, "Taxi Express", "Aceptar");
           return _this.button[0].disabled = false;
         },
         success: function(result) {
@@ -433,15 +433,11 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.FavDriverCtrl = (function(_super) {
-    var credentials, date, db, driverDetails;
+    var credentials, driverDetails;
 
     __extends(FavDriverCtrl, _super);
 
-    db = void 0;
-
     driverDetails = void 0;
-
-    date = void 0;
 
     credentials = void 0;
 
@@ -465,13 +461,9 @@
     };
 
     function FavDriverCtrl() {
-      this.removeFavoriteSQL = __bind(this.removeFavoriteSQL, this);
-      this.addFavoriteSQL = __bind(this.addFavoriteSQL, this);
-      this.updateLastUpdateFavorite = __bind(this.updateLastUpdateFavorite, this);
       this.changeFavorite = __bind(this.changeFavorite, this);
       this.loadDriverDetails = __bind(this.loadDriverDetails, this);
       FavDriverCtrl.__super__.constructor.apply(this, arguments);
-      this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
     }
 
     FavDriverCtrl.prototype.loadDriverDetails = function(driver) {
@@ -511,13 +503,10 @@
         _this = this;
       server = Lungo.Cache.get("server");
       this.credentials = Lungo.Cache.get("credentials");
-      this.date = new Date().toISOString().substring(0, 19);
-      this.date = this.date.replace("T", " ");
       session = Lungo.Cache.get("session");
       data = {
         customerEmail: this.credentials.email,
         driverEmail: this.driverDetails.email,
-        lastUpdateFavorites: this.date,
         sessionID: session
       };
       if (this.favorite[0].checked) {
@@ -526,9 +515,7 @@
           url: server + "client/addfavorite",
           data: data,
           success: function(result) {
-            __Controller.favorites.addFavorite(_this.driverDetails);
-            _this.updateLastUpdateFavorite();
-            return _this.addFavoriteSQL();
+            return __Controller.favorites.addFavorite(_this.driverDetails);
           },
           error: function(xhr, type) {
             return _this;
@@ -540,42 +527,13 @@
           url: server + "client/removefavorite",
           data: data,
           success: function(result) {
-            __Controller.favorites.deleteFavorite(_this.driverDetails);
-            _this.updateLastUpdateFavorite();
-            return _this.removeFavoriteSQL();
+            return __Controller.favorites.deleteFavorite(_this.driverDetails);
           },
           error: function(xhr, type) {
             return _this;
           }
         });
       }
-    };
-
-    FavDriverCtrl.prototype.updateLastUpdateFavorite = function() {
-      var _this = this;
-      return this.db.transaction(function(tx) {
-        var sql;
-        sql = "UPDATE profile SET lastUpdateFavorites = '" + _this.date + "' WHERE email ='" + _this.credentials.email + "';";
-        return tx.executeSql(sql);
-      });
-    };
-
-    FavDriverCtrl.prototype.addFavoriteSQL = function() {
-      var _this = this;
-      return this.db.transaction(function(tx) {
-        var sql;
-        sql = "INSERT INTO favorites  (email, phone, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment)         VALUES ('" + _this.driverDetails.email + "','" + _this.driverDetails.phone + "','" + _this.driverDetails.name + "','" + _this.driverDetails.surname + "',        '" + _this.driverDetails.valuation + "','" + _this.driverDetails.plate + "','" + _this.driverDetails.model + "','" + _this.driverDetails.image + "',        '" + _this.driverDetails.capacity + "','" + _this.driverDetails.accessible + "','" + _this.driverDetails.animals + "','" + _this.driverDetails.appPayment + "');";
-        return tx.executeSql(sql);
-      });
-    };
-
-    FavDriverCtrl.prototype.removeFavoriteSQL = function() {
-      var _this = this;
-      return this.db.transaction(function(tx) {
-        var sql;
-        sql = "DELETE FROM favorites WHERE email ='" + _this.driverDetails.email + "';";
-        return tx.executeSql(sql);
-      });
     };
 
     return FavDriverCtrl;
@@ -677,6 +635,21 @@
       }
     };
 
+    FavoritesCtrl.prototype.cleanFavorites = function() {
+      var driver, _i, _len, _ref;
+      _ref = __Model.FavoriteDriver.all();
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        driver = _ref[_i];
+        __Model.FavoriteDriver.get(driver.email)[0].destroy();
+        _views[driver.email].remove();
+        _views[driver.email] = void 0;
+        _viewsList[driver.email].remove();
+        _viewsList[driver.email] = void 0;
+      }
+      empty_favorites.style.display = "block";
+      return empty_favorites2.style.display = "block";
+    };
+
     return FavoritesCtrl;
 
   })(Monocle.Controller);
@@ -702,14 +675,12 @@
       "change #filters_seats": "saveFilters",
       "change #filters_payments": "saveFilters",
       "change #filters_animals": "saveFilters",
-      "change #filters_accessible": "saveFilters",
-      "tap #filters_b": "doSearch"
+      "change #filters_accessible": "saveFilters"
     };
 
     function FiltersCtrl() {
       this.parseResponse = __bind(this.parseResponse, this);
       this.saveFilters = __bind(this.saveFilters, this);
-      this.doSearch = __bind(this.doSearch, this);
       this.loadFilters = __bind(this.loadFilters, this);
       FiltersCtrl.__super__.constructor.apply(this, arguments);
     }
@@ -719,11 +690,6 @@
       this.payments[0].checked = payments.toString() === "true";
       this.animals[0].checked = animals.toString() === "true";
       return this.accessible[0].checked = accessible.toString() === "true";
-    };
-
-    FiltersCtrl.prototype.doSearch = function(event) {
-      __Controller.nearDriver.loadNearTaxis();
-      return Lungo.Router.back();
     };
 
     FiltersCtrl.prototype.saveFilters = function(event) {
@@ -880,6 +846,7 @@
     initialize = function(location) {
       var currentLocation, mapOptions;
       Lungo.Router.section("home_s");
+      Lungo.Router.section("home_s");
       if (map === void 0) {
         currentLocation = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
         mapOptions = {
@@ -1031,7 +998,6 @@
 
     function LoginCtrl() {
       this.getDriversAndTravelsSQL = __bind(this.getDriversAndTravelsSQL, this);
-      this.getFavoritesSQL = __bind(this.getFavoritesSQL, this);
       this.doSQL = __bind(this.doSQL, this);
       this.loadTravels = __bind(this.loadTravels, this);
       this.loadFavoriteTaxis = __bind(this.loadFavoriteTaxis, this);
@@ -1043,9 +1009,8 @@
       LoginCtrl.__super__.constructor.apply(this, arguments);
       this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
       this.db.transaction(function(tx) {
-        tx.executeSql("CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateFavorites STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )");
+        tx.executeSql("CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )");
         tx.executeSql("CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL, vote STRING NOT NULL)");
-        tx.executeSql("CREATE TABLE IF NOT EXISTS favorites (email STRING NOT NULL PRIMARY KEY, phone STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)");
         return tx.executeSql("CREATE TABLE IF NOT EXISTS drivers (email STRING NOT NULL PRIMARY KEY, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)");
       });
       this.read();
@@ -1058,20 +1023,20 @@
         Lungo.Router.section("init_s");
         date = new Date().toISOString().substring(0, 19);
         date = date.replace("T", " ");
-        return this.valideCredentials(this.username[0].value, this.password[0].value, date, date, date);
+        return this.valideCredentials(this.username[0].value, this.password[0].value, date, date);
       } else {
         return navigator.notification.alert("Debes rellenar el email y la contraseña", null, "Taxi Express", "Aceptar");
       }
     };
 
-    LoginCtrl.prototype.valideCredentials = function(email, pass, date, dateFavorites, dateTravels) {
+    LoginCtrl.prototype.valideCredentials = function(email, pass, date, dateTravels) {
       var data, device, pushID, server,
         _this = this;
       pushID = Lungo.Cache.get("pushID");
       if (pushID === void 0) {
         return setTimeout((function() {
           pushID = Lungo.Cache.get("pushID");
-          return _this.valideCredentials(email, pass, date, dateFavorites, dateTravels);
+          return _this.valideCredentials(email, pass, date, dateTravels);
         }), 500);
       } else {
         device = Lungo.Cache.get("pushDevice");
@@ -1080,7 +1045,6 @@
           email: email,
           password: pass,
           lastUpdate: date,
-          lastUpdateFavorites: dateFavorites,
           lastUpdateTravels: dateTravels,
           pushID: pushID,
           pushDevice: device
@@ -1093,6 +1057,7 @@
             return _this.parseResponse(result);
           },
           error: function(xhr, type) {
+            console.log(type.response);
             setTimeout((function() {
               return Lungo.Router.section("login_s");
             }), 500);
@@ -1104,7 +1069,7 @@
     };
 
     LoginCtrl.prototype.parseResponse = function(result) {
-      var date, dateFav, dateTrav, profile,
+      var date, dateTrav, profile,
         _this = this;
       Lungo.Cache.set("session", result.sessionID);
       if (result.email === void 0) {
@@ -1128,30 +1093,19 @@
         date = result.lastUpdate.substring(0, 19);
         date = date.replace("T", " ");
         if (credentials) {
-          dateFav = credentials.lastUpdateFavorites;
           dateTrav = credentials.lastUpdateTravels;
         } else {
-          dateFav = result.lastUpdateFavorites.substring(0, 19);
-          dateFav = dateFav.replace("T", " ");
           dateTrav = result.lastUpdateTravels.substring(0, 19);
           dateTrav = dateTrav.replace("T", " ");
         }
-        this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateFavorites, lastUpdateTravels, name, surname, phone, image, seats, payments, animals, accessible) VALUES ('" + profile.email + "','" + this.password[0].value + "','" + date + "','" + dateFav + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "');");
+        this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, payments, animals, accessible) VALUES ('" + profile.email + "','" + this.password[0].value + "','" + date + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "');");
         __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible);
       }
       Lungo.Cache.set("travelAccepted", false);
       Lungo.Cache.set("travelID", 0);
       Lungo.Cache.set("credentials", profile);
-      if (result.favlist) {
-        this.loadFavoriteTaxis(result.favlist);
-        dateFav = result.lastUpdateFavorites.substring(0, 19);
-        dateFav = dateFav.replace("T", " ");
-        this.doSQL("UPDATE profile SET lastUpdateFavorites = '" + dateFav + "' WHERE email ='" + profile.email + "';");
-        __Controller.favorites = new __Controller.FavoritesCtrl("section#favorites_s");
-      } else {
-        __Controller.favorites = new __Controller.FavoritesCtrl("section#favorites_s");
-        this.getFavoritesSQL();
-      }
+      this.loadFavoriteTaxis(result.favlist);
+      __Controller.favorites = new __Controller.FavoritesCtrl("section#favorites_s");
       if (result.travel_set) {
         this.loadTravels(result.travel_set);
         dateTrav = result.lastUpdateTravels.substring(0, 19);
@@ -1162,6 +1116,8 @@
         __Controller.travelList = new __Controller.TravelListCtrl("section#travelList_s");
         this.getDriversAndTravelsSQL();
       }
+      this.username[0].value = "";
+      this.password[0].value = "";
       __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
       __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
       __Controller.favDriver = new __Controller.FavDriverCtrl("section#favDriver_s");
@@ -1182,7 +1138,7 @@
             credentials = results.rows.item(0);
             _this.username[0].value = credentials.email;
             _this.password[0].value = credentials.pass;
-            return _this.valideCredentials(credentials.email, credentials.pass, credentials.lastUpdate, credentials.lastUpdateFavorites, credentials.lastUpdateTravels);
+            return _this.valideCredentials(credentials.email, credentials.pass, credentials.lastUpdate, credentials.lastUpdateTravels);
           } else {
             return Lungo.Router.section("login_s");
           }
@@ -1195,54 +1151,50 @@
       return this.db.transaction(function(tx) {
         tx.executeSql("DELETE FROM profile");
         tx.executeSql("DELETE FROM travels");
-        tx.executeSql("DELETE FROM favorites");
         return tx.executeSql("DELETE FROM drivers");
       });
     };
 
     LoginCtrl.prototype.loadFavoriteTaxis = function(taxis) {
-      var accessible, animals, appPayment, capacity, email, favDriver, image, model, name, phone, plate, sql, surname, taxi, valuation, _i, _len, _results;
-      this.doSQL("DELETE FROM favorites ");
+      var accessible, animals, appPayment, capacity, email, favDriver, image, model, name, phone, plate, surname, taxi, valuation, _i, _len, _results;
       if (taxis.length > 0) {
         empty_favorites.style.display = "none";
         empty_favorites2.style.display = "none";
-      }
-      _results = [];
-      for (_i = 0, _len = taxis.length; _i < _len; _i++) {
-        taxi = taxis[_i];
-        email = taxi.email;
-        phone = taxi.phone;
-        name = taxi.first_name;
-        surname = taxi.last_name;
-        valuation = taxi.valuation;
-        plate = taxi.car.plate;
-        model = taxi.car.company + " " + taxi.car.model;
-        image = "";
-        if (taxi.image) {
-          image = taxi.image;
+        _results = [];
+        for (_i = 0, _len = taxis.length; _i < _len; _i++) {
+          taxi = taxis[_i];
+          email = taxi.email;
+          phone = taxi.phone;
+          name = taxi.first_name;
+          surname = taxi.last_name;
+          valuation = taxi.valuation;
+          plate = taxi.car.plate;
+          model = taxi.car.company + " " + taxi.car.model;
+          image = "";
+          if (taxi.image) {
+            image = taxi.image;
+          }
+          capacity = taxi.car.capacity;
+          accessible = taxi.car.accessible;
+          animals = taxi.car.animals;
+          appPayment = taxi.car.appPayment;
+          _results.push(favDriver = __Model.FavoriteDriver.create({
+            email: email,
+            phone: phone,
+            name: name,
+            surname: surname,
+            valuation: valuation,
+            plate: plate,
+            model: model,
+            image: image,
+            capacity: capacity,
+            accessible: accessible,
+            animals: animals,
+            appPayment: appPayment
+          }));
         }
-        capacity = taxi.car.capacity;
-        accessible = taxi.car.accessible;
-        animals = taxi.car.animals;
-        appPayment = taxi.car.appPayment;
-        favDriver = __Model.FavoriteDriver.create({
-          email: email,
-          phone: phone,
-          name: name,
-          surname: surname,
-          valuation: valuation,
-          plate: plate,
-          model: model,
-          image: image,
-          capacity: capacity,
-          accessible: accessible,
-          animals: animals,
-          appPayment: appPayment
-        });
-        sql = "INSERT INTO favorites (email, phone, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('" + favDriver.email + "','" + favDriver.phone + "','" + favDriver.name + "','" + favDriver.surname + "','" + favDriver.valuation + "','" + favDriver.plate + "','" + favDriver.model + "','" + image + "','" + favDriver.capacity + "','" + favDriver.accessible + "','" + favDriver.animals + "','" + favDriver.appPayment + "');";
-        _results.push(this.doSQL(sql));
+        return _results;
       }
-      return _results;
     };
 
     LoginCtrl.prototype.loadTravels = function(travels) {
@@ -1251,117 +1203,78 @@
       this.doSQL("DELETE FROM drivers");
       if (travels.length > 0) {
         empty_travels.style.display = "none";
-      }
-      _results = [];
-      for (_i = 0, _len = travels.length; _i < _len; _i++) {
-        travel = travels[_i];
-        if (travel.endtime) {
-          id = travel.id;
-          starttime = new Date(travel.starttime);
-          endtime = new Date(travel.endtime);
-          coords = travel.startpoint.substring(7);
-          pos = coords.indexOf(" ");
-          long = coords.substring(0, pos);
-          lat = coords.substring(pos + 1, coords.indexOf(")"));
-          startpoint = new google.maps.LatLng(long, lat);
-          coords = travel.endpoint.substring(7);
-          pos = coords.indexOf(" ");
-          long = coords.substring(0, pos);
-          lat = coords.substring(pos + 1, coords.indexOf(")"));
-          endpoint = new google.maps.LatLng(long, lat);
-          origin = travel.origin;
-          destination = travel.destination;
-          vote = (travel.vote === "true").toString();
-          cost = travel.cost;
-          driver = __Model.Driver.get(travel.driver.email)[0];
-          if (driver === void 0) {
-            driver2 = travel.driver;
-            if (driver2.image === "") {
-              image = "";
-            } else {
-              image = driver2.image;
+        _results = [];
+        for (_i = 0, _len = travels.length; _i < _len; _i++) {
+          travel = travels[_i];
+          if (travel.endtime) {
+            id = travel.id;
+            starttime = new Date(travel.starttime);
+            endtime = new Date(travel.endtime);
+            coords = travel.startpoint.substring(7);
+            pos = coords.indexOf(" ");
+            long = coords.substring(0, pos);
+            lat = coords.substring(pos + 1, coords.indexOf(")"));
+            startpoint = new google.maps.LatLng(long, lat);
+            coords = travel.endpoint.substring(7);
+            pos = coords.indexOf(" ");
+            long = coords.substring(0, pos);
+            lat = coords.substring(pos + 1, coords.indexOf(")"));
+            endpoint = new google.maps.LatLng(long, lat);
+            origin = travel.origin;
+            destination = travel.destination;
+            vote = (travel.vote === "true").toString();
+            cost = travel.cost;
+            driver = __Model.Driver.get(travel.driver.email)[0];
+            if (driver === void 0) {
+              driver2 = travel.driver;
+              if (driver2.image === "") {
+                image = "";
+              } else {
+                image = driver2.image;
+              }
+              model = driver2.car.company + " " + driver2.car.model;
+              driver = __Model.Driver.create({
+                email: driver2.email,
+                name: driver2.first_name,
+                surname: driver2.last_name,
+                valuation: driver2.valuation,
+                plate: driver2.car.plate,
+                model: model,
+                image: driver2.image,
+                capacity: driver2.car.capacity,
+                accessible: driver2.car.accessible,
+                animals: driver2.car.animals,
+                appPayment: driver2.car.appPayment
+              });
+              sql = "INSERT INTO drivers (email, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('" + driver.email + "','" + driver.name + "','" + driver.surname + "','" + driver.valuation + "','" + driver.plate + "','" + model + "','" + image + "','" + driver.capacity + "','" + driver.accessible + "','" + driver.animals + "','" + driver.appPayment + "');";
+              this.doSQL(sql);
             }
-            model = driver2.car.company + " " + driver2.car.model;
-            driver = __Model.Driver.create({
-              email: driver2.email,
-              name: driver2.first_name,
-              surname: driver2.last_name,
-              valuation: driver2.valuation,
-              plate: driver2.car.plate,
-              model: model,
-              image: driver2.image,
-              capacity: driver2.car.capacity,
-              accessible: driver2.car.accessible,
-              animals: driver2.car.animals,
-              appPayment: driver2.car.appPayment
+            travel2 = __Model.Travel.create({
+              id: id,
+              starttime: starttime,
+              endtime: endtime,
+              startpoint: startpoint,
+              endpoint: endpoint,
+              cost: cost,
+              driver: driver,
+              origin: origin,
+              destination: destination,
+              vote: vote
             });
-            sql = "INSERT INTO drivers (email, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('" + driver.email + "','" + driver.name + "','" + driver.surname + "','" + driver.valuation + "','" + driver.plate + "','" + model + "','" + image + "','" + driver.capacity + "','" + driver.accessible + "','" + driver.animals + "','" + driver.appPayment + "');";
-            this.doSQL(sql);
+            sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "','" + travel2.vote + "');";
+            _results.push(this.doSQL(sql));
+          } else {
+            _results.push(void 0);
           }
-          travel2 = __Model.Travel.create({
-            id: id,
-            starttime: starttime,
-            endtime: endtime,
-            startpoint: startpoint,
-            endpoint: endpoint,
-            cost: cost,
-            driver: driver,
-            origin: origin,
-            destination: destination,
-            vote: vote
-          });
-          sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "','" + travel2.vote + "');";
-          _results.push(this.doSQL(sql));
-        } else {
-          _results.push(void 0);
         }
+        return _results;
       }
-      return _results;
     };
 
     LoginCtrl.prototype.doSQL = function(sql) {
       var _this = this;
       return this.db.transaction(function(tx) {
         return tx.executeSql(sql);
-      });
-    };
-
-    LoginCtrl.prototype.getFavoritesSQL = function() {
-      var _this = this;
-      return this.db.transaction(function(tx) {
-        return tx.executeSql("SELECT * FROM favorites", [], (function(tx, results) {
-          var fav, i, _results;
-          i = 0;
-          if (results.rows.length > 0) {
-            empty_favorites.style.display = "none";
-            empty_favorites2.style.display = "none";
-          }
-          _results = [];
-          while (i < results.rows.length) {
-            fav = results.rows.item(i);
-            __Model.FavoriteDriver.create({
-              email: fav.email,
-              phone: fav.phone,
-              name: fav.name,
-              surname: fav.surname,
-              valuation: fav.valuation,
-              plate: fav.plate,
-              model: fav.model,
-              image: fav.image,
-              capacity: fav.capacity,
-              accessible: fav.accessible,
-              animals: fav.animals,
-              appPayment: fav.appPayment
-            });
-            i++;
-            if (i === results.rows.length) {
-              _results.push(__Controller.favorites.loadFavoriteTaxis());
-            } else {
-              _results.push(void 0);
-            }
-          }
-          return _results;
-        }), null);
       });
     };
 
@@ -1457,7 +1370,7 @@
     };
 
     MenuCtrl.prototype.events = {
-      "tap #menu_logout": "doLogOut"
+      "tap #menu_logout_b": "doLogOut"
     };
 
     function MenuCtrl() {
@@ -1477,6 +1390,17 @@
       if (profile.image) {
         return this.avatar[0].src = profile.image;
       }
+    };
+
+    MenuCtrl.prototype.doLogOut = function() {
+      Lungo.Router.section("login_s");
+      Lungo.Cache.remove("travelID");
+      Lungo.Cache.remove("travelAccepted");
+      Lungo.Cache.remove("credentials");
+      this.avatar[0].src = "img/user.png";
+      __Controller.profile.resetProfile();
+      __Controller.favorites.cleanFavorites();
+      return __Controller.travelList.cleanTravels();
     };
 
     return MenuCtrl;
@@ -1499,6 +1423,10 @@
 
     position = void 0;
 
+    NearDriverCtrl.prototype.events = {
+      "singleTap #list_refresh_b": "loadNearTaxis"
+    };
+
     function NearDriverCtrl() {
       this.showTaxies = __bind(this.showTaxies, this);
       this.getDistanceAndTime = __bind(this.getDistanceAndTime, this);
@@ -1510,6 +1438,7 @@
     NearDriverCtrl.prototype.loadNearTaxis = function() {
       var credentials, server, session,
         _this = this;
+      console.log("llego");
       this.deleteNearTaxis();
       Lungo.Router.section("list_s");
       credentials = Lungo.Cache.get("credentials");
@@ -2063,6 +1992,12 @@
       });
     };
 
+    ProfileCtrl.prototype.resetProfile = function() {
+      profile_avatar.src = "img/user.png";
+      this.name[0].value = "";
+      return this.surname[0].value = "";
+    };
+
     return ProfileCtrl;
 
   })(Monocle.Controller);
@@ -2130,6 +2065,12 @@
                 return console.log(type.response);
               }
             });
+          }
+          break;
+        case "703":
+          if (notification.travelID === Lungo.Cache.get("travelID")) {
+            Lungo.Cache.remove("travelID");
+            return navigator.notification.alert("El taxista ha cancelado el viaje. Busque otro taxi.", null, "Taxi Express", "Aceptar");
           }
       }
     };
@@ -2507,7 +2448,8 @@
         url: server + "client/voteDriver",
         data: data,
         success: function(result) {
-          _this.valoration[0].disabled = true;
+          _this.votePos[0].disabled = true;
+          _this.voteNeg[0].disabled = true;
           return navigator.notification.alert("Taxista valorado", null, "Taxi Express", "Aceptar");
         },
         error: function(xhr, type) {
@@ -2556,6 +2498,18 @@
         }));
       }
       return _results;
+    };
+
+    TravelListCtrl.prototype.cleanTravels = function() {
+      var travel, _i, _len, _ref;
+      _ref = __Model.Travel.all();
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        travel = _ref[_i];
+        __Model.Travel.get(travel.id)[0].destroy();
+        _views[travel.id].remove();
+        _views[travel.id] = void 0;
+      }
+      return empty_travels.style.display = "block";
     };
 
     return TravelListCtrl;

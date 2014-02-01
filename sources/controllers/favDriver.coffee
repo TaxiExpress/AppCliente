@@ -1,8 +1,6 @@
 class __Controller.FavDriverCtrl extends Monocle.Controller
 
-  db = undefined
   driverDetails = undefined
-  date = undefined
   credentials = undefined
 
   elements:
@@ -24,7 +22,6 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
 
   constructor: ->
     super
-    @db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024)
     
     
   loadDriverDetails: (driver) =>
@@ -53,13 +50,10 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
   changeFavorite: (event) =>
     server = Lungo.Cache.get "server"
     @credentials = Lungo.Cache.get "credentials"
-    @date = new Date().toISOString().substring 0, 19
-    @date = @date.replace "T", " "
     session = Lungo.Cache.get "session"
     data = 
       customerEmail: @credentials.email
       driverEmail: @driverDetails.email
-      lastUpdateFavorites: @date
       sessionID: session
     if @favorite[0].checked
       $$.ajax
@@ -68,8 +62,6 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
         data: data
         success: (result) =>
           __Controller.favorites.addFavorite(@driverDetails)
-          @updateLastUpdateFavorite()
-          @addFavoriteSQL()
         error: (xhr, type) =>
           @
     else 
@@ -79,29 +71,5 @@ class __Controller.FavDriverCtrl extends Monocle.Controller
         data: data
         success: (result) =>
           __Controller.favorites.deleteFavorite(@driverDetails)
-          @updateLastUpdateFavorite()
-          @removeFavoriteSQL()
         error: (xhr, type) =>
           @
-
-
-  updateLastUpdateFavorite: =>
-    @db.transaction (tx) =>
-      sql = "UPDATE profile SET lastUpdateFavorites = '"+@date+"' WHERE email ='"+@credentials.email+"';"
-      tx.executeSql sql
-
-
-  addFavoriteSQL: =>
-    @db.transaction (tx) =>
-      sql = "INSERT INTO favorites  (email, phone, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) 
-        VALUES ('"+@driverDetails.email+"','"+@driverDetails.phone+"','"+@driverDetails.name+"','"+@driverDetails.surname+"',
-        '"+@driverDetails.valuation+"','"+@driverDetails.plate+"','"+@driverDetails.model+"','"+@driverDetails.image+"',
-        '"+@driverDetails.capacity+"','"+@driverDetails.accessible+"','"+@driverDetails.animals+"','"+@driverDetails.appPayment+"');"
-      tx.executeSql sql
-
-
-  removeFavoriteSQL: =>
-    @db.transaction (tx) =>
-      sql = "DELETE FROM favorites WHERE email ='"+@driverDetails.email+"';"
-      tx.executeSql sql
-

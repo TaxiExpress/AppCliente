@@ -44,7 +44,7 @@
                 <br/><fieldset><input id="register_phone" type="tel" maxlength="9" placeholder="Teléfono" /></fieldset>
                 <fieldset><input id="register_email" type="email" maxlength="40" placeholder="Email" /></fieldset>
                 <fieldset><input id="register_pass1" type="password" placeholder="Contraseña" /></fieldset>
-                <fieldset><input id="register_pass2" type="password" placeholder="Repita su contraseña" /></fieldset>
+                <fieldset><input id="register_pass2" type="password" placeholder="Confirmar contraseña" /></fieldset>
                 <button id="register_register_b" class="anchor accept" data-label="Registrar en TaxiExpress" />
                 <button class="anchor accept" data-label="Verificar cuenta" data-view-section="phoneVerification_s" />
                 <button class="anchor accept" data-label="Reenviar SMS" data-view-section="sendSMS_s" />
@@ -87,8 +87,10 @@
             </li>
             <li data-view-section="travelList_s">Trayectos realizados</li>
             <li data-view-section="favorites_s">Taxistas favoritos</li>
+            <li data-view-section="filters_s">Configuración</li>
             <li data-view-section="faq_s">F.A.Q.</li>
             <li data-view-section="legalAdvice_s">Aviso Legal</li>
+            <li id="menu_logout_b">Cerrar sesión</li>
         </article>
     </aside>   
 
@@ -126,7 +128,7 @@
                 <li class="anchor contrast">CAMBIO DE CONTRASEÑA</li>       
                 <fieldset><input id="password_old_pass" type="password" maxlength="20" placeholder="Contraseña actual" /></fieldset>
                 <fieldset><input id="password_new_pass1" type="password" placeholder="Nueva contraseña" /></fieldset>
-                <fieldset><input id="password_new_pass2" type="password" placeholder="Repita su nueva contraseña" /></fieldset>
+                <fieldset><input id="password_new_pass2" type="password" placeholder="Confirmar contraseña" /></fieldset>
                 <button id="password_save_b" class="anchor accept" data-label="Cambiar contraseña" />
             </div>
         </article>
@@ -149,7 +151,7 @@
     <section id="list_s" data-transition="slide" >        
         <header data-back="angle-left" data-title="Elegir taxi">
             <nav class="on-right">
-                <a href="#" id="list_filters_b" data-icon="bookmark-empty" data-view-section="filters_s"></a>
+                <a href="#" id="list_refresh_b" data-icon="refresh"></a>
             </nav>
         </header>
         <nav data-control="groupbar">
@@ -193,7 +195,6 @@
                     <small>Habilitado para minusválidos</small>
                     <input id="filters_accessible" type="checkbox" />
                 </fieldset>
-                <button id="filters_b" class="anchor accept" data-label="Buscar taxis cercanos" />
             </div>           
         </article>
     </section>
@@ -225,7 +226,7 @@
             <div id="empty_favorites" class="empty">
                 <span class="icon user"></span>
                 <strong>No tienes taxistas favoritos</strong>
-                <small>Si quiere añadir un taxista favorito, puede hacerlo en el apartado de trayectos realizados.</small>
+                <small>Si quieres añadir un taxista favorito, puedes hacerlo en el apartado de trayectos realizados.</small>
             </div>
         </article>
     </section>
@@ -261,7 +262,7 @@
             <div id="empty_travels" class="empty">
                 <span class="icon road"></span>
                 <strong>No tienes trayectos realizados</strong>
-                <small>En este apartado se mostrarán los trayectos que haya realizado a través de TaxiExpress.</small>
+                <small>En este apartado se mostrarán los trayectos que hayas realizado a través de TaxiExpress.</small>
             </div>
         </article>
     </section>

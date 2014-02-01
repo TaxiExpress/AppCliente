@@ -41,6 +41,10 @@
               addLastTravel result
             error: (xhr, type) =>
               console.log type.response
+      when "703" #Se ha cancelado el travel que ya me habian aceptado
+        if notification.travelID == Lungo.Cache.get "travelID"
+          Lungo.Cache.remove "travelID"
+          navigator.notification.alert "El taxista ha cancelado el viaje. Busque otro taxi.", null, "Taxi Express", "Aceptar"
 
 
   addLastTravel: (travel) ->
