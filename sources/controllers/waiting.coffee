@@ -11,6 +11,8 @@ class __Controller.WaitingCtrl extends Monocle.Controller
 
 
   cancel: (event) =>
+    @button_cancel[0].disabled = true
+    @button_cancel[0].innerText = "Cancelando petición"
     credentials = Lungo.Cache.get "credentials"
     server = Lungo.Cache.get "server"
     session = Lungo.Cache.get "session"
@@ -24,10 +26,14 @@ class __Controller.WaitingCtrl extends Monocle.Controller
           sessionID: session
           travelID: travelID
         error: (xhr, type) =>
+          @button_cancel[0].disabled = false
+          @button_cancel[0].innerText = "Cancelar petición"
           navigator.notification.alert type.response, null, "Taxi Express", "Aceptar"
         success: (result) =>
+          Lungo.Router.back()
+          @button_cancel[0].disabled = false
+          @button_cancel[0].innerText = "Cancelar petición"
           Lungo.Cache.remove "travelID"
           Lungo.Cache.remove "travelAccepted"
           Lungo.Cache.set "travelAccepted", true
-          Lungo.Router.back()
           navigator.notification.alert "Peticion cancelada", null, "Taxi Express", "Aceptar"

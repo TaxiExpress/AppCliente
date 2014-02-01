@@ -2542,6 +2542,8 @@
     WaitingCtrl.prototype.cancel = function(event) {
       var credentials, server, session, travelID,
         _this = this;
+      this.button_cancel[0].disabled = true;
+      this.button_cancel[0].innerText = "Cancelando petición";
       credentials = Lungo.Cache.get("credentials");
       server = Lungo.Cache.get("server");
       session = Lungo.Cache.get("session");
@@ -2556,13 +2558,17 @@
             travelID: travelID
           },
           error: function(xhr, type) {
+            _this.button_cancel[0].disabled = false;
+            _this.button_cancel[0].innerText = "Cancelar petición";
             return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
           },
           success: function(result) {
+            Lungo.Router.back();
+            _this.button_cancel[0].disabled = false;
+            _this.button_cancel[0].innerText = "Cancelar petición";
             Lungo.Cache.remove("travelID");
             Lungo.Cache.remove("travelAccepted");
             Lungo.Cache.set("travelAccepted", true);
-            Lungo.Router.back();
             return navigator.notification.alert("Peticion cancelada", null, "Taxi Express", "Aceptar");
           }
         });
