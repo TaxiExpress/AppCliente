@@ -92,7 +92,7 @@
       return _ref;
     }
 
-    Travel.fields("id", "starttime", "endtime", "startpoint", "endpoint", "cost", "driver", "origin", "destination", "vote");
+    Travel.fields("id", "starttime", "endtime", "startpoint", "endpoint", "cost", "driver", "origin", "destination", "vote", "customervoted");
 
     Travel.get = function(iden) {
       return this.select(function(travel) {
@@ -390,6 +390,7 @@
           _this.button[0].disabled = false;
           Lungo.Router.section("waiting_s");
           travelID = result.travelID;
+          Lungo.Cache.remove("travelID");
           Lungo.Cache.set("travelID", travelID.toString());
           Lungo.Cache.remove("travelAccepted");
           Lungo.Cache.set("travelAccepted", false);
@@ -410,6 +411,7 @@
                 },
                 success: function(result) {
                   Lungo.Cache.remove("travelID");
+                  Lungo.Cache.remove("travelAccepted");
                   Lungo.Cache.set("travelAccepted", false);
                   Lungo.Router.back();
                   return navigator.notification.alert("El taxista no ha aceptado tu solicitud", null, "Taxi Express", "Aceptar");
@@ -782,8 +784,8 @@
       HomeCtrl.__super__.constructor.apply(this, arguments);
       if (navigator.geolocation) {
         options = {
-          enableHighAccuracy: true,
-          timeout: 5000,
+          enableHighAccuracy: false,
+          timeout: 7000,
           maximumAge: 0
         };
         navigator.geolocation.getCurrentPosition(initialize, manageErrors, options);
@@ -808,10 +810,10 @@
       if (navigator.geolocation) {
         options = {
           enableHighAccuracy: false,
-          timeout: 5000,
+          timeout: 7000,
           maximumAge: 0
         };
-        return navigator.geolocation.getCurrentPosition(updatePosition, manageErrors);
+        return navigator.geolocation.getCurrentPosition(updatePosition, manageErrors, options);
       }
     };
 
@@ -882,9 +884,12 @@
         google.maps.event.addListener(map, "dragstart", function(event) {
           return home_streetField.value = 'Localizando ...';
         });
-        return google.maps.event.addListener(map, "zoom_changed", function(event) {
+        google.maps.event.addListener(map, "zoom_changed", function(event) {
           return getStreet(map.getCenter());
         });
+        return setTimeout((function() {
+          return navigator.splashscreen.hide();
+        }), 500);
       }
     };
 
@@ -1014,7 +1019,7 @@
       this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
       this.db.transaction(function(tx) {
         tx.executeSql("CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, distance STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )");
-        tx.executeSql("CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL, vote STRING NOT NULL)");
+        tx.executeSql("CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL, vote STRING NOT NULL, customervoted STRING NOT NULL)");
         return tx.executeSql("CREATE TABLE IF NOT EXISTS drivers (email STRING NOT NULL PRIMARY KEY, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)");
       });
       this.read();
@@ -1144,7 +1149,10 @@
             _this.password[0].value = credentials.pass;
             return _this.valideCredentials(credentials.email, credentials.pass, credentials.lastUpdate, credentials.lastUpdateTravels);
           } else {
-            return Lungo.Router.section("login_s");
+            Lungo.Router.section("login_s");
+            return setTimeout((function() {
+              return navigator.splashscreen.hide();
+            }), 500);
           }
         }), null);
       });
@@ -1202,7 +1210,7 @@
     };
 
     LoginCtrl.prototype.loadTravels = function(travels) {
-      var coords, cost, destination, driver, driver2, endpoint, endtime, id, image, lat, long, model, origin, pos, sql, startpoint, starttime, travel, travel2, vote, _i, _len, _results;
+      var coords, cost, customervoted, destination, driver, driver2, endpoint, endtime, id, image, lat, long, model, origin, pos, sql, startpoint, starttime, travel, travel2, vote, _i, _len, _results;
       this.doSQL("DELETE FROM travels");
       this.doSQL("DELETE FROM drivers");
       if (travels.length > 0) {
@@ -1228,6 +1236,7 @@
             destination = travel.destination;
             vote = (travel.vote === "true").toString();
             cost = travel.cost;
+            customervoted = travel.customervoted;
             driver = __Model.Driver.get(travel.driver.email)[0];
             if (driver === void 0) {
               driver2 = travel.driver;
@@ -1263,9 +1272,10 @@
               driver: driver,
               origin: origin,
               destination: destination,
-              vote: vote
+              vote: vote,
+              customervoted: customervoted
             });
-            sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "','" + travel2.vote + "');";
+            sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote, customervoted) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "','" + travel2.vote + "','" + travel2.customervoted + "');";
             _results.push(this.doSQL(sql));
           } else {
             _results.push(void 0);
@@ -1311,7 +1321,7 @@
       });
       return this.db.transaction(function(tx) {
         return tx.executeSql("SELECT * FROM travels", [], (function(tx, results) {
-          var coords, driver, endpoint, i, lat, long, pos, startpoint, travel, _results;
+          var coords, customervoted, driver, endpoint, i, lat, long, pos, startpoint, travel, _results;
           i = 0;
           if (results.rows.length > 0) {
             empty_travels.style.display = "none";
@@ -1330,6 +1340,7 @@
             long = coords.substring(0, pos);
             lat = coords.substring(pos + 1, coords.indexOf(")"));
             endpoint = new google.maps.LatLng(long, lat);
+            customervoted = travel.customervoted === 'true';
             __Model.Travel.create({
               id: travel.id,
               starttime: new Date(travel.starttime),
@@ -1340,7 +1351,8 @@
               driver: driver,
               origin: travel.origin,
               destination: travel.destination,
-              vote: travel.vote
+              vote: travel.vote,
+              customervoted: customervoted
             });
             i++;
             if (i === results.rows.length) {
@@ -1398,13 +1410,13 @@
 
     MenuCtrl.prototype.doLogOut = function() {
       Lungo.Router.section("login_s");
+      __Controller.profile.resetProfile();
+      __Controller.favorites.cleanFavorites();
+      __Controller.travelList.cleanTravels();
       Lungo.Cache.remove("travelID");
       Lungo.Cache.remove("travelAccepted");
       Lungo.Cache.remove("credentials");
-      this.avatar[0].src = "img/user.png";
-      __Controller.profile.resetProfile();
-      __Controller.favorites.cleanFavorites();
-      return __Controller.travelList.cleanTravels();
+      return this.avatar[0].src = "img/user.png";
     };
 
     return MenuCtrl;
@@ -1442,6 +1454,7 @@
     NearDriverCtrl.prototype.loadNearTaxis = function() {
       var credentials, server, session,
         _this = this;
+      console.log("llego");
       this.deleteNearTaxis();
       Lungo.Router.section("list_s");
       credentials = Lungo.Cache.get("credentials");
@@ -1462,6 +1475,7 @@
         },
         success: function(result) {
           var accessible, animals, appPayment, capacity, cont, coords, driver, email, image, lastDriver, lat, long, model, name, plate, pos, surname, taxi, valuation, _i, _len, _results;
+          console.log(result);
           if (result.length === 0) {
             empty_nearTaxies.style.display = "block";
           } else {
@@ -1562,6 +1576,7 @@
 
     NearDriverCtrl.prototype.showTaxies = function() {
       var driver, taxies, _i, _len, _results;
+      console.log("llgosa");
       taxies = __Model.NearDriver.all().sort(function(a, b) {
         return parseFloat(a.distance) - parseFloat(b.distance);
       });
@@ -1735,20 +1750,34 @@
         session = Lungo.Cache.get("session");
         travelID = Lungo.Cache.get("travelID");
         return $$.ajax({
-          type: "GET",
-          url: server + "client/payTravel",
+          type: "POST",
+          url: server + "client/travelpaid",
           data: {
             email: credentials.email,
             travelID: travelID,
             sessionID: session
           },
           error: function(xhr, type) {
-            return alert(type.response);
+            return console.log(type.response);
           },
           success: function(result) {
             navigator.notification.alert("Trayecto pagado", null, "Taxi Express", "Aceptar");
             home_driver.style.visibility = "hidden";
-            return Lungo.Router.section("home_s");
+            Lungo.Router.section("home_s");
+            return $$.ajax({
+              type: "GET",
+              url: server + "client/getlasttravel",
+              data: {
+                email: credentials.email,
+                sessionID: session
+              },
+              error: function(xhr, type) {
+                return console.log(type.response);
+              },
+              success: function(result) {
+                return __Controller.push.addLastTravel(result);
+              }
+            });
           }
         });
       }
@@ -2019,10 +2048,10 @@
 
     function PushCtrl() {
       this.doSQL = __bind(this.doSQL, this);
+      this.addLastTravel = __bind(this.addLastTravel, this);
       this.handlePush = __bind(this.handlePush, this);
       this.savePushID = __bind(this.savePushID, this);
       PushCtrl.__super__.constructor.apply(this, arguments);
-      this.savePushID("pushIDdeprueba", "IOS");
     }
 
     PushCtrl.prototype.savePushID = function(id, device) {
@@ -2041,7 +2070,8 @@
         case "702":
           if (notification.appPayment === "true") {
             __Controller.payment.loadPayment(notification.cost);
-            navigator.notification.alert("Ya puedes pagar tu trayecto en taxi", null, "Taxi Express", "Aceptar");
+            Lungo.Cache.remove("travelID");
+            Lungo.Cache.set("travelID", notification.travelID);
             home_driver.style.visibility = "visible";
             Lungo.Router.section("home_s");
             return Lungo.Router.section("payment_s");
@@ -2060,7 +2090,7 @@
               url: server + "client/getlasttravel",
               data: data,
               success: function(result) {
-                return addLastTravel(result);
+                return _this.addLastTravel(result);
               },
               error: function(xhr, type) {
                 return console.log(type.response);
@@ -2069,15 +2099,13 @@
           }
           break;
         case "703":
-          if (notification.travelID === Lungo.Cache.get("travelID")) {
-            Lungo.Cache.remove("travelID");
-            return navigator.notification.alert("El taxista ha cancelado el viaje. Busque otro taxi.", null, "Taxi Express", "Aceptar");
-          }
+          Lungo.Cache.remove("travelID");
+          return navigator.notification.alert("El taxista ha cancelado el viaje. Puede buscar otro.", null, "Taxi Express", "Aceptar");
       }
     };
 
     PushCtrl.prototype.addLastTravel = function(travel) {
-      var coords, cost, credentials, date, destination, driver, driver2, endpoint, endtime, id, image, lat, long, model, origin, pos, sql, startpoint, starttime, travel2, vote;
+      var coords, cost, credentials, customervoted, date, destination, driver, driver2, endpoint, endtime, id, image, lat, long, model, origin, pos, sql, startpoint, starttime, travel2, vote;
       id = travel.id;
       starttime = new Date(travel.starttime);
       endtime = new Date(travel.endtime);
@@ -2096,6 +2124,7 @@
       cost = travel.cost;
       vote = travel.vote;
       driver = __Model.Driver.get(travel.driver.email)[0];
+      customervoted = travel.customervoted;
       if (driver === void 0) {
         driver2 = travel.driver;
         if (driver2.image === "") {
@@ -2130,10 +2159,12 @@
         driver: driver,
         origin: origin,
         destination: destination,
-        vote: vote
+        vote: vote,
+        customervoted: customervoted
       });
-      sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver,vote) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "','" + travel2.vote + "');";
+      sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote, customervoted) VALUES ('" + travel2.id + "','" + travel2.starttime + "','" + travel2.endtime + "','" + travel.startpoint + "','" + travel.endpoint + "','" + travel2.origin + "','" + travel2.destination + "','" + travel2.cost + "','" + travel2.driver.email + "','" + travel2.vote + "','" + travel2.customervoted + "');";
       this.doSQL(sql);
+      __Controller.travelList.addTravel(travel2);
       credentials = Lungo.Cache.get("credentials");
       date = travel.lastUpdateTravels.substring(0, 19);
       date = date.replace("T", " ");
@@ -2318,7 +2349,8 @@
       "#travelDetails_cost": "cost",
       "#travelDetails_driver": "driver",
       "#travelDetails_positiveVote": "votePos",
-      "#travelDetails_negativeVote": "voteNeg"
+      "#travelDetails_negativeVote": "voteNeg",
+      "#travelDetails_votebox": "voteBox"
     };
 
     TravelDetailsCtrl.prototype.events = {
@@ -2341,8 +2373,8 @@
     TravelDetailsCtrl.prototype.loadTravelDetails = function(travel) {
       this.travel = travel;
       this.showMap(travel);
-      this.start[0].innerText = travel.origin;
-      this.end[0].innerText = travel.destination;
+      this.start[0].innerHTML = travel.origin;
+      this.end[0].innerHTML = travel.destination;
       this.date[0].innerText = travel.date;
       this.time[0].innerText = Math.floor((travel.endtime - travel.starttime) / 60000) + " minutos";
       this.cost[0].innerText = (travel.cost.toString().replace(".", ",")) + "€";
@@ -2353,12 +2385,10 @@
       } else {
         this.driver[0].src = "img/user.png";
       }
-      if (travel.vote !== "false") {
-        this.votePos[0].disabled = true;
-        return this.voteNeg[0].disabled = true;
+      if (travel.customervoted) {
+        return this.voteBox[0].style.visibility = "hidden";
       } else {
-        this.votePos[0].disabled = false;
-        return this.voteNeg[0].disabled = false;
+        return this.voteBox[0].style.visibility = "visible";
       }
     };
 
@@ -2446,11 +2476,19 @@
       };
       return $$.ajax({
         type: "POST",
-        url: server + "client/voteDriver",
+        url: server + "client/votedriver",
         data: data,
         success: function(result) {
-          _this.votePos[0].disabled = true;
-          _this.voteNeg[0].disabled = true;
+          var db;
+          _this.voteBox[0].style.visibility = "hidden";
+          _this.travel.customervoted = true;
+          _this.travel.save();
+          db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
+          db.transaction(function(tx) {
+            var sql;
+            sql = "UPDATE travels SET customervoted = 'true' WHERE id ='" + _this.travel.id + "';";
+            return tx.executeSql(sql);
+          });
           return navigator.notification.alert("Taxista valorado", null, "Taxi Express", "Aceptar");
         },
         error: function(xhr, type) {
@@ -2483,6 +2521,7 @@
     credentials = void 0;
 
     function TravelListCtrl() {
+      this.addTravel = __bind(this.addTravel, this);
       this.loadTravelList = __bind(this.loadTravelList, this);
       TravelListCtrl.__super__.constructor.apply(this, arguments);
       this.loadTravelList();
@@ -2511,6 +2550,12 @@
         _views[travel.id] = void 0;
       }
       return empty_travels.style.display = "block";
+    };
+
+    TravelListCtrl.prototype.addTravel = function(travel) {
+      return _views[travel.id] = new __View.Travel({
+        model: travel
+      });
     };
 
     return TravelListCtrl;

@@ -15,7 +15,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     @db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024)
     @db.transaction (tx) =>
       tx.executeSql "CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, distance STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )"
-      tx.executeSql "CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL, vote STRING NOT NULL)"
+      tx.executeSql "CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL, vote STRING NOT NULL, customervoted STRING NOT NULL)"
       tx.executeSql "CREATE TABLE IF NOT EXISTS drivers (email STRING NOT NULL PRIMARY KEY, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)"
     #@drop()
     @read()  
@@ -125,6 +125,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
           @valideCredentials(credentials.email, credentials.pass, credentials.lastUpdate, credentials.lastUpdateTravels)
         else
           Lungo.Router.section "login_s"
+          setTimeout((=> navigator.splashscreen.hide()) , 500)
       ), null
 
 
@@ -180,6 +181,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
           destination = travel.destination
           vote = (travel.vote == "true").toString()
           cost = travel.cost
+          customervoted = travel.customervoted
           driver = __Model.Driver.get(travel.driver.email)[0]
           if driver == undefined
             driver2 = travel.driver
@@ -190,8 +192,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
             driver = __Model.Driver.create email: driver2.email, name: driver2.first_name, surname: driver2.last_name, valuation: driver2.valuation, plate: driver2.car.plate, model: model, image: driver2.image, capacity: driver2.car.capacity, accessible: driver2.car.accessible, animals: driver2.car.animals, appPayment: driver2.car.appPayment
             sql = "INSERT INTO drivers (email, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('"+driver.email+"','"+driver.name+"','"+driver.surname+"','"+driver.valuation+"','"+driver.plate+"','"+model+"','"+image+"','"+driver.capacity+"','"+driver.accessible+"','"+driver.animals+"','"+driver.appPayment+"');"
             @doSQL sql
-          travel2 = __Model.Travel.create id: id, starttime: starttime, endtime: endtime, startpoint: startpoint, endpoint: endpoint, cost: cost, driver: driver, origin: origin, destination: destination, vote: vote
-          sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote) VALUES ('"+travel2.id+"','"+travel2.starttime+"','"+travel2.endtime+"','"+travel.startpoint+"','"+travel.endpoint+"','"+travel2.origin+"','"+travel2.destination+"','"+travel2.cost+"','"+travel2.driver.email+"','"+travel2.vote+"');"
+          travel2 = __Model.Travel.create id: id, starttime: starttime, endtime: endtime, startpoint: startpoint, endpoint: endpoint, cost: cost, driver: driver, origin: origin, destination: destination, vote: vote, customervoted: customervoted
+          sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote, customervoted) VALUES ('"+travel2.id+"','"+travel2.starttime+"','"+travel2.endtime+"','"+travel.startpoint+"','"+travel.endpoint+"','"+travel2.origin+"','"+travel2.destination+"','"+travel2.cost+"','"+travel2.driver.email+"','"+travel2.vote+"','"+travel2.customervoted+"');"
           @doSQL sql
 
 
@@ -227,7 +229,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
           long = coords.substring 0, pos
           lat = coords.substring pos+1, coords.indexOf ")"
           endpoint = new google.maps.LatLng(long,lat)
-          __Model.Travel.create id: travel.id, starttime: new Date(travel.starttime), endtime: new Date(travel.endtime), startpoint: startpoint, endpoint: endpoint, cost: travel.cost, driver: driver, origin: travel.origin, destination: travel.destination, vote: travel.vote
+          customervoted = travel.customervoted == 'true'
+          __Model.Travel.create id: travel.id, starttime: new Date(travel.starttime), endtime: new Date(travel.endtime), startpoint: startpoint, endpoint: endpoint, cost: travel.cost, driver: driver, origin: travel.origin, destination: travel.destination, vote: travel.vote, customervoted: customervoted
           i++
           if i == results.rows.length
             __Controller.travelList.loadTravelList()

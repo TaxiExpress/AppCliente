@@ -11,6 +11,7 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
 
 
   loadNearTaxis: =>
+    console.log "llego"
     @deleteNearTaxis()
     Lungo.Router.section "list_s"
     credentials = Lungo.Cache.get "credentials"
@@ -28,6 +29,7 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
       error: (xhr, type) =>
         console.log type.response
       success: (result) =>
+        console.log result
         if result.length == 0
           empty_nearTaxies.style.display = "block"
         else
@@ -87,6 +89,7 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
 
 
   showTaxies: =>
+    console.log "llgosa"
     taxies = __Model.NearDriver.all().sort (a, b) ->
       parseFloat(a.distance) - parseFloat(b.distance)
     for driver in taxies

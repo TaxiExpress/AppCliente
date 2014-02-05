@@ -61,6 +61,7 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
         @button[0].disabled = false
         Lungo.Router.section "waiting_s"
         travelID = result.travelID
+        Lungo.Cache.remove "travelID"
         Lungo.Cache.set "travelID", travelID.toString()
         Lungo.Cache.remove "travelAccepted"
         Lungo.Cache.set "travelAccepted", false
@@ -79,6 +80,7 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
                 navigator.notification.alert type.response, null, "Taxi Express", "Aceptar"
               success: (result) =>
                 Lungo.Cache.remove "travelID"
+                Lungo.Cache.remove "travelAccepted"
                 Lungo.Cache.set "travelAccepted", false
                 Lungo.Router.back()
                 navigator.notification.alert "El taxista no ha aceptado tu solicitud", null, "Taxi Express", "Aceptar"

@@ -53,17 +53,25 @@ class __Controller.PaymentCtrl extends Monocle.Controller
       session = Lungo.Cache.get "session"
       travelID = Lungo.Cache.get "travelID"
       $$.ajax
-        type: "GET"
-        url: server + "client/payTravel"
+        type: "POST"
+        url: server + "client/travelpaid"
         data:
           email: credentials.email
           travelID: travelID
           sessionID: session
         error: (xhr, type) =>
-          alert type.response
+          console.log type.response
         success: (result) =>
           navigator.notification.alert "Trayecto pagado", null, "Taxi Express", "Aceptar"
           home_driver.style.visibility = "hidden"
           Lungo.Router.section "home_s"
-
-        
+          $$.ajax
+            type: "GET"
+            url: server + "client/getlasttravel"
+            data:
+              email: credentials.email
+              sessionID: session
+            error: (xhr, type) =>
+              console.log type.response
+            success: (result) =>                    
+              __Controller.push.addLastTravel(result)

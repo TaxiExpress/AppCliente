@@ -100,6 +100,7 @@ button.down > abbr{font-weight: 100!important}
 .little_list li.arrow::after{top:47%;}
 .little_list li.thumb:not(.big) > div{padding-left:.2em; padding-top:0px;}
 .little_list li:not(.big){padding-top:12px}
+.little_list li strong{padding-right: 0px}
 .list li strong{margin-bottom:0px;margin-right: 35px}
 .meddium_list li strong{margin-bottom:0px;margin-right: 20px}
 .faq li small{font-size:15px;color:#555;overflow: visible;white-space: normal;text-overflow: ellipsis;display: block;padding-right: 0px;padding-top: 5px;}
@@ -230,7 +231,8 @@ form input[type="text"].border,.form input[type="text"].border,form input[type="
 form textarea,.form textarea{min-height:2.5em;line-height:1.2em}
 form fieldset,.form fieldset{position:relative;padding:0 .5em;line-height:45px;}
 form fieldset > small:not(.select) > label,.form fieldset > small:not(.select) > label{margin-right: 10px;}
-form fieldset > small:not(.select),.form fieldset > small:not(.select){font-size: 15px; margin-left:8px; line-height: 35px}
+form fieldset > small:not(.select) > span{overflow:hidden;}
+form fieldset > small:not(.select),.form fieldset > small:not(.select){font-size: 15px; margin-left:8px; line-height: 35px; overflow: hidden;}
 form fieldset > label:not(.select),.form fieldset > label:not(.select){float:left;min-width:26px;margin:1em 0;line-height:100%;}
 form fieldset > label:not(.select).absolute,.form fieldset > label:not(.select).absolute{position:absolute}
 form fieldset > label:not(.select).anchor,.form fieldset > label:not(.select).anchor{width:auto;overflow:hidden}

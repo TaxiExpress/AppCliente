@@ -18,10 +18,10 @@ class __Controller.HomeCtrl extends Monocle.Controller
     super
     if navigator.geolocation
       options =
-        enableHighAccuracy: true,
-        timeout: 5000,
+        enableHighAccuracy: false,
+        timeout: 7000,
         maximumAge: 0
-      navigator.geolocation.getCurrentPosition initialize, manageErrors, options    
+      navigator.geolocation.getCurrentPosition initialize, manageErrors, options
 
 
   manageErrors = (err) ->
@@ -38,9 +38,9 @@ class __Controller.HomeCtrl extends Monocle.Controller
     if navigator.geolocation
       options =
         enableHighAccuracy: false,
-        timeout: 5000,
+        timeout: 7000,
         maximumAge: 0
-      navigator.geolocation.getCurrentPosition updatePosition, manageErrors
+      navigator.geolocation.getCurrentPosition updatePosition, manageErrors, options
 
 
   updatePosition = (location) ->
@@ -95,6 +95,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
         home_streetField.value = 'Localizando ...'
       google.maps.event.addListener map, "zoom_changed", (event) ->
         getStreet(map.getCenter())
+      setTimeout((=> navigator.splashscreen.hide()) , 500)
 
 
   getStreet = (pos) =>

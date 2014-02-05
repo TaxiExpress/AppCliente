@@ -12,6 +12,7 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     "#travelDetails_driver"                            : "driver"
     "#travelDetails_positiveVote"                      : "votePos"
     "#travelDetails_negativeVote"                      : "voteNeg"
+    "#travelDetails_votebox"                      : "voteBox"
 
   events:
     "singleTap #travelDetails_driver"                  : "viewDriver"
@@ -25,8 +26,8 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
   loadTravelDetails: (travel) =>
     @travel = travel
     @showMap travel
-    @start[0].innerText = travel.origin
-    @end[0].innerText = travel.destination
+    @start[0].innerHTML = travel.origin
+    @end[0].innerHTML = travel.destination
     @date[0].innerText = travel.date
     @time[0].innerText = Math.floor((travel.endtime - travel.starttime) / 60000 ) + " minutos"
     @cost[0].innerText = (travel.cost.toString().replace ".", ",") + "€"
@@ -36,12 +37,10 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
       @driver[0].src = travel.driver.image
     else
       @driver[0].src = "img/user.png"
-    if travel.vote != "false"
-      @votePos[0].disabled = true
-      @voteNeg[0].disabled = true
+    if travel.customervoted
+      @voteBox[0].style.visibility = "hidden"
     else
-      @votePos[0].disabled = false
-      @voteNeg[0].disabled = false
+      @voteBox[0].style.visibility = "visible"
 
 
   showMap: (travel) =>
@@ -111,11 +110,16 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
       travelID: @travel.id
     $$.ajax
       type: "POST"
-      url: server + "client/voteDriver"
+      url: server + "client/votedriver"
       data: data
       success: (result) =>
-        @votePos[0].disabled = true
-        @voteNeg[0].disabled = true
+        @voteBox[0].style.visibility = "hidden"
+        @travel.customervoted = true
+        @travel.save()
+        db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024)
+        db.transaction (tx) =>
+          sql = "UPDATE travels SET customervoted = 'true' WHERE id ='"+@travel.id+"';"
+          tx.executeSql sql
         navigator.notification.alert "Taxista valorado", null, "Taxi Express", "Aceptar"
       error: (xhr, type) =>
         console.log type.response

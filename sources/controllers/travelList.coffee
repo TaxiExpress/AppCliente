@@ -20,3 +20,7 @@ class __Controller.TravelListCtrl extends Monocle.Controller
       _views[travel.id].remove()
       _views[travel.id]= undefined
     empty_travels.style.display = "block"
+
+
+  addTravel: (travel) =>
+    _views[travel.id] = new __View.Travel model: travel

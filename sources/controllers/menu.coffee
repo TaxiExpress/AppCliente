@@ -24,10 +24,10 @@ class __Controller.MenuCtrl extends Monocle.Controller
 
   doLogOut: ->
     Lungo.Router.section "login_s"
+    __Controller.profile.resetProfile()
+    __Controller.favorites.cleanFavorites()
+    __Controller.travelList.cleanTravels()
     Lungo.Cache.remove "travelID"
     Lungo.Cache.remove "travelAccepted"
     Lungo.Cache.remove "credentials"
     @avatar[0].src = "img/user.png"
-    __Controller.profile.resetProfile()
-    __Controller.favorites.cleanFavorites()
-    __Controller.travelList.cleanTravels()

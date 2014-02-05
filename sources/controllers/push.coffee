@@ -4,7 +4,7 @@
 
   constructor: ->
     super
-    @savePushID "pushIDdeprueba", "IOS"
+    #@savePushID "pushIDdeprueba", "IOS"
 
   savePushID: (id, device) =>
     Lungo.Cache.set "pushID", id
@@ -20,7 +20,8 @@
       when "702" #Recibo la push de pago
         if notification.appPayment == "true"
           __Controller.payment.loadPayment(notification.cost)
-          navigator.notification.alert "Ya puedes pagar tu trayecto en taxi", null, "Taxi Express", "Aceptar"
+          Lungo.Cache.remove "travelID"
+          Lungo.Cache.set "travelID", notification.travelID
           home_driver.style.visibility = "visible"
           Lungo.Router.section "home_s"      
           Lungo.Router.section "payment_s"
@@ -38,16 +39,15 @@
             url: server + "client/getlasttravel"
             data: data
             success: (result) =>
-              addLastTravel result
+              @addLastTravel result
             error: (xhr, type) =>
               console.log type.response
       when "703" #Se ha cancelado el travel que ya me habian aceptado
-        if notification.travelID == Lungo.Cache.get "travelID"
-          Lungo.Cache.remove "travelID"
-          navigator.notification.alert "El taxista ha cancelado el viaje. Busque otro taxi.", null, "Taxi Express", "Aceptar"
+        Lungo.Cache.remove "travelID"
+        navigator.notification.alert "El taxista ha cancelado el viaje. Puede buscar otro.", null, "Taxi Express", "Aceptar"
 
 
-  addLastTravel: (travel) ->
+  addLastTravel: (travel) =>
     id = travel.id
     starttime = new Date(travel.starttime)
     endtime = new Date(travel.endtime)
@@ -66,6 +66,7 @@
     cost = travel.cost
     vote = travel.vote
     driver = __Model.Driver.get(travel.driver.email)[0]
+    customervoted = travel.customervoted
     if driver == undefined
       driver2 = travel.driver
       if driver2.image == ""
@@ -75,9 +76,10 @@
       driver = __Model.Driver.create email: driver2.email, name: driver2.first_name, surname: driver2.last_name, valuation: driver2.valuation, plate: driver2.car.plate, model: model, image: driver2.image, capacity: driver2.car.capacity, accessible: driver2.car.accessible, animals: driver2.car.animals, appPayment: driver2.car.appPayment
       sql = "INSERT INTO drivers (email, name, surname, valuation, plate, model, image, capacity, accessible, animals, appPayment) VALUES ('"+driver.email+"','"+driver.name+"','"+driver.surname+"','"+driver.valuation+"','"+driver.plate+"','"+model+"','"+image+"','"+driver.capacity+"','"+driver.accessible+"','"+driver.animals+"','"+driver.appPayment+"');"
       @doSQL sql
-    travel2 = __Model.Travel.create id: id, starttime: starttime, endtime: endtime, startpoint: startpoint, endpoint: endpoint, cost: cost, driver: driver, origin: origin, destination: destination, vote: vote
-    sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver,vote) VALUES ('"+travel2.id+"','"+travel2.starttime+"','"+travel2.endtime+"','"+travel.startpoint+"','"+travel.endpoint+"','"+travel2.origin+"','"+travel2.destination+"','"+travel2.cost+"','"+travel2.driver.email+"','"+travel2.vote+"');"
+    travel2 = __Model.Travel.create id: id, starttime: starttime, endtime: endtime, startpoint: startpoint, endpoint: endpoint, cost: cost, driver: driver, origin: origin, destination: destination, vote: vote, customervoted: customervoted
+    sql = "INSERT INTO travels (id, starttime, endtime, startpoint, endpoint, origin, destination, cost, driver, vote, customervoted) VALUES ('"+travel2.id+"','"+travel2.starttime+"','"+travel2.endtime+"','"+travel.startpoint+"','"+travel.endpoint+"','"+travel2.origin+"','"+travel2.destination+"','"+travel2.cost+"','"+travel2.driver.email+"','"+travel2.vote+"','"+travel2.customervoted+"');"
     @doSQL sql
+    __Controller.travelList.addTravel(travel2)
     credentials = Lungo.Cache.get "credentials"
     date = travel.lastUpdateTravels.substring 0, 19
     date = date.replace "T", " "
