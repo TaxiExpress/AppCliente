@@ -20,7 +20,13 @@ class __Controller.MenuCtrl extends Monocle.Controller
       @name[0].textContent = profile.email
     else
       @name[0].textContent = profile.name + " " + profile.surname
-    @avatar[0].src = profile.image if profile.image
+    if profile.image
+      @avatar[0].src = profile.image 
+      if __Controller.home
+        __Controller.home.setPhotoPoi profile.image
+
+  getPhoto: =>
+    return @avatar[0].src
 
   doLogOut: ->
     Lungo.Router.section "login_s"

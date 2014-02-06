@@ -764,7 +764,8 @@
     HomeCtrl.prototype.elements = {
       "#home_refresh_b": "button_refresh",
       "#home_streetField": "streetField",
-      "#home_driver": "driver"
+      "#home_driver": "driver",
+      "#home_photo": "poi"
     };
 
     HomeCtrl.prototype.events = {
@@ -775,6 +776,7 @@
     };
 
     function HomeCtrl() {
+      this.setPhotoPoi = __bind(this.setPhotoPoi, this);
       this.payTaxi = __bind(this.payTaxi, this);
       this.getTaxi = __bind(this.getTaxi, this);
       this.hideAside = __bind(this.hideAside, this);
@@ -782,6 +784,7 @@
       this.refresh = __bind(this.refresh, this);
       var options;
       HomeCtrl.__super__.constructor.apply(this, arguments);
+      this.setPhotoPoi(__Controller.menu.getPhoto());
       if (navigator.geolocation) {
         options = {
           enableHighAccuracy: false,
@@ -973,6 +976,10 @@
 
     HomeCtrl.prototype.payTaxi = function(event) {
       return Lungo.Router.section("payment_s");
+    };
+
+    HomeCtrl.prototype.setPhotoPoi = function(photo) {
+      return this.poi[0].src = photo;
     };
 
     return HomeCtrl;
@@ -1372,7 +1379,8 @@
 }).call(this);
 
 (function() {
-  var __hasProp = {}.hasOwnProperty,
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.MenuCtrl = (function(_super) {
@@ -1389,6 +1397,7 @@
     };
 
     function MenuCtrl() {
+      this.getPhoto = __bind(this.getPhoto, this);
       MenuCtrl.__super__.constructor.apply(this, arguments);
       this.updateProfile();
     }
@@ -1403,8 +1412,15 @@
         this.name[0].textContent = profile.name + " " + profile.surname;
       }
       if (profile.image) {
-        return this.avatar[0].src = profile.image;
+        this.avatar[0].src = profile.image;
+        if (__Controller.home) {
+          return __Controller.home.setPhotoPoi(profile.image);
+        }
       }
+    };
+
+    MenuCtrl.prototype.getPhoto = function() {
+      return this.avatar[0].src;
     };
 
     MenuCtrl.prototype.doLogOut = function() {

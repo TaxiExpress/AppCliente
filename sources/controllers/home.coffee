@@ -7,6 +7,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
     "#home_refresh_b"                        : "button_refresh"
     "#home_streetField"                      : "streetField"
     "#home_driver"                           : "driver"
+    "#home_photo"                            : "poi"
 
   events:
     "singleTap #home_driver"                 : "payTaxi"
@@ -16,6 +17,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
 
   constructor: ->
     super
+    @setPhotoPoi __Controller.menu.getPhoto()
     if navigator.geolocation
       options =
         enableHighAccuracy: false,
@@ -161,3 +163,6 @@ class __Controller.HomeCtrl extends Monocle.Controller
 
   payTaxi: (event) =>
     Lungo.Router.section "payment_s"
+
+  setPhotoPoi: (photo) =>
+    @poi[0].src = photo
