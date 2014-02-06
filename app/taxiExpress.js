@@ -825,24 +825,22 @@
     };
 
     HomeCtrl.prototype.confirm = function(event) {
-      var _this = this;
+      var onConfirm,
+        _this = this;
       Lungo.Aside.hide();
-      return Lungo.Notification.confirm({
-        title: "¿Qué taxi desea?",
-        description: "Seleccione la opción que  más le convenga",
-        accept: {
-          label: "El más cercano",
-          callback: function() {
-            return _this.getTaxi();
-          }
-        },
-        cancel: {
-          label: "Elegir taxi",
-          callback: function() {
-            return __Controller.nearDriver.loadNearTaxis();
-          }
+      onConfirm = function(button) {
+        switch (button) {
+          case 1:
+            _this.getTaxi();
+            break;
+          case 2:
+            __Controller.nearDriver.loadNearTaxis();
+            break;
+          case 3:
+            _this;
         }
-      });
+      };
+      return navigator.notification.confirm("Seleccione la opción que  más le convenga", onConfirm, "¿Qué taxi desea?", "El más cercano,Elegir taxi, Cancelar");
     };
 
     HomeCtrl.prototype.hideAside = function(event) {
@@ -907,6 +905,7 @@
             } else {
               home_streetField.value = results[0].address_components[1].short_name + ", " + results[0].address_components[0].short_name;
             }
+            Lungo.Cache.remove("origin");
             return Lungo.Cache.set("origin", home_streetField.value);
           } else {
             return home_streetField.value = 'Calle desconocida';

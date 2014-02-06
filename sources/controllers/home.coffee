@@ -51,17 +51,16 @@ class __Controller.HomeCtrl extends Monocle.Controller
 
   confirm: (event) =>
     Lungo.Aside.hide()
-    Lungo.Notification.confirm
-      title: "¿Qué taxi desea?"
-      description: "Seleccione la opción que  más le convenga"
-      accept:
-        label: "El más cercano"
-        callback: =>
+    onConfirm = (button) =>
+      switch button
+        when 1
           @getTaxi()
-      cancel:
-        label: "Elegir taxi"
-        callback: =>
+        when 2
           __Controller.nearDriver.loadNearTaxis()
+        when 3
+          @
+      return
+    navigator.notification.confirm "Seleccione la opción que  más le convenga", onConfirm, "¿Qué taxi desea?", "El más cercano,Elegir taxi, Cancelar"
 
 
   hideAside: (event) =>
@@ -109,6 +108,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
           if results[0].address_components[1].short_name == results[0].address_components[0].short_name
             home_streetField.value = results[0].address_components[1].short_name
           else home_streetField.value = results[0].address_components[1].short_name + ", " +results[0].address_components[0].short_name
+          Lungo.Cache.remove "origin"
           Lungo.Cache.set "origin", home_streetField.value
         else
           home_streetField.value = 'Calle desconocida'
