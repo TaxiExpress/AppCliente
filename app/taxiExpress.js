@@ -1453,7 +1453,6 @@
     NearDriverCtrl.prototype.loadNearTaxis = function() {
       var credentials, server, session,
         _this = this;
-      console.log("llego");
       this.deleteNearTaxis();
       Lungo.Router.section("list_s");
       credentials = Lungo.Cache.get("credentials");
@@ -1474,7 +1473,6 @@
         },
         success: function(result) {
           var accessible, animals, appPayment, capacity, cont, coords, driver, email, image, lastDriver, lat, long, model, name, plate, pos, surname, taxi, valuation, _i, _len, _results;
-          console.log(result);
           if (result.length === 0) {
             empty_nearTaxies.style.display = "block";
           } else {
@@ -1545,15 +1543,12 @@
     };
 
     NearDriverCtrl.prototype.getDistanceAndTime = function(driver, lastDriver) {
-      var directionsService, request, wp,
+      var directionsService, request,
         _this = this;
-      wp = new Array();
-      wp[0] = new google.maps.LatLng(driver.position.d, driver.position.e);
-      wp[1] = new google.maps.LatLng(this.position.d, this.position.e);
       directionsService = new google.maps.DirectionsService();
       request = {
-        origin: wp[0],
-        destination: wp[1],
+        origin: new google.maps.LatLng(driver.position.d, driver.position.e),
+        destination: new google.maps.LatLng(this.position.d, this.position.e),
         travelMode: google.maps.DirectionsTravelMode.DRIVING
       };
       return directionsService.route(request, function(response, status) {
@@ -1564,18 +1559,19 @@
           driver.distance = distance;
           driver.time = time + 1;
           driver.save();
-          if (lastDriver) {
-            return setTimeout((function() {
-              return _this.showTaxies();
-            }), 50);
-          }
+        } else {
+          driver.destroy();
+        }
+        if (lastDriver) {
+          return setTimeout((function() {
+            return _this.showTaxies();
+          }), 50);
         }
       });
     };
 
     NearDriverCtrl.prototype.showTaxies = function() {
       var driver, taxies, _i, _len, _results;
-      console.log("llgosa");
       taxies = __Model.NearDriver.all().sort(function(a, b) {
         return parseFloat(a.distance) - parseFloat(b.distance);
       });

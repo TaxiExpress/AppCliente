@@ -11,7 +11,6 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
 
 
   loadNearTaxis: =>
-    console.log "llego"
     @deleteNearTaxis()
     Lungo.Router.section "list_s"
     credentials = Lungo.Cache.get "credentials"
@@ -29,7 +28,6 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
       error: (xhr, type) =>
         console.log type.response
       success: (result) =>
-        console.log result
         if result.length == 0
           empty_nearTaxies.style.display = "block"
         else
@@ -70,13 +68,10 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
 
 
   getDistanceAndTime: (driver, lastDriver) =>
-    wp = new Array()
-    wp[0] = new google.maps.LatLng(driver.position.d, driver.position.e )
-    wp[1] = new google.maps.LatLng(@position.d, @position.e)
     directionsService = new google.maps.DirectionsService()
     request =
-      origin: wp[0]
-      destination: wp[1]
+      origin: new google.maps.LatLng(driver.position.d, driver.position.e )
+      destination: new google.maps.LatLng(@position.d, @position.e)
       travelMode: google.maps.DirectionsTravelMode.DRIVING
     directionsService.route request, (response, status) =>
       if status is google.maps.DirectionsStatus.OK
@@ -85,11 +80,12 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
         driver.distance = distance
         driver.time = time+1
         driver.save()
-        setTimeout((=> @showTaxies()) , 50) if lastDriver
+      else
+        driver.destroy()
+      setTimeout((=> @showTaxies()) , 50) if lastDriver
 
 
   showTaxies: =>
-    console.log "llgosa"
     taxies = __Model.NearDriver.all().sort (a, b) ->
       parseFloat(a.distance) - parseFloat(b.distance)
     for driver in taxies
