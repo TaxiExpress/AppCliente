@@ -879,14 +879,11 @@
         };
         map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
         getStreet(currentLocation);
-        google.maps.event.addListener(map, "dragend", function(event) {
+        google.maps.event.addListener(map, "idle", function(event) {
           return getStreet(map.getCenter());
         });
         google.maps.event.addListener(map, "dragstart", function(event) {
           return home_streetField.value = 'Localizando ...';
-        });
-        google.maps.event.addListener(map, "zoom_changed", function(event) {
-          return getStreet(map.getCenter());
         });
         return setTimeout((function() {
           return navigator.splashscreen.hide();

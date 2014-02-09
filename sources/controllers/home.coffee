@@ -90,12 +90,10 @@ class __Controller.HomeCtrl extends Monocle.Controller
         ]
       map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions)
       getStreet(currentLocation)
-      google.maps.event.addListener map, "dragend", (event) ->
+      google.maps.event.addListener map, "idle", (event) ->
         getStreet(map.getCenter())
       google.maps.event.addListener map, "dragstart", (event) ->
         home_streetField.value = 'Localizando ...'
-      google.maps.event.addListener map, "zoom_changed", (event) ->
-        getStreet(map.getCenter())
       setTimeout((=> navigator.splashscreen.hide()) , 500)
 
 
