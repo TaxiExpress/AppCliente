@@ -57,9 +57,10 @@ class __Controller.LoginCtrl extends Monocle.Controller
           @parseResponse result
         error: (xhr, type) =>
           console.log type.response
-          setTimeout((=>Lungo.Router.section "login_s") , 500)
           @password[0].value = ""
+          Lungo.Router.section "login_s"
           navigator.notification.alert type.response , null, "Taxi Express", "Aceptar"
+          setTimeout((=> navigator.splashscreen.hide()) , 500)
 
 
   parseResponse: (result) ->

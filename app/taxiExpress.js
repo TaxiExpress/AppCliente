@@ -1070,11 +1070,12 @@
           },
           error: function(xhr, type) {
             console.log(type.response);
-            setTimeout((function() {
-              return Lungo.Router.section("login_s");
-            }), 500);
             _this.password[0].value = "";
-            return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
+            Lungo.Router.section("login_s");
+            navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
+            return setTimeout((function() {
+              return navigator.splashscreen.hide();
+            }), 500);
           }
         });
       }
