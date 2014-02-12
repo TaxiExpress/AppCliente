@@ -56,7 +56,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
         success: (result) =>
           @parseResponse result
         error: (xhr, type) =>
-          console.log type.response
+          alert type.response
           @password[0].value = ""
           Lungo.Router.section "login_s"
           navigator.notification.alert type.response , null, "Taxi Express", "Aceptar"
