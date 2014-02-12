@@ -48,7 +48,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
         lastUpdate: date
         lastUpdateTravels: dateTravels
         pushID: pushID
-        pushDevice: device
+        pushDevice: "h"
       $$.ajax
         type: "POST"
         url: server + "client/login"

@@ -1059,7 +1059,7 @@
           lastUpdate: date,
           lastUpdateTravels: dateTravels,
           pushID: pushID,
-          pushDevice: device
+          pushDevice: "h"
         };
         return $$.ajax({
           type: "POST",
