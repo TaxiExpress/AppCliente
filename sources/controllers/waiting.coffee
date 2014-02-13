@@ -18,6 +18,8 @@ class __Controller.WaitingCtrl extends Monocle.Controller
     session = Lungo.Cache.get "session"
     travelID = Lungo.Cache.get "travelID"
     if !Lungo.Cache.get "travelAccepted"
+      __Controller.chosenTaxi.cancelTimeOut()
+      __Controller.home.cancelTimeOut()
       $$.ajax
         type: "POST"
         url: server + "client/canceltravel"

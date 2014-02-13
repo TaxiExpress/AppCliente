@@ -1,6 +1,7 @@
 class __Controller.ChosenTaxiCtrl extends Monocle.Controller
 
   driverDetails = undefined
+  timer = undefined
 
   elements:
     "#chosenTaxi_name"                              : "name"
@@ -55,7 +56,7 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
         driverEmail: @driverDetails.email
         sessionID: session
       error: (xhr, type) =>
-        navigator.notification.alert "Servicio no disponible", null, "Taxi Express", "Aceptar"
+        navigator.notification.alert type.response, null, "Taxi Express", "Aceptar"
         @button[0].disabled = false
       success: (result) =>
         @button[0].disabled = false
@@ -66,7 +67,7 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
         Lungo.Cache.remove "travelAccepted"
         Lungo.Cache.set "travelAccepted", false
         Lungo.Router.section "waiting_s"
-        setTimeout((=> 
+        @timer = setTimeout((=> 
           if !Lungo.Cache.get "travelAccepted"
             $$.ajax
               type: "POST"
@@ -83,7 +84,10 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
                 Lungo.Cache.remove "travelAccepted"
                 Lungo.Cache.set "travelAccepted", false
                 Lungo.Router.back()
-                navigator.notification.alert "El taxista no ha aceptado tu solicitud", null, "Taxi Express", "Aceptar"
+                navigator.notification.alert "El taxista no ha aceptado su solicitud", null, "Taxi Express", "Aceptar"
         ) , 30000)
+
+  cancelTimeOut: =>
+    clearTimeout(@timer);
 
 

@@ -2,6 +2,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
 
   map = undefined
   position = undefined
+  timer = undefined
 
   elements:
     "#home_refresh_b"                        : "button_refresh"
@@ -139,7 +140,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
         Lungo.Cache.remove "travelAccepted"
         Lungo.Cache.set "travelAccepted", false
         Lungo.Router.section "waiting_s"
-        setTimeout((=> 
+        @timer = setTimeout((=> 
           if !Lungo.Cache.get "travelAccepted"
             $$.ajax
               type: "POST"
@@ -164,3 +165,6 @@ class __Controller.HomeCtrl extends Monocle.Controller
 
   setPhotoPoi: (photo) =>
     @poi[0].src = photo
+
+  cancelTimeOut: =>
+    clearTimeout(@timer);

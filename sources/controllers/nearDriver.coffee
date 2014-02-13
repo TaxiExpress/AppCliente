@@ -76,7 +76,9 @@ class __Controller.NearDriverCtrl extends Monocle.Controller
     directionsService.route request, (response, status) =>
       if status is google.maps.DirectionsStatus.OK
         distance = (response.routes[0].legs[0].distance.value/1000).toFixed(2)
+        console.log distance
         time = Math.round(response.routes[0].legs[0].duration.value/60)
+        console.log time
         driver.distance = distance
         driver.time = time+1
         driver.save()

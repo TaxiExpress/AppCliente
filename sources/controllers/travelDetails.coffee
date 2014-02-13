@@ -29,7 +29,11 @@ class __Controller.TravelDetailsCtrl extends Monocle.Controller
     @start[0].innerHTML = travel.origin
     @end[0].innerHTML = travel.destination
     @date[0].innerText = travel.date
-    @time[0].innerText = Math.floor((travel.endtime - travel.starttime) / 60000 ) + " minutos"
+    mins = Math.floor((travel.endtime - travel.starttime) / 60000 )+1
+    if mins >1 
+      @time[0].innerText = mins + " minutos"
+    else
+      @time[0].innerText = mins + " minuto"
     @cost[0].innerText = (travel.cost.toString().replace ".", ",") + "€"
     @driverDetails = travel.driver
     @changeValuation()

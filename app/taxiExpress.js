@@ -203,7 +203,7 @@
 
     NearDriverList.prototype.container = "section #nearList_a";
 
-    NearDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"chosenTaxi_s\">                \n          <div class=\"on-right\">{{time}} mins aprox</div>\n          <img src=\"{{image}}\" alt=\"\" />\n          <div>\n              <strong>a {{distance}} km</strong>\n              <small>{{name}} {{surname}}</small>\n              <small><strong>{{valuationStars}}</strong></small>\n          </div>\n          {{#appPayment}}<span data-icon=\"credit-card\">\n            <span class=\"icon credit-card\"></span>\n          </span>{{/appPayment}}\n      </li>";
+    NearDriverList.prototype.template = " \n<li class=\"thumb arrow selectable\" data-view-section=\"chosenTaxi_s\">                \n          <div class=\"on-right\">{{time}} min aprox</div>\n          <img src=\"{{image}}\" alt=\"\" />\n          <div>\n              <strong>a {{distance}} km</strong>\n              <small>{{name}} {{surname}}</small>\n              <small><strong>{{valuationStars}}</strong></small>\n          </div>\n          {{#appPayment}}<span data-icon=\"credit-card\">\n            <span class=\"icon credit-card\"></span>\n          </span>{{/appPayment}}\n      </li>";
 
     NearDriverList.prototype.events = {
       "singleTap li": "onView"
@@ -310,11 +310,13 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.ChosenTaxiCtrl = (function(_super) {
-    var driverDetails;
+    var driverDetails, timer;
 
     __extends(ChosenTaxiCtrl, _super);
 
     driverDetails = void 0;
+
+    timer = void 0;
 
     ChosenTaxiCtrl.prototype.elements = {
       "#chosenTaxi_name": "name",
@@ -334,6 +336,7 @@
     };
 
     function ChosenTaxiCtrl() {
+      this.cancelTimeOut = __bind(this.cancelTimeOut, this);
       this.requestTaxi = __bind(this.requestTaxi, this);
       this.loadDriverDetails = __bind(this.loadDriverDetails, this);
       ChosenTaxiCtrl.__super__.constructor.apply(this, arguments);
@@ -382,7 +385,7 @@
           sessionID: session
         },
         error: function(xhr, type) {
-          navigator.notification.alert("Servicio no disponible", null, "Taxi Express", "Aceptar");
+          navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
           return _this.button[0].disabled = false;
         },
         success: function(result) {
@@ -395,7 +398,7 @@
           Lungo.Cache.remove("travelAccepted");
           Lungo.Cache.set("travelAccepted", false);
           Lungo.Router.section("waiting_s");
-          return setTimeout((function() {
+          return _this.timer = setTimeout((function() {
             if (!Lungo.Cache.get("travelAccepted")) {
               return $$.ajax({
                 type: "POST",
@@ -414,13 +417,17 @@
                   Lungo.Cache.remove("travelAccepted");
                   Lungo.Cache.set("travelAccepted", false);
                   Lungo.Router.back();
-                  return navigator.notification.alert("El taxista no ha aceptado tu solicitud", null, "Taxi Express", "Aceptar");
+                  return navigator.notification.alert("El taxista no ha aceptado su solicitud", null, "Taxi Express", "Aceptar");
                 }
               });
             }
           }), 30000);
         }
       });
+    };
+
+    ChosenTaxiCtrl.prototype.cancelTimeOut = function() {
+      return clearTimeout(this.timer);
     };
 
     return ChosenTaxiCtrl;
@@ -752,7 +759,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.HomeCtrl = (function(_super) {
-    var getStreet, initialize, manageErrors, map, position, reconnect, updatePosition,
+    var getStreet, initialize, manageErrors, map, position, reconnect, timer, updatePosition,
       _this = this;
 
     __extends(HomeCtrl, _super);
@@ -760,6 +767,8 @@
     map = void 0;
 
     position = void 0;
+
+    timer = void 0;
 
     HomeCtrl.prototype.elements = {
       "#home_refresh_b": "button_refresh",
@@ -776,6 +785,7 @@
     };
 
     function HomeCtrl() {
+      this.cancelTimeOut = __bind(this.cancelTimeOut, this);
       this.setPhotoPoi = __bind(this.setPhotoPoi, this);
       this.payTaxi = __bind(this.payTaxi, this);
       this.getTaxi = __bind(this.getTaxi, this);
@@ -944,7 +954,7 @@
           Lungo.Cache.remove("travelAccepted");
           Lungo.Cache.set("travelAccepted", false);
           Lungo.Router.section("waiting_s");
-          return setTimeout((function() {
+          return _this.timer = setTimeout((function() {
             if (!Lungo.Cache.get("travelAccepted")) {
               return $$.ajax({
                 type: "POST",
@@ -977,6 +987,10 @@
 
     HomeCtrl.prototype.setPhotoPoi = function(photo) {
       return this.poi[0].src = photo;
+    };
+
+    HomeCtrl.prototype.cancelTimeOut = function() {
+      return clearTimeout(this.timer);
     };
 
     return HomeCtrl;
@@ -1569,7 +1583,9 @@
         var distance, time;
         if (status === google.maps.DirectionsStatus.OK) {
           distance = (response.routes[0].legs[0].distance.value / 1000).toFixed(2);
+          console.log(distance);
           time = Math.round(response.routes[0].legs[0].duration.value / 60);
+          console.log(time);
           driver.distance = distance;
           driver.time = time + 1;
           driver.save();
@@ -2380,12 +2396,18 @@
     }
 
     TravelDetailsCtrl.prototype.loadTravelDetails = function(travel) {
+      var mins;
       this.travel = travel;
       this.showMap(travel);
       this.start[0].innerHTML = travel.origin;
       this.end[0].innerHTML = travel.destination;
       this.date[0].innerText = travel.date;
-      this.time[0].innerText = Math.floor((travel.endtime - travel.starttime) / 60000) + " minutos";
+      mins = Math.floor((travel.endtime - travel.starttime) / 60000) + 1;
+      if (mins > 1) {
+        this.time[0].innerText = mins + " minutos";
+      } else {
+        this.time[0].innerText = mins + " minuto";
+      }
       this.cost[0].innerText = (travel.cost.toString().replace(".", ",")) + "€";
       this.driverDetails = travel.driver;
       this.changeValuation();
@@ -2562,6 +2584,7 @@
     };
 
     TravelListCtrl.prototype.addTravel = function(travel) {
+      empty_travels.style.display = "none";
       return _views[travel.id] = new __View.Travel({
         model: travel
       });
@@ -2604,6 +2627,8 @@
       session = Lungo.Cache.get("session");
       travelID = Lungo.Cache.get("travelID");
       if (!Lungo.Cache.get("travelAccepted")) {
+        __Controller.chosenTaxi.cancelTimeOut();
+        __Controller.home.cancelTimeOut();
         return $$.ajax({
           type: "POST",
           url: server + "client/canceltravel",

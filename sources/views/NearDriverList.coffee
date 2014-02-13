@@ -4,7 +4,7 @@ class __View.NearDriverList extends Monocle.View
 
   template  : """ 
   		<li class="thumb arrow selectable" data-view-section="chosenTaxi_s">                
-          <div class="on-right">{{time}} mins aprox</div>
+          <div class="on-right">{{time}} min aprox</div>
           <img src="{{image}}" alt="" />
           <div>
               <strong>a {{distance}} km</strong>

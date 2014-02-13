@@ -23,4 +23,5 @@ class __Controller.TravelListCtrl extends Monocle.Controller
 
 
   addTravel: (travel) =>
+    empty_travels.style.display = "none"
     _views[travel.id] = new __View.Travel model: travel
