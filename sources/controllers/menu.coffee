@@ -29,11 +29,23 @@ class __Controller.MenuCtrl extends Monocle.Controller
     return @avatar[0].src
 
   doLogOut: ->
-    Lungo.Router.section "login_s"
-    __Controller.profile.resetProfile()
-    __Controller.favorites.cleanFavorites()
-    __Controller.travelList.cleanTravels()
-    Lungo.Cache.remove "travelID"
-    Lungo.Cache.remove "travelAccepted"
-    Lungo.Cache.remove "credentials"
-    @avatar[0].src = "img/user.png"
+    Lungo.Aside.hide()
+    onConfirm = (button) =>
+      switch button
+        when 1
+          Lungo.Router.section "login_s"
+          __Controller.profile.resetProfile()
+          __Controller.favorites.cleanFavorites()
+          __Controller.travelList.cleanTravels()
+          __Controller.home.setPhotoPoi("img/user.png")
+          Lungo.Cache.remove "travelID"
+          Lungo.Cache.remove "travelAccepted"
+          Lungo.Cache.remove "credentials"
+          @avatar[0].src = "img/user.png"
+        when 2
+          @
+      return
+    navigator.notification.confirm "", onConfirm, "¿Desea cerrar sesión?", "Sí,No"
+
+
+    

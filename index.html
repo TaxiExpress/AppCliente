@@ -448,7 +448,7 @@
             switch( e.event ) {
                 case 'registered':
                 if ( e.regid.length > 0 ) {
-                    __Controller.push.savePushID(e.regid, "ANDROID");
+                    __Controller.push.savePushID(e.regid);
                 }
                 break;                
                 case 'message':
@@ -473,7 +473,7 @@
         }
         
         function tokenHandler (result) {
-            __Controller.push.savePushID(result,"IOS");
+            __Controller.push.savePushID(result);
         }
         
         function successHandler (result) {

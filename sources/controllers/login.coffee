@@ -2,6 +2,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
   db = undefined
   credentials = undefined
+  logged = undefined
 
   elements:
     "#login_username"                              : "username"
@@ -22,9 +23,13 @@ class __Controller.LoginCtrl extends Monocle.Controller
 
 
   doLogin: (event) =>
+    input = document.getElementById("login_username")
+    input.blur()
+    input = document.getElementById("login_password")
+    input.blur()
     if @username[0].value && @password[0].value
       @drop()
-      Lungo.Router.section "init_s"
+      navigator.splashscreen.show()
       date = new Date().toISOString().substring 0, 19
       date = date.replace "T", " "
       @valideCredentials(@username[0].value, @password[0].value, date, date)
@@ -39,8 +44,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
         pushID = Lungo.Cache.get "pushID"
         @valideCredentials email, pass, date, dateTravels 
       ) , 500)
+      return
     else
-      device = Lungo.Cache.get "pushDevice"
       server = Lungo.Cache.get "server"
       data = 
         email: email
@@ -48,7 +53,6 @@ class __Controller.LoginCtrl extends Monocle.Controller
         lastUpdate: date
         lastUpdateTravels: dateTravels
         pushID: pushID
-        pushDevice: "h"
       $$.ajax
         type: "POST"
         url: server + "client/login"
@@ -56,11 +60,9 @@ class __Controller.LoginCtrl extends Monocle.Controller
         success: (result) =>
           @parseResponse result
         error: (xhr, type) =>
-          alert type.response
           @password[0].value = ""
-          Lungo.Router.section "login_s"
-          navigator.notification.alert type.response , null, "Taxi Express", "Aceptar"
-          setTimeout((=> navigator.splashscreen.hide()) , 500)
+          navigator.notification.alert type.response , Lungo.Router.section "login_s", "Taxi Express", "Aceptar"
+          navigator.splashscreen.hide()
 
 
   parseResponse: (result) ->
@@ -90,8 +92,11 @@ class __Controller.LoginCtrl extends Monocle.Controller
         dateTrav = dateTrav.replace "T", " "
       @doSQL "INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible) VALUES ('"+profile.email+"','"+@password[0].value+"','"+date+"','"+dateTrav+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"','"+result.fCapacity+"','"+result.fDistance+"','"+result.fAppPayment+"','"+result.fAnimals+"','"+result.fAccessible+"');"
       __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible, result.fDistance)
+    Lungo.Cache.remove "travelAccepted"
     Lungo.Cache.set "travelAccepted", false
+    Lungo.Cache.remove "travelID"
     Lungo.Cache.set "travelID", 0
+    Lungo.Cache.remove "credentials"
     Lungo.Cache.set "credentials", profile
     @loadFavoriteTaxis(result.favlist)
     __Controller.favorites = new __Controller.FavoritesCtrl "section#favorites_s"
@@ -106,14 +111,22 @@ class __Controller.LoginCtrl extends Monocle.Controller
       @getDriversAndTravelsSQL()
     @username[0].value = ""
     @password[0].value = ""
-    __Controller.profile = new __Controller.ProfileCtrl "section#profile_s"
-    __Controller.payment = new __Controller.PaymentCtrl "section#payment_s"
-    __Controller.favDriver = new __Controller.FavDriverCtrl "section#favDriver_s"
-    __Controller.waiting = new __Controller.WaitingCtrl "section#waiting_s"
-    __Controller.chosenTaxi = new __Controller.ChosenTaxiCtrl "section#chosenTaxi_s"
-    __Controller.nearDriver = new __Controller.NearDriverCtrl "section#list_s"
-    __Controller.travelDetails = new __Controller.TravelDetailsCtrl "section#travelDetails_s"
-    setTimeout((=>__Controller.home = new __Controller.HomeCtrl "section#home_s") , 1000)
+    if !@logged
+      __Controller.profile = new __Controller.ProfileCtrl "section#profile_s"
+      __Controller.payment = new __Controller.PaymentCtrl "section#payment_s"
+      __Controller.favDriver = new __Controller.FavDriverCtrl "section#favDriver_s"
+      __Controller.waiting = new __Controller.WaitingCtrl "section#waiting_s"
+      __Controller.chosenTaxi = new __Controller.ChosenTaxiCtrl "section#chosenTaxi_s"
+      __Controller.nearDriver = new __Controller.NearDriverCtrl "section#list_s"
+      __Controller.travelDetails = new __Controller.TravelDetailsCtrl "section#travelDetails_s"
+      setTimeout((=>__Controller.home = new __Controller.HomeCtrl "section#home_s") , 1000)
+      @logged = true
+    else
+      Lungo.Router.section "home_s"
+      __Controller.profile.loadProfile()
+      __Controller.home.setPhotoPoi __Controller.menu.getPhoto()
+      setTimeout((=> navigator.splashscreen.hide()) , 500)
+
 
 
   read: =>

@@ -4,11 +4,10 @@
 
   constructor: ->
     super
-    #@savePushID "pushIDdeprueba", "IOS"
+    #@savePushID "pushIDdeprueba"
 
-  savePushID: (id, device) =>
+  savePushID: (id) =>
     Lungo.Cache.set "pushID", id
-    Lungo.Cache.set "pushDevice", device
 
 
   handlePush: (notification) =>

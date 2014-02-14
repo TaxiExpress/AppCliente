@@ -1005,13 +1005,15 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.LoginCtrl = (function(_super) {
-    var credentials, db;
+    var credentials, db, logged;
 
     __extends(LoginCtrl, _super);
 
     db = void 0;
 
     credentials = void 0;
+
+    logged = void 0;
 
     LoginCtrl.prototype.elements = {
       "#login_username": "username",
@@ -1043,10 +1045,14 @@
     }
 
     LoginCtrl.prototype.doLogin = function(event) {
-      var date;
+      var date, input;
+      input = document.getElementById("login_username");
+      input.blur();
+      input = document.getElementById("login_password");
+      input.blur();
       if (this.username[0].value && this.password[0].value) {
         this.drop();
-        Lungo.Router.section("init_s");
+        navigator.splashscreen.show();
         date = new Date().toISOString().substring(0, 19);
         date = date.replace("T", " ");
         return this.valideCredentials(this.username[0].value, this.password[0].value, date, date);
@@ -1056,24 +1062,22 @@
     };
 
     LoginCtrl.prototype.valideCredentials = function(email, pass, date, dateTravels) {
-      var data, device, pushID, server,
+      var data, pushID, server,
         _this = this;
       pushID = Lungo.Cache.get("pushID");
       if (pushID === void 0) {
-        return setTimeout((function() {
+        setTimeout((function() {
           pushID = Lungo.Cache.get("pushID");
           return _this.valideCredentials(email, pass, date, dateTravels);
         }), 500);
       } else {
-        device = Lungo.Cache.get("pushDevice");
         server = Lungo.Cache.get("server");
         data = {
           email: email,
           password: pass,
           lastUpdate: date,
           lastUpdateTravels: dateTravels,
-          pushID: pushID,
-          pushDevice: "h"
+          pushID: pushID
         };
         return $$.ajax({
           type: "POST",
@@ -1083,13 +1087,9 @@
             return _this.parseResponse(result);
           },
           error: function(xhr, type) {
-            alert(type.response);
             _this.password[0].value = "";
-            Lungo.Router.section("login_s");
-            navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
-            return setTimeout((function() {
-              return navigator.splashscreen.hide();
-            }), 500);
+            navigator.notification.alert(type.response, Lungo.Router.section("login_s", "Taxi Express", "Aceptar"));
+            return navigator.splashscreen.hide();
           }
         });
       }
@@ -1128,8 +1128,11 @@
         this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible) VALUES ('" + profile.email + "','" + this.password[0].value + "','" + date + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fDistance + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "');");
         __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible, result.fDistance);
       }
+      Lungo.Cache.remove("travelAccepted");
       Lungo.Cache.set("travelAccepted", false);
+      Lungo.Cache.remove("travelID");
       Lungo.Cache.set("travelID", 0);
+      Lungo.Cache.remove("credentials");
       Lungo.Cache.set("credentials", profile);
       this.loadFavoriteTaxis(result.favlist);
       __Controller.favorites = new __Controller.FavoritesCtrl("section#favorites_s");
@@ -1145,16 +1148,26 @@
       }
       this.username[0].value = "";
       this.password[0].value = "";
-      __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
-      __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
-      __Controller.favDriver = new __Controller.FavDriverCtrl("section#favDriver_s");
-      __Controller.waiting = new __Controller.WaitingCtrl("section#waiting_s");
-      __Controller.chosenTaxi = new __Controller.ChosenTaxiCtrl("section#chosenTaxi_s");
-      __Controller.nearDriver = new __Controller.NearDriverCtrl("section#list_s");
-      __Controller.travelDetails = new __Controller.TravelDetailsCtrl("section#travelDetails_s");
-      return setTimeout((function() {
-        return __Controller.home = new __Controller.HomeCtrl("section#home_s");
-      }), 1000);
+      if (!this.logged) {
+        __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
+        __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
+        __Controller.favDriver = new __Controller.FavDriverCtrl("section#favDriver_s");
+        __Controller.waiting = new __Controller.WaitingCtrl("section#waiting_s");
+        __Controller.chosenTaxi = new __Controller.ChosenTaxiCtrl("section#chosenTaxi_s");
+        __Controller.nearDriver = new __Controller.NearDriverCtrl("section#list_s");
+        __Controller.travelDetails = new __Controller.TravelDetailsCtrl("section#travelDetails_s");
+        setTimeout((function() {
+          return __Controller.home = new __Controller.HomeCtrl("section#home_s");
+        }), 1000);
+        return this.logged = true;
+      } else {
+        Lungo.Router.section("home_s");
+        __Controller.profile.loadProfile();
+        __Controller.home.setPhotoPoi(__Controller.menu.getPhoto());
+        return setTimeout((function() {
+          return navigator.splashscreen.hide();
+        }), 500);
+      }
     };
 
     LoginCtrl.prototype.read = function() {
@@ -1436,14 +1449,27 @@
     };
 
     MenuCtrl.prototype.doLogOut = function() {
-      Lungo.Router.section("login_s");
-      __Controller.profile.resetProfile();
-      __Controller.favorites.cleanFavorites();
-      __Controller.travelList.cleanTravels();
-      Lungo.Cache.remove("travelID");
-      Lungo.Cache.remove("travelAccepted");
-      Lungo.Cache.remove("credentials");
-      return this.avatar[0].src = "img/user.png";
+      var onConfirm,
+        _this = this;
+      Lungo.Aside.hide();
+      onConfirm = function(button) {
+        switch (button) {
+          case 1:
+            Lungo.Router.section("login_s");
+            __Controller.profile.resetProfile();
+            __Controller.favorites.cleanFavorites();
+            __Controller.travelList.cleanTravels();
+            __Controller.home.setPhotoPoi("img/user.png");
+            Lungo.Cache.remove("travelID");
+            Lungo.Cache.remove("travelAccepted");
+            Lungo.Cache.remove("credentials");
+            _this.avatar[0].src = "img/user.png";
+            break;
+          case 2:
+            _this;
+        }
+      };
+      return navigator.notification.confirm("", onConfirm, "¿Desea cerrar sesión?", "Sí,No");
     };
 
     return MenuCtrl;
@@ -2079,9 +2105,8 @@
       PushCtrl.__super__.constructor.apply(this, arguments);
     }
 
-    PushCtrl.prototype.savePushID = function(id, device) {
-      Lungo.Cache.set("pushID", id);
-      return Lungo.Cache.set("pushDevice", device);
+    PushCtrl.prototype.savePushID = function(id) {
+      return Lungo.Cache.set("pushID", id);
     };
 
     PushCtrl.prototype.handlePush = function(notification) {
