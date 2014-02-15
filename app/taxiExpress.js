@@ -441,6 +441,82 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+  __Controller.CreditCardCtrl = (function(_super) {
+    var expires, number;
+
+    __extends(CreditCardCtrl, _super);
+
+    number = void 0;
+
+    expires = void 0;
+
+    CreditCardCtrl.prototype.elements = {
+      "#creditCard_number": "numberInput",
+      "#creditCard_expires": "expiresInput"
+    };
+
+    CreditCardCtrl.prototype.events = {
+      "singleTap #creditCard_save_b": "updateButton",
+      "singleTap #creditCard_number": "clickNumber",
+      "singleTap #creditCard_expires": "clickExpires"
+    };
+
+    function CreditCardCtrl() {
+      this.loadCreditCardInfo = __bind(this.loadCreditCardInfo, this);
+      this.updateButton = __bind(this.updateButton, this);
+      this.clickExpires = __bind(this.clickExpires, this);
+      this.clickNumber = __bind(this.clickNumber, this);
+      CreditCardCtrl.__super__.constructor.apply(this, arguments);
+    }
+
+    CreditCardCtrl.prototype.clickNumber = function(event) {
+      return this.numberInput[0].value = "";
+    };
+
+    CreditCardCtrl.prototype.clickExpires = function(event) {
+      return this.expiresInput[0].value = "";
+    };
+
+    CreditCardCtrl.prototype.updateButton = function(event) {
+      var credentials, db,
+        _this = this;
+      if (this.expiresInput[0].value[2] !== '/' || this.numberInput[0].value.length < 16) {
+        return navigator.notification.alert("Compruebe que los datos son correctos", null, "Taxi Express", "Aceptar");
+      } else {
+        this.loadCreditCardInfo(this.numberInput[0].value, this.expiresInput[0].value);
+        credentials = Lungo.Cache.get("credentials");
+        db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
+        db.transaction(function(tx) {
+          return tx.executeSql("UPDATE profile SET expires = '" + _this.expires + "',creditCard = '" + _this.number + "'  WHERE email ='" + credentials.email + "';");
+        });
+        return navigator.notification.alert("Datos actualizados", null, "Taxi Express", "Aceptar");
+      }
+    };
+
+    CreditCardCtrl.prototype.loadCreditCardInfo = function(number, expires) {
+      number = number.toString();
+      expires = expires.toString();
+      this.number = number;
+      this.expires = expires;
+      number = number.substring(number.length - 2, number.length);
+      if (number !== "") {
+        this.numberInput[0].value = "**** **** **** **" + number;
+      }
+      this.expiresInput[0].value = expires;
+      return __Controller.payment.loadCreditCardInfo(this.number, this.expires);
+    };
+
+    return CreditCardCtrl;
+
+  })(Monocle.Controller);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
   __Controller.FavDriverCtrl = (function(_super) {
     var credentials, driverDetails;
 
@@ -1037,7 +1113,7 @@
       LoginCtrl.__super__.constructor.apply(this, arguments);
       this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
       this.db.transaction(function(tx) {
-        tx.executeSql("CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, distance STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )");
+        tx.executeSql("CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, distance STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL, creditCard STRING NOT NULL , expires STRING NOT NULL )");
         tx.executeSql("CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL, vote STRING NOT NULL, customervoted STRING NOT NULL)");
         return tx.executeSql("CREATE TABLE IF NOT EXISTS drivers (email STRING NOT NULL PRIMARY KEY, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)");
       });
@@ -1052,7 +1128,6 @@
       input.blur();
       if (this.username[0].value && this.password[0].value) {
         this.drop();
-        navigator.splashscreen.show();
         date = new Date().toISOString().substring(0, 19);
         date = date.replace("T", " ");
         return this.valideCredentials(this.username[0].value, this.password[0].value, date, date);
@@ -1096,7 +1171,7 @@
     };
 
     LoginCtrl.prototype.parseResponse = function(result) {
-      var date, dateTrav, profile,
+      var creditCard, date, dateTrav, expires, profile,
         _this = this;
       Lungo.Cache.set("session", result.sessionID);
       if (result.email === void 0) {
@@ -1108,6 +1183,8 @@
           image: credentials.image
         };
         __Controller.filters.loadFilters(credentials.seats, credentials.payments, credentials.animals, credentials.accessible, credentials.distance);
+        creditCard = credentials.creditCard;
+        expires = credentials.expires;
       } else {
         this.doSQL("DELETE FROM profile");
         profile = {
@@ -1125,8 +1202,10 @@
           dateTrav = result.lastUpdateTravels.substring(0, 19);
           dateTrav = dateTrav.replace("T", " ");
         }
-        this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible) VALUES ('" + profile.email + "','" + this.password[0].value + "','" + date + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fDistance + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "');");
+        this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible, creditCard, expires) VALUES ('" + profile.email + "','" + this.password[0].value + "','" + date + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fDistance + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "','','');");
         __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible, result.fDistance);
+        creditCard = "";
+        expires = "";
       }
       Lungo.Cache.remove("travelAccepted");
       Lungo.Cache.set("travelAccepted", false);
@@ -1150,6 +1229,7 @@
       this.password[0].value = "";
       if (!this.logged) {
         __Controller.profile = new __Controller.ProfileCtrl("section#profile_s");
+        __Controller.creditCard = new __Controller.CreditCardCtrl("section#creditCard_s");
         __Controller.payment = new __Controller.PaymentCtrl("section#payment_s");
         __Controller.favDriver = new __Controller.FavDriverCtrl("section#favDriver_s");
         __Controller.waiting = new __Controller.WaitingCtrl("section#waiting_s");
@@ -1159,15 +1239,16 @@
         setTimeout((function() {
           return __Controller.home = new __Controller.HomeCtrl("section#home_s");
         }), 1000);
-        return this.logged = true;
+        this.logged = true;
       } else {
         Lungo.Router.section("home_s");
         __Controller.profile.loadProfile();
         __Controller.home.setPhotoPoi(__Controller.menu.getPhoto());
-        return setTimeout((function() {
+        setTimeout((function() {
           return navigator.splashscreen.hide();
         }), 500);
       }
+      return __Controller.creditCard.loadCreditCardInfo(creditCard, expires);
     };
 
     LoginCtrl.prototype.read = function() {
@@ -1737,9 +1818,13 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.PaymentCtrl = (function(_super) {
-    var amount;
+    var amount, expiresValue, numberValue;
 
     __extends(PaymentCtrl, _super);
+
+    numberValue = void 0;
+
+    expiresValue = void 0;
 
     amount = void 0;
 
@@ -1753,14 +1838,35 @@
     };
 
     PaymentCtrl.prototype.events = {
-      "singleTap #payment_submit": "doPayment"
+      "singleTap #payment_submit": "doPayment",
+      "singleTap #payment_credit_card": "clickNumber",
+      "change #payment_credit_card": "changeNumber",
+      "singleTap #payment_cvc": "clickCVC",
+      "singleTap #payment_expires": "clickExpires"
     };
 
     function PaymentCtrl() {
+      this.loadCreditCardInfo = __bind(this.loadCreditCardInfo, this);
       this.stripeResponseHandler = __bind(this.stripeResponseHandler, this);
       this.doPayment = __bind(this.doPayment, this);
       PaymentCtrl.__super__.constructor.apply(this, arguments);
     }
+
+    PaymentCtrl.prototype.changeNumber = function(amount_payment) {
+      return this;
+    };
+
+    PaymentCtrl.prototype.clickNumber = function(amount_payment) {
+      return this.creditCard[0].value = "";
+    };
+
+    PaymentCtrl.prototype.clickCVC = function(amount_payment) {
+      return this.cvc[0].value = "";
+    };
+
+    PaymentCtrl.prototype.clickExpires = function(amount_payment) {
+      return this.expires[0].value = "";
+    };
 
     PaymentCtrl.prototype.loadPayment = function(amount_payment) {
       amount = amount_payment;
@@ -1774,6 +1880,10 @@
     PaymentCtrl.prototype.doPayment = function(event) {
       if (!(this.creditCard.val() && this.cvc.val() && this.expires.val())) {
         return navigator.notification.alert("Debes completar todos los detalles de la tarjeta", null, "Taxi Express", "Aceptar");
+      } else if (this.creditCard.val().length < 16) {
+        return navigator.notification.alert("Compruebe el número de tarjeta de crédito", null, "Taxi Express", "Aceptar");
+      } else if (this.expires.val()[2] !== "/") {
+        return navigator.notification.alert("Compruebe la fecha de caducidad", null, "Taxi Express", "Aceptar");
       } else {
         this.button[0].disabled = true;
         Stripe.setPublishableKey("pk_test_VdRyFEwU3Ap84cUaLp5S8yBC");
@@ -1814,6 +1924,7 @@
           success: function(result) {
             navigator.notification.alert("Trayecto pagado", null, "Taxi Express", "Aceptar");
             home_driver.style.visibility = "hidden";
+            _this.loadCreditCardInfo(_this.numberValue, _this.expiresValue);
             Lungo.Router.section("home_s");
             return $$.ajax({
               type: "GET",
@@ -1831,6 +1942,18 @@
             });
           }
         });
+      }
+    };
+
+    PaymentCtrl.prototype.loadCreditCardInfo = function(number, expires) {
+      this.numberValue = number;
+      this.expiresValue = expires;
+      number = number.substring(number.length - 2, number.length);
+      if (this.numberValue !== "") {
+        this.creditCard[0].value = "**** **** **** **" + number;
+      }
+      if (expires !== "") {
+        return this.expires[0].value = expires;
       }
     };
 

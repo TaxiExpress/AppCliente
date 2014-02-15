@@ -134,6 +134,25 @@
         </article>
     </section>
 
+    <section id="creditCard_s" data-transition="slide">        
+        <header data-title="Tarjeta de crédito" data-back="angle-left"></header>
+        <article id="password_a">
+            <div class="form list">  
+                <li class="anchor contrast">DATOS DE LA TARJETA DE CRÉDITO</li>
+                <fieldset>
+                    <label data-icon="credit-card"></label>
+                    <input id="creditCard_number" type="text" maxlength="16" placeholder="Número de tarjeta" />
+                </fieldset>
+                <fieldset>                    
+                    <label data-icon="calendar"></label>
+                    <input id="creditCard_expires" type="text" maxlength="7" placeholder="MM/YYYY" />
+                </fieldset>
+                <button id="creditCard_save_b" class="anchor accept" data-label="Actualizar datos" />
+
+            </div>
+        </article>
+    </section>
+
     <section id="home_s" data-transition="slide">        
         <article id="home_a" class="street">
             <button class="topLeftButton" data-view-aside="menu_s" data-icon="menu"></button>
@@ -180,7 +199,7 @@
     </section>    
 
     <section id="filters_s" data-transition="slide" >
-        <header data-title="Filtros de búsqueda" data-back="angle-left"></header>      
+        <header data-title="Configuración" data-back="angle-left"></header>      
         <article id="filters_a" class="scroll" >
             <div class="form list">
                 <li class="anchor contrast">CARACTERÍSTICAS DEL TAXI A BUSCAR</li>
@@ -220,6 +239,11 @@
                             <option value="3">3 km</option>
                         </select>
                     </label>
+                </fieldset>
+                <br><br>
+                <fieldset data-icon="angle-right" data-view-section="creditCard_s">
+                    <label data-icon="credit-card"></label>
+                    <small>Tarjeta de crédito</small>
                 </fieldset>
             </div>           
         </article>

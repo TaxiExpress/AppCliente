@@ -1,5 +1,7 @@
 class __Controller.PaymentCtrl extends Monocle.Controller
 
+  numberValue = undefined
+  expiresValue = undefined
   amount = undefined
 
   elements:
@@ -12,9 +14,26 @@ class __Controller.PaymentCtrl extends Monocle.Controller
 
   events:
     "singleTap #payment_submit"                   : "doPayment"
+    "singleTap #payment_credit_card"              : "clickNumber"
+    "change #payment_credit_card"                 : "changeNumber"
+    "singleTap #payment_cvc"                      : "clickCVC"
+    "singleTap #payment_expires"                  : "clickExpires"
 
   constructor: ->
     super
+
+
+  changeNumber: (amount_payment) ->
+    @
+
+  clickNumber: (amount_payment) ->
+    @creditCard[0].value = ""
+
+  clickCVC: (amount_payment) ->
+    @cvc[0].value = ""
+
+  clickExpires: (amount_payment) ->
+    @expires[0].value = ""
 
 
   loadPayment: (amount_payment) ->
@@ -29,6 +48,10 @@ class __Controller.PaymentCtrl extends Monocle.Controller
   doPayment: (event) =>
     if !(@creditCard.val() && @cvc.val() && @expires.val())
       navigator.notification.alert "Debes completar todos los detalles de la tarjeta", null, "Taxi Express", "Aceptar"
+    else if @creditCard.val().length <16
+      navigator.notification.alert "Compruebe el número de tarjeta de crédito", null, "Taxi Express", "Aceptar"
+    else if @expires.val()[2] != "/"
+      navigator.notification.alert "Compruebe la fecha de caducidad", null, "Taxi Express", "Aceptar"
     else
       @button[0].disabled = true
       Stripe.setPublishableKey "pk_test_VdRyFEwU3Ap84cUaLp5S8yBC"
@@ -64,6 +87,7 @@ class __Controller.PaymentCtrl extends Monocle.Controller
         success: (result) =>
           navigator.notification.alert "Trayecto pagado", null, "Taxi Express", "Aceptar"
           home_driver.style.visibility = "hidden"
+          @loadCreditCardInfo @numberValue, @expiresValue
           Lungo.Router.section "home_s"
           $$.ajax
             type: "GET"
@@ -75,3 +99,14 @@ class __Controller.PaymentCtrl extends Monocle.Controller
               console.log type.response
             success: (result) =>                    
               __Controller.push.addLastTravel(result)
+
+  loadCreditCardInfo: (number, expires) =>
+    @numberValue = number
+    @expiresValue = expires
+    number = number.substring number.length - 2, number.length
+    if @numberValue != ""
+      @creditCard[0].value = "**** **** **** **" + number
+    if expires != ""
+      @expires[0].value = expires
+
+    

@@ -15,7 +15,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     super
     @db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024)
     @db.transaction (tx) =>
-      tx.executeSql "CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, distance STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL )"
+      tx.executeSql "CREATE TABLE IF NOT EXISTS profile (email STRING NOT NULL PRIMARY KEY, pass STRING NOT NULL, lastUpdate STRING NOT NULL, lastUpdateTravels STRING NOT NULL, name STRING NOT NULL, surname STRING NOT NULL, phone STRING NOT NULL, image STRING NOT NULL, seats STRING NOT NULL, distance STRING NOT NULL, payments STRING NOT NULL, animals STRING NOT NULL, accessible STRING NOT NULL, creditCard STRING NOT NULL , expires STRING NOT NULL )"
       tx.executeSql "CREATE TABLE IF NOT EXISTS travels (id STRING NOT NULL, starttime STRING NOT NULL, endtime STRING NOT NULL, startpoint STRING NOT NULL, endpoint STRING NOT NULL, origin STRING NOT NULL, destination STRING NOT NULL, cost STRING NOT NULL, driver STRING NOT NULL, vote STRING NOT NULL, customervoted STRING NOT NULL)"
       tx.executeSql "CREATE TABLE IF NOT EXISTS drivers (email STRING NOT NULL PRIMARY KEY, name STRING NOT NULL, surname STRING NOT NULL, valuation STRING NOT NULL, plate STRING NOT NULL, model STRING NOT NULL, image STRING NOT NULL, capacity STRING NOT NULL, accessible STRING NOT NULL, animals STRING NOT NULL, appPayment STRING NOT NULL)"
     #@drop()
@@ -29,7 +29,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     input.blur()
     if @username[0].value && @password[0].value
       @drop()
-      navigator.splashscreen.show()
+      #navigator.splashscreen.show()
       date = new Date().toISOString().substring 0, 19
       date = date.replace "T", " "
       @valideCredentials(@username[0].value, @password[0].value, date, date)
@@ -75,6 +75,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
         email: credentials.email
         image: credentials.image
       __Controller.filters.loadFilters(credentials.seats, credentials.payments, credentials.animals, credentials.accessible, credentials.distance)
+      creditCard = credentials.creditCard
+      expires = credentials.expires
     else 
       @doSQL "DELETE FROM profile"
       profile =
@@ -90,8 +92,10 @@ class __Controller.LoginCtrl extends Monocle.Controller
       else
         dateTrav = result.lastUpdateTravels.substring 0, 19
         dateTrav = dateTrav.replace "T", " "
-      @doSQL "INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible) VALUES ('"+profile.email+"','"+@password[0].value+"','"+date+"','"+dateTrav+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"','"+result.fCapacity+"','"+result.fDistance+"','"+result.fAppPayment+"','"+result.fAnimals+"','"+result.fAccessible+"');"
+      @doSQL "INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible, creditCard, expires) VALUES ('"+profile.email+"','"+@password[0].value+"','"+date+"','"+dateTrav+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"','"+result.fCapacity+"','"+result.fDistance+"','"+result.fAppPayment+"','"+result.fAnimals+"','"+result.fAccessible+"','','');"
       __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible, result.fDistance)
+      creditCard = ""
+      expires = ""
     Lungo.Cache.remove "travelAccepted"
     Lungo.Cache.set "travelAccepted", false
     Lungo.Cache.remove "travelID"
@@ -113,6 +117,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     @password[0].value = ""
     if !@logged
       __Controller.profile = new __Controller.ProfileCtrl "section#profile_s"
+      __Controller.creditCard = new __Controller.CreditCardCtrl "section#creditCard_s"
       __Controller.payment = new __Controller.PaymentCtrl "section#payment_s"
       __Controller.favDriver = new __Controller.FavDriverCtrl "section#favDriver_s"
       __Controller.waiting = new __Controller.WaitingCtrl "section#waiting_s"
@@ -126,6 +131,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       __Controller.profile.loadProfile()
       __Controller.home.setPhotoPoi __Controller.menu.getPhoto()
       setTimeout((=> navigator.splashscreen.hide()) , 500)
+    __Controller.creditCard.loadCreditCardInfo creditCard, expires
 
 
 
