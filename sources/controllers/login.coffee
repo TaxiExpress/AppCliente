@@ -29,7 +29,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     input.blur()
     if @username[0].value && @password[0].value
       @drop()
-      #navigator.splashscreen.show()
+      navigator.splashscreen.show()
       date = new Date().toISOString().substring 0, 19
       date = date.replace "T", " "
       @valideCredentials(@username[0].value, @password[0].value, date, date)

@@ -33,7 +33,7 @@ class __Controller.HomeCtrl extends Monocle.Controller
     ) , 5000)
 
   reconnect =  ->
-      navigator.geolocation.getCurrentPosition initialize, manageErrors    
+    navigator.geolocation.getCurrentPosition initialize, manageErrors    
 
   refresh: (event) =>
     Lungo.Aside.hide()

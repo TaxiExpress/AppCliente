@@ -1128,6 +1128,7 @@
       input.blur();
       if (this.username[0].value && this.password[0].value) {
         this.drop();
+        navigator.splashscreen.show();
         date = new Date().toISOString().substring(0, 19);
         date = date.replace("T", " ");
         return this.valideCredentials(this.username[0].value, this.password[0].value, date, date);
@@ -2137,7 +2138,9 @@
       }), 500);
     };
 
-    ProfileCtrl.prototype.clickAvatar = function(event) {};
+    ProfileCtrl.prototype.clickAvatar = function(event) {
+      return this.image[0].click();
+    };
 
     ProfileCtrl.prototype.clickHeader = function(event) {
       var input;
