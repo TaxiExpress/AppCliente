@@ -1244,7 +1244,7 @@
       } else {
         Lungo.Router.section("home_s");
         __Controller.profile.loadProfile();
-        __Controller.home.setPhotoPoi(__Controller.menu.getPhoto());
+        __Controller.menu.updateProfile();
         setTimeout((function() {
           return navigator.splashscreen.hide();
         }), 500);
@@ -2238,7 +2238,7 @@
     PushCtrl.prototype.handlePush = function(notification) {
       var credentials, data, server, session,
         _this = this;
-      switch (notification.code) {
+      switch (notification.message) {
         case "701":
           Lungo.Cache.set("travelAccepted", true);
           Lungo.Router.section("home_s");

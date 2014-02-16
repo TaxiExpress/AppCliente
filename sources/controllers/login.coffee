@@ -129,7 +129,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
     else
       Lungo.Router.section "home_s"
       __Controller.profile.loadProfile()
-      __Controller.home.setPhotoPoi __Controller.menu.getPhoto()
+      __Controller.menu.updateProfile()
       setTimeout((=> navigator.splashscreen.hide()) , 500)
     __Controller.creditCard.loadCreditCardInfo creditCard, expires
 

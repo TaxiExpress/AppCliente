@@ -11,7 +11,7 @@
 
 
   handlePush: (notification) =>
-    switch notification.code
+    switch notification.message
       when "701" #Recibo push de trayecto aceptado
         Lungo.Cache.set "travelAccepted", true
         Lungo.Router.section "home_s"      
