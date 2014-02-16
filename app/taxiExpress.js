@@ -390,8 +390,8 @@
         },
         success: function(result) {
           var travelID;
-          _this.button[0].disabled = false;
           Lungo.Router.section("waiting_s");
+          _this.button[0].disabled = false;
           travelID = result.travelID;
           Lungo.Cache.remove("travelID");
           Lungo.Cache.set("travelID", travelID.toString());
@@ -1872,9 +1872,7 @@
     PaymentCtrl.prototype.loadPayment = function(amount_payment) {
       amount = amount_payment;
       this.amount_text[0].innerText = "A pagar: " + amount + " €";
-      this.creditCard.val("");
       this.cvc.val("");
-      this.expires.val("");
       return this.button[0].disabled = false;
     };
 

@@ -59,8 +59,8 @@ class __Controller.ChosenTaxiCtrl extends Monocle.Controller
         navigator.notification.alert type.response, null, "Taxi Express", "Aceptar"
         @button[0].disabled = false
       success: (result) =>
-        @button[0].disabled = false
         Lungo.Router.section "waiting_s"
+        @button[0].disabled = false
         travelID = result.travelID
         Lungo.Cache.remove "travelID"
         Lungo.Cache.set "travelID", travelID.toString()

@@ -39,9 +39,7 @@ class __Controller.PaymentCtrl extends Monocle.Controller
   loadPayment: (amount_payment) ->
     amount = amount_payment
     @amount_text[0].innerText = "A pagar: "+amount+" €"
-    @creditCard.val("")
     @cvc.val("")
-    @expires.val("")
     @button[0].disabled = false
 
 
