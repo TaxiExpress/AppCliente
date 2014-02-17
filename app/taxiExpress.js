@@ -1689,11 +1689,13 @@
       };
       return directionsService.route(request, function(response, status) {
         var distance, time;
+        distance = 0;
+        time = 0;
+        driver.distance = distance;
+        driver.time = time + 1;
         if (status === google.maps.DirectionsStatus.OK) {
           distance = (response.routes[0].legs[0].distance.value / 1000).toFixed(2);
-          console.log(distance);
           time = Math.round(response.routes[0].legs[0].duration.value / 60);
-          console.log(time);
           driver.distance = distance;
           driver.time = time + 1;
           driver.save();
