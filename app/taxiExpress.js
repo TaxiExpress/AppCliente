@@ -1972,7 +1972,8 @@
 
     PhoneVerificationCtrl.prototype.elements = {
       "#phoneVerification_phone": "phone",
-      "#phoneVerification_code": "code"
+      "#phoneVerification_code": "code",
+      "#phoneVerification_emailcode": "email"
     };
 
     PhoneVerificationCtrl.prototype.events = {
@@ -1993,10 +1994,10 @@
     PhoneVerificationCtrl.prototype.doVerification = function(event) {
       var data, phone, server, session,
         _this = this;
-      if (!(this.phone[0].value || this.code[0].value)) {
+      if (!(this.phone[0].value || this.code[0].value || this.email[0].value)) {
         return navigator.notification.alert("Debes rellenar todos los campos", null, "Taxi Express", "Aceptar");
-      } else if (this.code[0].value.length < 4) {
-        return navigator.notification.alert("El código debe tener al menos 4 dígitos", null, "Taxi Express", "Aceptar");
+      } else if (this.code[0].value.length < 4 || this.email[0].value.length < 4) {
+        return navigator.notification.alert("Los códigos deben tener al menos 4 dígitos", null, "Taxi Express", "Aceptar");
       } else {
         server = Lungo.Cache.get("server");
         phone = "+34" + this.phone[0].value;
@@ -2004,6 +2005,7 @@
         data = {
           phone: phone,
           validationCode: this.code[0].value,
+          validationCodeEmail: this.email[0].value,
           sessionID: session
         };
         return $$.ajax({
@@ -2023,6 +2025,7 @@
     PhoneVerificationCtrl.prototype.parseResponse = function(result) {
       __Controller.register.validated();
       this.code[0].value = "";
+      this.email[0].value = "";
       this.phone[0].value = "";
       return this.phone[0].disabled = false;
     };

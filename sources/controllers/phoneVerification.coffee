@@ -3,6 +3,7 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
   elements:
     "#phoneVerification_phone"                         : "phone"
     "#phoneVerification_code"                          : "code"
+    "#phoneVerification_emailcode"                     : "email"
 
   events:
     "singleTap #phoneVerification_b"                   : "doVerification"
@@ -17,10 +18,10 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
 
 
   doVerification: (event) => 
-    if !(@phone[0].value || @code[0].value)
+    if !(@phone[0].value || @code[0].value ||  @email[0].value )
       navigator.notification.alert "Debes rellenar todos los campos", null, "Taxi Express", "Aceptar"
-    else if @code[0].value.length < 4
-      navigator.notification.alert "El código debe tener al menos 4 dígitos", null, "Taxi Express", "Aceptar"
+    else if @code[0].value.length < 4 || @email[0].value.length < 4
+      navigator.notification.alert "Los códigos deben tener al menos 4 dígitos", null, "Taxi Express", "Aceptar"
     else
       server = Lungo.Cache.get "server"
       phone = "+34" + @phone[0].value
@@ -28,6 +29,7 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
       data =
         phone: phone
         validationCode: @code[0].value
+        validationCodeEmail: @email[0].value
         sessionID: session
       $$.ajax
         type: "POST"
@@ -42,6 +44,7 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
   parseResponse: (result) =>
     __Controller.register.validated()
     @code[0].value = ""
+    @email[0].value = ""
     @phone[0].value = ""
     @phone[0].disabled = false
 
