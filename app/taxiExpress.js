@@ -367,63 +367,65 @@
     ChosenTaxiCtrl.prototype.requestTaxi = function(event) {
       var credentials, origin, position, server, session,
         _this = this;
-      this.button[0].disabled = true;
-      credentials = Lungo.Cache.get("credentials");
-      position = Lungo.Cache.get("geoPosition");
-      server = Lungo.Cache.get("server");
-      session = Lungo.Cache.get("session");
-      origin = Lungo.Cache.get("origin");
-      return $$.ajax({
-        type: "POST",
-        url: server + "client/getselectedtaxi",
-        data: {
-          email: credentials.email,
-          longitude: position.e,
-          latitude: position.d,
-          origin: origin,
-          driverEmail: this.driverDetails.email,
-          sessionID: session
-        },
-        error: function(xhr, type) {
-          navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
-          return _this.button[0].disabled = false;
-        },
-        success: function(result) {
-          var travelID;
-          Lungo.Router.section("waiting_s");
-          _this.button[0].disabled = false;
-          travelID = result.travelID;
-          Lungo.Cache.remove("travelID");
-          Lungo.Cache.set("travelID", travelID.toString());
-          Lungo.Cache.remove("travelAccepted");
-          Lungo.Cache.set("travelAccepted", false);
-          Lungo.Router.section("waiting_s");
-          return _this.timer = setTimeout((function() {
-            if (!Lungo.Cache.get("travelAccepted")) {
-              return $$.ajax({
-                type: "POST",
-                url: server + "client/canceltravel",
-                data: {
-                  email: credentials.email,
-                  sessionID: session,
-                  travelID: travelID.toString()
-                },
-                error: function(xhr, type) {
-                  Lungo.Router.back();
-                  return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
-                },
-                success: function(result) {
-                  Lungo.Cache.remove("travelID");
-                  Lungo.Cache.remove("travelAccepted");
-                  Lungo.Cache.set("travelAccepted", false);
-                  Lungo.Router.back();
-                  return navigator.notification.alert("El taxista no ha aceptado su solicitud", null, "Taxi Express", "Aceptar");
-                }
-              });
-            }
-          }), 30000);
-        }
-      });
+      if (!this.button[0].disabled) {
+        this.button[0].disabled = true;
+        credentials = Lungo.Cache.get("credentials");
+        position = Lungo.Cache.get("geoPosition");
+        server = Lungo.Cache.get("server");
+        session = Lungo.Cache.get("session");
+        origin = Lungo.Cache.get("origin");
+        return $$.ajax({
+          type: "POST",
+          url: server + "client/getselectedtaxi",
+          data: {
+            email: credentials.email,
+            longitude: position.e,
+            latitude: position.d,
+            origin: origin,
+            driverEmail: this.driverDetails.email,
+            sessionID: session
+          },
+          error: function(xhr, type) {
+            navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
+            return _this.button[0].disabled = false;
+          },
+          success: function(result) {
+            var travelID;
+            Lungo.Router.section("waiting_s");
+            _this.button[0].disabled = false;
+            travelID = result.travelID;
+            Lungo.Cache.remove("travelID");
+            Lungo.Cache.set("travelID", travelID.toString());
+            Lungo.Cache.remove("travelAccepted");
+            Lungo.Cache.set("travelAccepted", false);
+            Lungo.Router.section("waiting_s");
+            return _this.timer = setTimeout((function() {
+              if (!Lungo.Cache.get("travelAccepted")) {
+                return $$.ajax({
+                  type: "POST",
+                  url: server + "client/canceltravel",
+                  data: {
+                    email: credentials.email,
+                    sessionID: session,
+                    travelID: travelID.toString()
+                  },
+                  error: function(xhr, type) {
+                    Lungo.Router.back();
+                    return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
+                  },
+                  success: function(result) {
+                    Lungo.Cache.remove("travelID");
+                    Lungo.Cache.remove("travelAccepted");
+                    Lungo.Cache.set("travelAccepted", false);
+                    Lungo.Router.back();
+                    return navigator.notification.alert("El taxista no ha aceptado su solicitud", null, "Taxi Express", "Aceptar");
+                  }
+                });
+              }
+            }), 30000);
+          }
+        });
+      }
     };
 
     ChosenTaxiCtrl.prototype.cancelTimeOut = function() {
@@ -2774,38 +2776,40 @@
     WaitingCtrl.prototype.cancel = function(event) {
       var credentials, server, session, travelID,
         _this = this;
-      this.button_cancel[0].disabled = true;
-      this.button_cancel[0].innerText = "Cancelando petición";
-      credentials = Lungo.Cache.get("credentials");
-      server = Lungo.Cache.get("server");
-      session = Lungo.Cache.get("session");
-      travelID = Lungo.Cache.get("travelID");
-      if (!Lungo.Cache.get("travelAccepted")) {
-        __Controller.chosenTaxi.cancelTimeOut();
-        __Controller.home.cancelTimeOut();
-        return $$.ajax({
-          type: "POST",
-          url: server + "client/canceltravel",
-          data: {
-            email: credentials.email,
-            sessionID: session,
-            travelID: travelID
-          },
-          error: function(xhr, type) {
-            _this.button_cancel[0].disabled = false;
-            _this.button_cancel[0].innerText = "Cancelar petición";
-            return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
-          },
-          success: function(result) {
-            Lungo.Router.back();
-            _this.button_cancel[0].disabled = false;
-            _this.button_cancel[0].innerText = "Cancelar petición";
-            Lungo.Cache.remove("travelID");
-            Lungo.Cache.remove("travelAccepted");
-            Lungo.Cache.set("travelAccepted", true);
-            return navigator.notification.alert("Peticion cancelada", null, "Taxi Express", "Aceptar");
-          }
-        });
+      if (!this.button_cancel[0].disabled) {
+        this.button_cancel[0].disabled = true;
+        this.button_cancel[0].innerText = "Cancelando petición";
+        credentials = Lungo.Cache.get("credentials");
+        server = Lungo.Cache.get("server");
+        session = Lungo.Cache.get("session");
+        travelID = Lungo.Cache.get("travelID");
+        if (!Lungo.Cache.get("travelAccepted")) {
+          __Controller.chosenTaxi.cancelTimeOut();
+          __Controller.home.cancelTimeOut();
+          return $$.ajax({
+            type: "POST",
+            url: server + "client/canceltravel",
+            data: {
+              email: credentials.email,
+              sessionID: session,
+              travelID: travelID
+            },
+            error: function(xhr, type) {
+              _this.button_cancel[0].disabled = false;
+              _this.button_cancel[0].innerText = "Cancelar petición";
+              return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
+            },
+            success: function(result) {
+              Lungo.Router.back();
+              _this.button_cancel[0].disabled = false;
+              _this.button_cancel[0].innerText = "Cancelar petición";
+              Lungo.Cache.remove("travelID");
+              Lungo.Cache.remove("travelAccepted");
+              Lungo.Cache.set("travelAccepted", true);
+              return navigator.notification.alert("Peticion cancelada", null, "Taxi Express", "Aceptar");
+            }
+          });
+        }
       }
     };
 
