@@ -66,6 +66,7 @@ button.down > abbr{font-weight: 100!important}
 .red{background:#333!important;margin-top: 5px; margin-bottom: 5px; width: 49%; color:#fff}
 .overMap{position: relative;margin-top: -247px;height: 220px;z-index: 1;}
 .faq li{height:auto!important;}
+.faq li strong {margin-right: 0 !important;padding-right: 0 !important;white-space: normal!important;}
 
 .list li{list-style-type:none;position:relative;text-align:-webkit-match-parent;line-height:inherit;}
 .list li:not(.big){padding-top:17px;padding-bottom:17px;padding-left:10px;margin-bottom: 1px;}
