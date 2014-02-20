@@ -15,6 +15,16 @@ class __Controller.RegisterCtrl extends Monocle.Controller
     super
 
 
+  getPassHash: (pass) =>
+    tx = pass
+    i = 0
+    while i < 5000
+      hashObj = new jsSHA(tx, "TEXT")
+      tx = hashObj.getHash("SHA-256", "HEX")
+      i++
+    return tx
+    
+
   register: (event) =>
     if !(@pass1[0].value || @pass2[0].value || @email[0].value || @phone[0].value)
       navigator.notification.alert "Debes rellenar todos los campos", null, "Taxi Express", "Aceptar"
@@ -27,9 +37,10 @@ class __Controller.RegisterCtrl extends Monocle.Controller
       date = date.replace "T", " "
       server = Lungo.Cache.get "server"
       phone = "+34" + @phone[0].value
+      pass = @getPassHash @pass1[0].value
       @data = 
         email: @email[0].value
-        password: @pass1[0].value
+        password: pass
         phone: phone
         lastUpdate: date
       $$.ajax

@@ -367,26 +367,38 @@
             <div class="list faq indented"> 
                 <li>
                     <div>
-                        <strong>¿Es segura TaxiExpress?</strong>
-                        <small>Vestibulum rutrum eleifend sapien, sit amet vulputate purus venenatis nec. Quisque in commodo nisl. Mauris sagittis sed justo in auctor. Praesent auctor laoreet orci, at pellentesque mi dapibus vitae. Phasellus dolor libero, eleifend at commodo a, rutrum in purus. Nulla rhoncus enim vitae feugiat hendrerit. Nullam adipiscing risus ac nulla vulputate egestas. In tempor turpis in nulla tincidunt dapibus.</small>
+                        <strong>¿Dónde puedo conseguir un taxi?</strong>
+                        <small>Todos los taxis que hayan descargado la aplicación y se encuentren libres en el momento de hacer la petición recibirán una solicitud (también podrá seleccionar los taxistas que cumplan unas determinadas condiciones) En cuanto uno de los taxistas la acepta, la solicitud queda confirmada.</small>
                     </div>
                 </li>
                 <li>
                     <div>
-                        <strong>¿Qué hago si no viene el taxi?</strong>
-                        <small>Nulla ac congue est, non luctus lectus. Vestibulum quis ornare ante. Nam elementum nec est et sodales. Pellentesque accumsan odio non ipsum pretium, at volutpat tortor sodales. Nam laoreet, mi ullamcorper lacinia venenatis, metus nisl sagittis arcu, id gravida orci ante gravida orci. Suspendisse eu massa quis massa pulvinar eleifend lacinia non velit. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aenean commodo nibh arcu, vel aliquet turpis blandit id.</small>
+                        <strong>¿Puedo especificar condiciones especiales de búsqueda del taxi?</strong>
+                        <small>Se podrán indicar preferencias especiales como, taxi habilitado para minusválidos, taxi que admita animales, taxis con un número determinado de plazas y taxis que admitan el pago a través de la aplicación o taxis a un determinado radio de distancia.</small>
                     </div>
                 </li>
                 <li>
                     <div>
-                        <strong>¿Cómo puedo registrarme?</strong>
-                        <small>n lobortis, neque non hendrerit tincidunt, augue eros imperdiet sem, ut placerat ipsum magna quis velit. Donec quis elit congue, semper libero eget, aliquam ligula. Praesent sed metus vitae augue pulvinar consectetur. Phasellus quis dapibus sem. Donec ornare cursus est vel dictum. Etiam eget tellus nec orci ultricies elementum pellentesque aliquam felis. Maecenas id dui vel dolor suscipit pulvinar. Nulla luctus, purus sed tempor euismod, orci lacus eleifend urna, at iaculis erat metus eget ipsum. Integer interdum libero sed elit tristique, quis mattis mauris placerat.</small>
+                        <strong>¿Puedo cerrar la aplicación sin perder la reserva del taxi?</strong>
+                        <small>Si, se puede cerrar la aplicación sin problema.</small>
                     </div>
                 </li>
                 <li>
                     <div>
-                        <strong>¿Cómo puedo registrarme?</strong>
-                        <small>Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Praesent dapibus lacus in leo mattis adipiscing. Donec ullamcorper, dolor ut pharetra euismod, velit urna cursus mi, vel aliquam erat eros ac elit. Vestibulum interdum, sem eu fringilla varius, dui nibh hendrerit lacus, et pretium enim sem sit amet lectus. Etiam sed velit commodo, suscipit quam eget, varius mi. Sed a adipiscing lacus. Cras auctor tellus a pellentesque pulvinar. Donec ac semper sem. Morbi fringilla placerat venenatis. Quisque congue ante lacus, quis ultrices nunc consequat eget.</small>
+                        <strong>¿Puedo cancelar la reserva?</strong>
+                        <small>Por parte del cliente, la reserva no se podrá cancelar en ningún caso. Solo se podrá cancelar la petición de taxi en el caso de que todavía no haya sido aceptado por ningún taxista.</small>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong>¿Puedo puntuar a los taxis?</strong>
+                        <small>Sí. Desde la sección de trayectos realizados, se puede acceder al detalle de cada viaje. Desde esta misma vista, nos permitirá votar al taxista de forma positiva o negativa.</small>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong>¿Puedo cancelar la reserva?</strong>
+                        <small>Por parte del cliente, la reserva no se podrá cancelar en ningún caso. Solo se podrá cancelar la petición de taxi en el caso de que todavía no haya sido aceptado por ningún taxista.</small>
                     </div>
                 </li>
             </div>          
@@ -424,7 +436,7 @@
                 Domicilio social: Avenida de las Universidades 24, 48007 Bilbao.<br/>
                 Teléfono: 949 999 999<br/>
                 E-mail: <a href="mailto:dessiproject@googlegroups.com">dessiproject@googlegroups.com</a><br/>
-                Web: <a href="http://www.taxiexpress.com">www.taxiexpress.com</a></p>
+                Web: <a href="http://www.taxiexpress.tk">www.taxiexpress.tk</a></p>
                 
                 <p>Para la utilización de nuestro sitio web es necesaria la utilización de cookies. Las cookies se utilizan con las finalidades descritas en el tercer párrafo de este documento. Si usted lo desea puede configurar su navegador para ser avisado en pantalla de la recepción de cookies y para impedir la instalación de cookies en su disco duro. Por favor, consulte las instrucciones y manuales de su navegador para ampliar esta información.</p>
             </div>          
@@ -437,8 +449,8 @@
     <script src="https://js.stripe.com/v2/"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
     <script src="app/taxiExpress.js"></script>
+    <script src="app/sha256.js"></script>
     <script src="cordova.js"></script>
-    <script src="PushNotification.js"></script>
     <script type="text/javascript">
         var pushNotification;        
         function onDeviceReady() {

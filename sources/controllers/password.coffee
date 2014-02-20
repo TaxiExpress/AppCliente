@@ -14,6 +14,16 @@ class __Controller.PasswordCtrl extends Monocle.Controller
     super
 
 
+  getPassHash: (pass) =>
+    tx = pass
+    i = 0
+    while i < 5000
+      hashObj = new jsSHA(tx, "TEXT")
+      tx = hashObj.getHash("SHA-256", "HEX")
+      i++
+    return tx
+
+
   saveNewPassword: (event) =>
     if !(@new_pass1[0].value || @new_pass2[0].value || @old_pass[0].value )
       navigator.notification.alert "Debes rellenar todos los campos", null, "Taxi Express", "Aceptar"
@@ -25,14 +35,16 @@ class __Controller.PasswordCtrl extends Monocle.Controller
       server = Lungo.Cache.get "server"
       credentials = Lungo.Cache.get "credentials"
       session = Lungo.Cache.get "session"
+      oldPass = @getPassHash @old_pass[0].value
+      newPass = @getPassHash @new_pass1[0].value
       if @new_pass1[0].value == @new_pass2[0].value
         $$.ajax
           type: "POST"
           url: server + "client/changepassword"
           data:
             email: credentials.email
-            oldPass: @old_pass[0].value
-            newPass: @new_pass1[0].value
+            oldPass: oldPass
+            newPass: newPass
             sessionID: session
           success: (result) =>
             @parseResponse result

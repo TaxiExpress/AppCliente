@@ -1111,6 +1111,7 @@
       this.read = __bind(this.read, this);
       this.valideCredentials = __bind(this.valideCredentials, this);
       this.doLogin = __bind(this.doLogin, this);
+      this.getPassHash = __bind(this.getPassHash, this);
       var _this = this;
       LoginCtrl.__super__.constructor.apply(this, arguments);
       this.db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
@@ -1121,6 +1122,18 @@
       });
       this.read();
     }
+
+    LoginCtrl.prototype.getPassHash = function(pass) {
+      var hashObj, i, tx;
+      tx = pass;
+      i = 0;
+      while (i < 5000) {
+        hashObj = new jsSHA(tx, "TEXT");
+        tx = hashObj.getHash("SHA-256", "HEX");
+        i++;
+      }
+      return tx;
+    };
 
     LoginCtrl.prototype.doLogin = function(event) {
       var date, input;
@@ -1133,7 +1146,7 @@
         navigator.splashscreen.show();
         date = new Date().toISOString().substring(0, 19);
         date = date.replace("T", " ");
-        return this.valideCredentials(this.username[0].value, this.password[0].value, date, date);
+        return this.valideCredentials(this.username[0].value, this.getPassHash(password[0].value), date, date);
       } else {
         return navigator.notification.alert("Debes rellenar el email y la contraseña", null, "Taxi Express", "Aceptar");
       }
@@ -1174,7 +1187,7 @@
     };
 
     LoginCtrl.prototype.parseResponse = function(result) {
-      var creditCard, date, dateTrav, expires, profile,
+      var creditCard, date, dateTrav, expires, passwordHash, profile,
         _this = this;
       Lungo.Cache.set("session", result.sessionID);
       if (result.email === void 0) {
@@ -1205,7 +1218,8 @@
           dateTrav = result.lastUpdateTravels.substring(0, 19);
           dateTrav = dateTrav.replace("T", " ");
         }
-        this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible, creditCard, expires) VALUES ('" + profile.email + "','" + this.password[0].value + "','" + date + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fDistance + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "','','');");
+        passwordHash = this.getPassHash(password[0].value);
+        this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible, creditCard, expires) VALUES ('" + profile.email + "','" + passwordHash + "','" + date + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fDistance + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "','','');");
         __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible, result.fDistance);
         creditCard = "";
         expires = "";
@@ -1758,11 +1772,24 @@
     function PasswordCtrl() {
       this.parseResponse = __bind(this.parseResponse, this);
       this.saveNewPassword = __bind(this.saveNewPassword, this);
+      this.getPassHash = __bind(this.getPassHash, this);
       PasswordCtrl.__super__.constructor.apply(this, arguments);
     }
 
+    PasswordCtrl.prototype.getPassHash = function(pass) {
+      var hashObj, i, tx;
+      tx = pass;
+      i = 0;
+      while (i < 5000) {
+        hashObj = new jsSHA(tx, "TEXT");
+        tx = hashObj.getHash("SHA-256", "HEX");
+        i++;
+      }
+      return tx;
+    };
+
     PasswordCtrl.prototype.saveNewPassword = function(event) {
-      var server, session,
+      var newPass, oldPass, server, session,
         _this = this;
       if (!(this.new_pass1[0].value || this.new_pass2[0].value || this.old_pass[0].value)) {
         return navigator.notification.alert("Debes rellenar todos los campos", null, "Taxi Express", "Aceptar");
@@ -1774,14 +1801,16 @@
         server = Lungo.Cache.get("server");
         credentials = Lungo.Cache.get("credentials");
         session = Lungo.Cache.get("session");
+        oldPass = this.getPassHash(this.old_pass[0].value);
+        newPass = this.getPassHash(this.new_pass1[0].value);
         if (this.new_pass1[0].value === this.new_pass2[0].value) {
           return $$.ajax({
             type: "POST",
             url: server + "client/changepassword",
             data: {
               email: credentials.email,
-              oldPass: this.old_pass[0].value,
-              newPass: this.new_pass1[0].value,
+              oldPass: oldPass,
+              newPass: newPass,
               sessionID: session
             },
             success: function(result) {
@@ -2394,11 +2423,24 @@
       this.validated = __bind(this.validated, this);
       this.parseResponse = __bind(this.parseResponse, this);
       this.register = __bind(this.register, this);
+      this.getPassHash = __bind(this.getPassHash, this);
       RegisterCtrl.__super__.constructor.apply(this, arguments);
     }
 
+    RegisterCtrl.prototype.getPassHash = function(pass) {
+      var hashObj, i, tx;
+      tx = pass;
+      i = 0;
+      while (i < 5000) {
+        hashObj = new jsSHA(tx, "TEXT");
+        tx = hashObj.getHash("SHA-256", "HEX");
+        i++;
+      }
+      return tx;
+    };
+
     RegisterCtrl.prototype.register = function(event) {
-      var date, phone, server,
+      var date, pass, phone, server,
         _this = this;
       if (!(this.pass1[0].value || this.pass2[0].value || this.email[0].value || this.phone[0].value)) {
         return navigator.notification.alert("Debes rellenar todos los campos", null, "Taxi Express", "Aceptar");
@@ -2411,9 +2453,10 @@
         date = date.replace("T", " ");
         server = Lungo.Cache.get("server");
         phone = "+34" + this.phone[0].value;
+        pass = this.getPassHash(this.pass1[0].value);
         this.data = {
           email: this.email[0].value,
-          password: this.pass1[0].value,
+          password: pass,
           phone: phone,
           lastUpdate: date
         };

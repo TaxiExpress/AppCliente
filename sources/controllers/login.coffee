@@ -21,6 +21,14 @@ class __Controller.LoginCtrl extends Monocle.Controller
     #@drop()
     @read()  
 
+  getPassHash: (pass) =>
+    tx = pass
+    i = 0
+    while i < 5000
+      hashObj = new jsSHA(tx, "TEXT")
+      tx = hashObj.getHash("SHA-256", "HEX")
+      i++
+    return tx
 
   doLogin: (event) =>
     input = document.getElementById("login_username")
@@ -32,7 +40,7 @@ class __Controller.LoginCtrl extends Monocle.Controller
       navigator.splashscreen.show()
       date = new Date().toISOString().substring 0, 19
       date = date.replace "T", " "
-      @valideCredentials(@username[0].value, @password[0].value, date, date)
+      @valideCredentials(@username[0].value, @getPassHash(password[0].value), date, date)
     else
       navigator.notification.alert "Debes rellenar el email y la contraseña", null, "Taxi Express", "Aceptar"
 
@@ -92,7 +100,8 @@ class __Controller.LoginCtrl extends Monocle.Controller
       else
         dateTrav = result.lastUpdateTravels.substring 0, 19
         dateTrav = dateTrav.replace "T", " "
-      @doSQL "INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible, creditCard, expires) VALUES ('"+profile.email+"','"+@password[0].value+"','"+date+"','"+dateTrav+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"','"+result.fCapacity+"','"+result.fDistance+"','"+result.fAppPayment+"','"+result.fAnimals+"','"+result.fAccessible+"','','');"
+      passwordHash = @getPassHash password[0].value
+      @doSQL "INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible, creditCard, expires) VALUES ('"+profile.email+"','"+passwordHash+"','"+date+"','"+dateTrav+"','"+profile.name+"','"+profile.surname+"','"+profile.phone+"','"+profile.image+"','"+result.fCapacity+"','"+result.fDistance+"','"+result.fAppPayment+"','"+result.fAnimals+"','"+result.fAccessible+"','','');"
       __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible, result.fDistance)
       creditCard = ""
       expires = ""
