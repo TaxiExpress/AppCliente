@@ -1,6 +1,7 @@
 class __Controller.PasswordCtrl extends Monocle.Controller
 
   credentials = undefined
+  @newPass = undefined
 
   elements:
     "#password_old_pass"                       : "old_pass"
@@ -36,7 +37,7 @@ class __Controller.PasswordCtrl extends Monocle.Controller
       credentials = Lungo.Cache.get "credentials"
       session = Lungo.Cache.get "session"
       oldPass = @getPassHash @old_pass[0].value
-      newPass = @getPassHash @new_pass1[0].value
+      @newPass = @getPassHash @new_pass1[0].value
       if @new_pass1[0].value == @new_pass2[0].value
         $$.ajax
           type: "POST"
@@ -44,7 +45,7 @@ class __Controller.PasswordCtrl extends Monocle.Controller
           data:
             email: credentials.email
             oldPass: oldPass
-            newPass: newPass
+            newPass: @newPass
             sessionID: session
           success: (result) =>
             @parseResponse result
@@ -55,7 +56,7 @@ class __Controller.PasswordCtrl extends Monocle.Controller
   parseResponse: (result) =>
     db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024)
     db.transaction (tx) =>
-      sql = "UPDATE profile SET pass = '"+@new_pass1[0].value+"' WHERE email ='"+credentials.email+"';"
+      sql = "UPDATE profile SET pass = '"+@newPass+"' WHERE email ='"+credentials.email+"';"
       tx.executeSql sql
     navigator.notification.alert "Contraseña modificada", null, "Taxi Express", "Aceptar"
     Lungo.Router.back()

@@ -1083,7 +1083,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.LoginCtrl = (function(_super) {
-    var credentials, db, logged;
+    var credentials, db, logged, passHashed;
 
     __extends(LoginCtrl, _super);
 
@@ -1092,6 +1092,8 @@
     credentials = void 0;
 
     logged = void 0;
+
+    passHashed = void 0;
 
     LoginCtrl.prototype.elements = {
       "#login_username": "username",
@@ -1146,7 +1148,8 @@
         navigator.splashscreen.show();
         date = new Date().toISOString().substring(0, 19);
         date = date.replace("T", " ");
-        return this.valideCredentials(this.username[0].value, this.getPassHash(password[0].value), date, date);
+        this.passHashed = this.getPassHash(this.password[0].value);
+        return this.valideCredentials(this.username[0].value, this.passHashed, date, date);
       } else {
         return navigator.notification.alert("Debes rellenar el email y la contraseña", null, "Taxi Express", "Aceptar");
       }
@@ -1218,7 +1221,7 @@
           dateTrav = result.lastUpdateTravels.substring(0, 19);
           dateTrav = dateTrav.replace("T", " ");
         }
-        passwordHash = this.getPassHash(password[0].value);
+        passwordHash = this.passHashed;
         this.doSQL("INSERT INTO profile (email, pass, lastUpdate, lastUpdateTravels, name, surname, phone, image, seats, distance, payments, animals, accessible, creditCard, expires) VALUES ('" + profile.email + "','" + passwordHash + "','" + date + "','" + dateTrav + "','" + profile.name + "','" + profile.surname + "','" + profile.phone + "','" + profile.image + "','" + result.fCapacity + "','" + result.fDistance + "','" + result.fAppPayment + "','" + result.fAnimals + "','" + result.fAccessible + "','','');");
         __Controller.filters.loadFilters(result.fCapacity, result.fAppPayment, result.fAnimals, result.fAccessible, result.fDistance);
         creditCard = "";
@@ -1759,6 +1762,8 @@
 
     credentials = void 0;
 
+    PasswordCtrl.newPass = void 0;
+
     PasswordCtrl.prototype.elements = {
       "#password_old_pass": "old_pass",
       "#password_new_pass1": "new_pass1",
@@ -1789,7 +1794,7 @@
     };
 
     PasswordCtrl.prototype.saveNewPassword = function(event) {
-      var newPass, oldPass, server, session,
+      var oldPass, server, session,
         _this = this;
       if (!(this.new_pass1[0].value || this.new_pass2[0].value || this.old_pass[0].value)) {
         return navigator.notification.alert("Debes rellenar todos los campos", null, "Taxi Express", "Aceptar");
@@ -1802,7 +1807,7 @@
         credentials = Lungo.Cache.get("credentials");
         session = Lungo.Cache.get("session");
         oldPass = this.getPassHash(this.old_pass[0].value);
-        newPass = this.getPassHash(this.new_pass1[0].value);
+        this.newPass = this.getPassHash(this.new_pass1[0].value);
         if (this.new_pass1[0].value === this.new_pass2[0].value) {
           return $$.ajax({
             type: "POST",
@@ -1810,7 +1815,7 @@
             data: {
               email: credentials.email,
               oldPass: oldPass,
-              newPass: newPass,
+              newPass: this.newPass,
               sessionID: session
             },
             success: function(result) {
@@ -1830,7 +1835,7 @@
       db = window.openDatabase("TaxiExpressNew", "1.0", "description", 4 * 1024 * 1024);
       db.transaction(function(tx) {
         var sql;
-        sql = "UPDATE profile SET pass = '" + _this.new_pass1[0].value + "' WHERE email ='" + credentials.email + "';";
+        sql = "UPDATE profile SET pass = '" + _this.newPass + "' WHERE email ='" + credentials.email + "';";
         return tx.executeSql(sql);
       });
       navigator.notification.alert("Contraseña modificada", null, "Taxi Express", "Aceptar");
