@@ -1146,6 +1146,7 @@
       if (this.username[0].value && this.password[0].value) {
         this.drop();
         navigator.splashscreen.show();
+        Lungo.Router.section("init_s");
         date = new Date().toISOString().substring(0, 19);
         date = date.replace("T", " ");
         this.passHashed = this.getPassHash(this.password[0].value);
@@ -1585,13 +1586,15 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   __Controller.NearDriverCtrl = (function(_super) {
-    var position, _viewsList;
+    var position, requested, _viewsList;
 
     __extends(NearDriverCtrl, _super);
 
     _viewsList = [];
 
     position = void 0;
+
+    requested = void 0;
 
     NearDriverCtrl.prototype.events = {
       "singleTap #list_refresh_b": "loadNearTaxis"
@@ -1603,85 +1606,89 @@
       this.deleteNearTaxis = __bind(this.deleteNearTaxis, this);
       this.loadNearTaxis = __bind(this.loadNearTaxis, this);
       NearDriverCtrl.__super__.constructor.apply(this, arguments);
+      this.requested = false;
     }
 
     NearDriverCtrl.prototype.loadNearTaxis = function() {
       var credentials, server, session,
         _this = this;
-      this.deleteNearTaxis();
-      Lungo.Router.section("list_s");
-      credentials = Lungo.Cache.get("credentials");
-      position = Lungo.Cache.get("geoPosition");
-      server = Lungo.Cache.get("server");
-      session = Lungo.Cache.get("session");
-      return $$.ajax({
-        type: "GET",
-        url: server + "client/getneartaxies",
-        data: {
-          email: credentials.email,
-          longitud: position.d,
-          latitud: position.e,
-          sessionID: session
-        },
-        error: function(xhr, type) {
-          return console.log(type.response);
-        },
-        success: function(result) {
-          var accessible, animals, appPayment, capacity, cont, coords, driver, email, image, lastDriver, lat, long, model, name, plate, pos, surname, taxi, valuation, _i, _len, _results;
-          if (result.length === 0) {
-            empty_nearTaxies.style.display = "block";
-          } else {
-            empty_nearTaxies.style.display = "none";
-          }
-          _this.position = Lungo.Cache.get("geoPosition");
-          cont = 0;
-          lastDriver = false;
-          _results = [];
-          for (_i = 0, _len = result.length; _i < _len; _i++) {
-            taxi = result[_i];
-            email = taxi.email;
-            name = taxi.first_name;
-            surname = taxi.last_name;
-            valuation = taxi.valuation;
-            coords = taxi.geom.substring(7);
-            pos = coords.indexOf(" ");
-            long = coords.substring(0, pos);
-            lat = coords.substring(pos + 1, coords.indexOf(")"));
-            position = new google.maps.LatLng(long, lat);
-            plate = taxi.car.plate;
-            model = taxi.car.company + " " + taxi.car.model;
-            if (taxi.image !== null && taxi.image !== "") {
-              image = taxi.image;
+      if (!this.requested) {
+        this.requested = true;
+        this.deleteNearTaxis();
+        Lungo.Router.section("list_s");
+        credentials = Lungo.Cache.get("credentials");
+        position = Lungo.Cache.get("geoPosition");
+        server = Lungo.Cache.get("server");
+        session = Lungo.Cache.get("session");
+        return $$.ajax({
+          type: "GET",
+          url: server + "client/getneartaxies",
+          data: {
+            email: credentials.email,
+            longitude: position.e,
+            latitude: position.d,
+            sessionID: session
+          },
+          error: function(xhr, type) {
+            return console.log(type.response);
+          },
+          success: function(result) {
+            var accessible, animals, appPayment, capacity, cont, coords, driver, email, image, lastDriver, lat, long, model, name, plate, pos, surname, taxi, valuation, _i, _len, _results;
+            if (result.length === 0) {
+              empty_nearTaxies.style.display = "block";
             } else {
-              image = "img/user.png";
+              empty_nearTaxies.style.display = "none";
             }
-            capacity = taxi.car.capacity;
-            accessible = taxi.car.accessible;
-            animals = taxi.car.animals;
-            appPayment = taxi.car.appPayment;
-            driver = __Model.NearDriver.create({
-              email: email,
-              name: name,
-              surname: surname,
-              position: position,
-              valuation: valuation,
-              plate: plate,
-              model: model,
-              image: image,
-              capacity: capacity,
-              accessible: accessible,
-              animals: animals,
-              appPayment: appPayment
-            });
-            cont++;
-            if (result.length === cont) {
-              lastDriver = true;
+            _this.position = Lungo.Cache.get("geoPosition");
+            cont = 0;
+            lastDriver = false;
+            _results = [];
+            for (_i = 0, _len = result.length; _i < _len; _i++) {
+              taxi = result[_i];
+              email = taxi.email;
+              name = taxi.first_name;
+              surname = taxi.last_name;
+              valuation = taxi.valuation;
+              coords = taxi.geom.substring(7);
+              pos = coords.indexOf(" ");
+              long = coords.substring(0, pos);
+              lat = coords.substring(pos + 1, coords.indexOf(")"));
+              position = new google.maps.LatLng(long, lat);
+              plate = taxi.car.plate;
+              model = taxi.car.company + " " + taxi.car.model;
+              if (taxi.image !== null && taxi.image !== "") {
+                image = taxi.image;
+              } else {
+                image = "img/user.png";
+              }
+              capacity = taxi.car.capacity;
+              accessible = taxi.car.accessible;
+              animals = taxi.car.animals;
+              appPayment = taxi.car.appPayment;
+              driver = __Model.NearDriver.create({
+                email: email,
+                name: name,
+                surname: surname,
+                position: position,
+                valuation: valuation,
+                plate: plate,
+                model: model,
+                image: image,
+                capacity: capacity,
+                accessible: accessible,
+                animals: animals,
+                appPayment: appPayment
+              });
+              cont++;
+              if (result.length === cont) {
+                lastDriver = true;
+              }
+              _results.push(_this.getDistanceAndTime(driver, lastDriver));
             }
-            _results.push(_this.getDistanceAndTime(driver, lastDriver));
+            return _results;
           }
-          return _results;
-        }
-      });
+        });
+      }
     };
 
     NearDriverCtrl.prototype.deleteNearTaxis = function() {
@@ -1730,18 +1737,17 @@
     };
 
     NearDriverCtrl.prototype.showTaxies = function() {
-      var driver, taxies, _i, _len, _results;
+      var driver, taxies, _i, _len;
       taxies = __Model.NearDriver.all().sort(function(a, b) {
         return parseFloat(a.distance) - parseFloat(b.distance);
       });
-      _results = [];
       for (_i = 0, _len = taxies.length; _i < _len; _i++) {
         driver = taxies[_i];
-        _results.push(_viewsList[driver.email] = new __View.NearDriverList({
+        _viewsList[driver.email] = new __View.NearDriverList({
           model: driver
-        }));
+        });
       }
-      return _results;
+      return this.requested = false;
     };
 
     return NearDriverCtrl;
