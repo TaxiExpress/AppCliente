@@ -38,7 +38,7 @@ class __Controller.PhoneVerificationCtrl extends Monocle.Controller
         success: (result) =>
           @parseResponse result
         error: (xhr, type) =>
-          alert type.response
+          navigator.notification.alert type.response, null, "Taxi Express", "Aceptar"
 
 
   parseResponse: (result) =>

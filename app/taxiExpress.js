@@ -1773,7 +1773,8 @@
     PasswordCtrl.prototype.elements = {
       "#password_old_pass": "old_pass",
       "#password_new_pass1": "new_pass1",
-      "#password_new_pass2": "new_pass2"
+      "#password_new_pass2": "new_pass2",
+      "#password_save_b": "button"
     };
 
     PasswordCtrl.prototype.events = {
@@ -1799,9 +1800,11 @@
       return tx;
     };
 
-    PasswordCtrl.prototype.saveNewPassword = function(event) {
+    PasswordCtrl.prototype.saveNewPassword = function() {
       var oldPass, server, session,
         _this = this;
+      this.button[0].disabled = true;
+      this.button[0].innerText = "Cambiando contraseña";
       if (!(this.new_pass1[0].value || this.new_pass2[0].value || this.old_pass[0].value)) {
         return navigator.notification.alert("Debes rellenar todos los campos", null, "Taxi Express", "Aceptar");
       } else if (this.new_pass1[0].value.length < 8 || this.new_pass1[0].value.length > 20) {
@@ -1825,9 +1828,13 @@
               sessionID: session
             },
             success: function(result) {
+              _this.button[0].disabled = false;
+              _this.button[0].innerText = "Cambiar contraseña";
               return _this.parseResponse(result);
             },
             error: function(xhr, type) {
+              _this.button[0].disabled = false;
+              _this.button[0].innerText = "Cambiar contraseña";
               return console.log(type.response);
             }
           });
@@ -2060,7 +2067,7 @@
             return _this.parseResponse(result);
           },
           error: function(xhr, type) {
-            return alert(type.response);
+            return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
           }
         });
       }
@@ -2479,7 +2486,7 @@
             return _this.parseResponse(result);
           },
           error: function(xhr, type) {
-            return alert(type.response);
+            return navigator.notification.alert(type.response, null, "Taxi Express", "Aceptar");
           }
         });
       }

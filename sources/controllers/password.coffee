@@ -7,6 +7,7 @@ class __Controller.PasswordCtrl extends Monocle.Controller
     "#password_old_pass"                       : "old_pass"
     "#password_new_pass1"                      : "new_pass1"
     "#password_new_pass2"                      : "new_pass2"
+    "#password_save_b"                         : "button"
 
   events:
     "singleTap #password_save_b"               : "saveNewPassword"
@@ -24,8 +25,9 @@ class __Controller.PasswordCtrl extends Monocle.Controller
       i++
     return tx
 
-
-  saveNewPassword: (event) =>
+  saveNewPassword:  =>
+    @button[0].disabled = true
+    @button[0].innerText = "Cambiando contraseña"
     if !(@new_pass1[0].value || @new_pass2[0].value || @old_pass[0].value )
       navigator.notification.alert "Debes rellenar todos los campos", null, "Taxi Express", "Aceptar"
     else if @new_pass1[0].value.length < 8 || @new_pass1[0].value.length > 20
@@ -48,8 +50,12 @@ class __Controller.PasswordCtrl extends Monocle.Controller
             newPass: @newPass
             sessionID: session
           success: (result) =>
+            @button[0].disabled = false
+            @button[0].innerText = "Cambiar contraseña"
             @parseResponse result
           error: (xhr, type) =>
+            @button[0].disabled = false
+            @button[0].innerText = "Cambiar contraseña"
             console.log type.response
         
 
